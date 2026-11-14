@@ -17,7 +17,8 @@ namespace esphome {
 namespace parkside_charger {
 
 // ---- LTC4162-L register map (SMBus word access, little endian) ----
-// Source: LTC4162-L datasheet / Linux driver ltc4162-l-charger.c.
+// Verified against the LTC4162-L datasheet Rev A (register map, Table 1 LSB sizes)
+// and the Linux driver ltc4162-l-charger.c.
 static const uint8_t REG_CONFIG_BITS = 0x14;          // b5 suspend_charger, b4 run_bsr, b2 force_telemetry_on
 static const uint8_t REG_IIN_LIMIT_TARGET = 0x15;     // (n+1) * 500uV / RSNSI
 static const uint8_t REG_CHARGE_CURRENT_SETTING = 0x1A;  // (n+1) * 1mV / RSNSB, n = 0..31
@@ -155,6 +156,10 @@ class ParksideSlot : public PollingComponent, public i2c::I2CDevice {
   void set_led_(bool r, bool g, bool b);
   void publish_all_();
   static float soc_from_ocv_(float v_cell);
+  // board-level faults (strapping / IC variant) that a battery swap must not clear
+  bool static_fault_() const {
+    return this->fault_text_.rfind("CELLS", 0) == 0 || this->fault_text_.rfind("wrong charger", 0) == 0;
+  }
   static const char *phase_str_(Phase p);
 
   ParksideCharger *charger_{nullptr};

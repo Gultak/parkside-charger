@@ -1,8 +1,8 @@
 section,qty,part,example / MPN,approx. unit price EUR,notes
-slot board (x10),1,Li-ion step-down charger 1-8 cells I2C,Analog Devices LTC4162-LEUFD#PBF,9.50,core of each slot
-slot board (x10),1,Power inductor several uH Isat>=5A shielded,per LTC4162 datasheet / DC2038A,1.00,
+slot board (x10),1,Li-ion step-down charger 1-8 cells I2C,Analog Devices LTC4162EUFD-LAD#PBF,9.50,must be the -LAD (I2C adjustable) version
+slot board (x10),1,Power inductor 6.8 uH Isat>=4.5A shielded,Coilcraft XAL6060-682 or similar,1.00,L >= 0.3*Vin(max)/1.5MHz = 5 uH
 slot board (x10),2,Current sense resistor 10 mOhm 1% >=0.5W,e.g. Vishay WSL1206R0100,0.30,RSNSB + RSNSI
-slot board (x10),2,MOSFETs per LTC4162 typical application (INFET / BATFET),per datasheet,0.50,
+slot board (x10),2,N-channel MOSFETs (INFET >=40 V / BATFET >=30 V),per LTC4162 datasheet MOSFET selection,0.50,
 slot board (x10),1,Passives set (caps 50 V X7R + polymer; resistors; NTC bias 10k 0.1%),,1.50,
 slot board (x10),1,I/O expander 8-bit I2C,NXP PCA9554PW / TI TCA9554,0.80,address 0x20
 slot board (x10),2,Fuse 5 A fast SMD,Littelfuse 0451005.MRL,0.50,input + battery side

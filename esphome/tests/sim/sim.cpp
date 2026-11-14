@@ -38,6 +38,7 @@ struct FakeLTC : i2c::FakeBus {
     uint16_t v = reg[r];
     bool susp = reg[0x14] & (1 << 5);
     switch (r) {
+      case 0x43: v = (vin > 20 && !susp) ? 5 : 0; break;  // cell_count is 0 unless the charger is enabled
       case 0x3A: v = (uint16_t) (vpack() / 5 / 192.4e-6f); break;
       case 0x3B: v = (uint16_t) (vin / 1.649e-3f); break;
       case 0x3D: v = (uint16_t) (int16_t) (i * 0.01f / 1.466e-6f); break;

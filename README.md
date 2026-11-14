@@ -47,8 +47,8 @@ Home Assistant.
 
 - **Rail and contact geometry** of the X20V pack. The model is fully parametric, but its numbers
   are educated placeholders.
-- **The LTC4162-L register scaling** in `parkside_charger.h` comes from the datasheet and the
-  Linux driver. Before trusting it, compare the voltage and current readings with a meter
-  (bring-up step 3).
+- **The LTC4162-L register map and scaling** have been checked against the datasheet (Rev A)
+  and the Linux driver. Still compare the voltage and current readings with a meter during
+  bring-up (step 3), because sense-resistor tolerances apply.
 - The slot-board power stage must follow the datasheet or demo-board layout. This repo specifies
   values and pinout at the functional level, not a finished PCB layout.

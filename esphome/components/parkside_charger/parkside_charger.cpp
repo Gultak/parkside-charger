@@ -54,11 +54,22 @@ bool ParksideSlot::configure_chip_() {
     return false;
   uint8_t cells = cc & 0x0F;
   uint8_t chem = (cc >> 8) & 0x0F;
-  (void) chem;
-  if (cells != this->cells_) {
+  // cell_count reads 0 ("unknown") whenever the charger is not enabled, e.g. without
+  // input power or while suspended (datasheet: CHEM_CELLS_REG) - only check real values.
+  if (cells != 0 && cells != this->cells_) {
     this->fault_text_ = str_sprintf("CELLS pins strap %u cells, expected %u", cells, this->cells_);
     ESP_LOGE(TAG, "Slot %u: %s - charging blocked", this->slot_number_, this->fault_text_.c_str());
     this->phase_ = Phase::FAULT;
+  }
+  // chem 0 = LTC4162_LAD (adjustable LTC4162-L); 1..3 = fixed 4.2/4.1/4.0 V Li-ion
+  // versions; 4+ = LiFePO4 / lead-acid variants which must never charge a Li-ion pack.
+  if (chem > 3) {
+    this->fault_text_ = str_sprintf("wrong charger IC variant (chem=%u, need LTC4162-L)", chem);
+    ESP_LOGE(TAG, "Slot %u: %s - charging blocked", this->slot_number_, this->fault_text_.c_str());
+    this->phase_ = Phase::FAULT;
+  } else if (chem != 0) {
+    ESP_LOGW(TAG, "Slot %u: fixed-voltage LTC4162-L variant (chem=%u); use the adjustable LTC4162-LAD for "
+             "storage/ready levels", this->slot_number_, chem);
   }
   ESP_LOGV(TAG, "Slot %u: chem=%u cells=%u", this->slot_number_, chem, cells);
 
@@ -214,7 +225,7 @@ void ParksideSlot::on_inserted_() {
   this->sd_v0_ = NAN;
   this->sd_elapsed_s_ = 0;
   this->self_discharge_ = NAN;
-  if (this->phase_ != Phase::FAULT || this->fault_text_.rfind("CELLS", 0) != 0) {
+  if (this->phase_ != Phase::FAULT || !this->static_fault_()) {
     this->phase_ = Phase::SETTLING;
     this->fault_text_.clear();
   }
@@ -231,7 +242,7 @@ void ParksideSlot::on_removed_() {
   this->allocation_ = 0;
   this->charge_in_progress_ = false;
   this->full_override_ = false;
-  if (this->phase_ != Phase::FAULT || this->fault_text_.rfind("CELLS", 0) != 0) {
+  if (this->phase_ != Phase::FAULT || !this->static_fault_()) {
     this->phase_ = Phase::EMPTY;
     this->fault_text_.clear();
   }

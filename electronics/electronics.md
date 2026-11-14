@@ -57,7 +57,11 @@ build ten boards, check on one pack:
 The board slides into the card guides of the printed bay. Components go on the top side. The
 connectors face the rear lid.
 
-### 3.1 Charger: LTC4162-LEUFD
+### 3.1 Charger: LTC4162EUFD-LAD#PBF (I²C-adjustable version)
+
+Order the **-LAD** version. The -L40, -L41 and -L42 versions charge to a fixed 4.0/4.1/4.2 V,
+which breaks the storage and ready modes. The -xxM versions run MPPT by default. The firmware
+reads the chemistry code and refuses to charge with a non-Li-ion variant.
 
 Build the **typical application circuit from the LTC4162-L datasheet** (front page, plus
 "Applications Information"). Better still, copy the schematic and layout of the
@@ -66,14 +70,16 @@ with a good layout, so reuse the proven one. Make these choices:
 
 | Item | Value | Notes |
 |---|---|---|
-| Cell count pins (CELLS0..2) | strapped for **5 cells** | Firmware reads this back and blocks charging on a mismatch |
+| Cell count pins | **CELLS1 = VCC2P5, CELLS0 = VCC2P5** → 5 cells (datasheet Table 5) | Firmware reads `cell_count` back and blocks charging on a mismatch. It reads 0 while the charger isn't running, which is normal |
 | R_SNSB (battery current) | **10 mΩ**, 1 %, ≥ 0.5 W, 1206/2512 | 0.1 A steps, max 3.2 A. Firmware default limit is 1.5 A per slot |
 | R_SNSI (input current) | **10 mΩ**, 1 % | Firmware limits input to 3 A |
-| Inductor | per datasheet inductor selection (several µH, I_sat ≥ 5 A, low DCR, shielded) | e.g. Würth WE-XHMI / Coilcraft XAL60xx class |
-| Input FET (INFET) | per datasheet | Blocks back-feed from the battery into the 24 V bus |
-| Battery FET (BGATE) | per datasheet | |
+| RT | **63.4 kΩ** 1 % | 1.5 MHz switching frequency (f = 94 / RT[kΩ]) |
+| Inductor | **6.8 µH**, I_sat ≥ 4.5 A, low DCR, shielded | Datasheet formula: L = 0.3 × V_IN(max) / f = 0.3 × 25 V / 1.5 MHz = 5 µH minimum. 6.8 µH is also what the datasheet's application circuits use. e.g. Coilcraft XAL6060-682 or Würth WE-XHMI |
+| BOOST capacitor | 22 nF, ≥ 6.3 V, X7R | |
+| Input FET (INFET) | **N-channel** MOSFET, ≥ 40 V, per datasheet "INFET and BATFET MOSFET Selection" | Blocks back-feed from the battery into the 24 V bus |
+| Battery FET (BATFET) | **N-channel** MOSFET, ≥ 30 V, low R_DS(on) | Same section of the datasheet |
 | NTCBIAS → NTC | **10 kΩ 0.1 %** bias to the pack's T contact | Firmware converts using `ntc_bias_resistor`, `ntc_r25`, `ntc_beta` |
-| DVCC (I²C supply) | **5V_SLOT** | Sets the I²C logic level (slot-side bus runs at 5 V). Check that DVCC accepts 5 V in the datasheet's absolute maximum ratings; otherwise feed DVCC from a 3.3 V LDO and keep the slot bus at 3.3 V (see §4 note) |
+| DVCC (I²C supply) | **5V_SLOT** | Datasheet: DVCC 1.8–5.5 V operating, 5.5 V absolute maximum, and SDA/SCL must stay ≤ DVCC. A 5 V rail (±5 %) with the slot bus pulled up to the same rail is within spec. Don't use a buck that overshoots above 5.5 V |
 | SDA/SCL | 100 Ω series + ESD diode (e.g. PESD5V0S2UT) | The cable comes from outside the board |
 | SMBALERT | to PCA9554 IO5 (optional) | Not used by the firmware yet |
 | VOUT (PowerPath system output) | only the datasheet's minimum capacitance, no load | |

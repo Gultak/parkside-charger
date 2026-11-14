@@ -131,8 +131,9 @@ action:
 ## Bring-up checklist
 
 1. Main board only, no slots: `i2c scan` must show 0x44, 0x70 and 0x71.
-2. One slot board **without a battery**: the log shows the slot's LTC4162 and PCA9554. Check that
-   `CELLS` reads 5, with no "strap" error.
+2. One slot board **without a battery**: the log shows the slot's LTC4162 and PCA9554, with no
+   "strap" or "wrong charger IC" error. `cell_count` only reads 5 while the charger is running
+   and 0 otherwise, so the strapping check takes effect during the first charge.
 3. Put a **lab supply in place of the battery** (20 V, 0.5 A limit, with a 10 kΩ resistor from T to
    B− standing in for the NTC). Check the voltage reading against a multimeter, and adjust
    `sense_resistor` if the current reading is off.
