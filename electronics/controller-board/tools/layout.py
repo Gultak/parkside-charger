@@ -16,7 +16,7 @@ ESP_X, ESP_Y = 55.0, 19.5          # module centre; rotated 180 deg: USB at the 
 PLACE = {
     "U2": (ESP_X, ESP_Y, 180),
     # headers along the top edge
-    "J4": (23.5, 3.6, 90), "J5": (28.0, 12.0, 180), "J6": (70.4, 3.6, 90),
+    "J4": (23.5, 3.6, 90), "J5": (28.0, 12.0, 180), "J6": (71.0, 3.6, 90),
     # I2C pull-ups / mux reset next to the module pins
     "R9": (37.4, 20.8, 0), "R10": (37.4, 23.3, 0), "R11": (71.0, 26.0, 0),
     # voltage dividers next to IO0/IO1
@@ -37,7 +37,7 @@ PLACE = {
     "U1": (86.0, 92.0, 0), "C5": (83.0, 81.0, 0), "C6": (90.5, 81.0, 0), "F2": (96.5, 81.0, 0),
     "C7": (99.6, 87.0, 90),
     # mounting holes
-    "H1": (5.0, 78.5, 0), "H2": (105.0, 78.5, 0), "H3": (18.0, 3.8, 0), "H4": (91.0, 3.8, 0),
+    "H1": (5.0, 78.5, 0), "H2": (105.0, 78.5, 0), "H3": (18.0, 3.8, 0), "H4": (91.8, 3.8, 0),
 }
 for i in range(8):
     y = 10.0 + 8.0 * i
@@ -70,15 +70,15 @@ LABELS = [
     ("PARKSIDE CHARGER CONTROLLER rev A", 55.0, 72.5, 1.2),
     ("PSU IN: +24V GND", 9.0, 98.6, 0.8), ("OUT A: +24V GND", 59.0, 98.6, 0.8),
     ("OUT B: +24V GND", 73.0, 98.6, 0.8), ("10 A", 26.0, 84.6, 0.8),
-    ("SHT40: 3V3 GND SCL SDA", 27.4, 7.8, 0.7), ("QWIIC", 28.0, 16.6, 0.7),
-    ("EXP: 3V3 GND IO5 IO6 IO7 TX RX", 78.0, 7.8, 0.7),
+    ("SHT40: 3V3 GND SCL SDA", 27.4, 7.8, 0.8), ("QWIIC", 28.0, 16.6, 0.8),
+    ("EXP: 3V3 GND IO5 IO6 IO7 TX RX", 78.6, 7.8, 0.8),
 ]
 for i in range(8):
     y = 10.0 + 8.0 * i
     LABELS.append((f"S{1 + i}", 15.6, y + 1.0, 1.0))
     LABELS.append((f"S{9 + i}", 94.2, y + 1.0, 1.0))
-LABELS.append(("5V GND SDA SCL", 8.0, 73.6, 0.7))
-LABELS.append(("SCL SDA GND 5V", 102.0, 73.6, 0.7))
+LABELS.append(("5V GND SDA SCL", 8.0, 73.6, 0.8))
+LABELS.append(("SCL SDA GND 5V", 102.0, 73.6, 0.8))
 
 # ------------------------------------------------------------------ schematic --
 TITLE = "Parkside charger - controller board"

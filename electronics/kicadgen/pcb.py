@@ -345,6 +345,8 @@ def add_zone(board, netobj, layer, poly, priority, clearance=0.2, min_w=0.2):
     z.SetLocalClearance(pcbnew.FromMM(clearance))
     z.SetMinThickness(pcbnew.FromMM(min_w))
     z.SetIsFilled(False)
+    if priority == 0:   # background GND fills: drop isolated fragments
+        z.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_ALWAYS)
     board.Add(z)
     return z
 
@@ -488,7 +490,10 @@ def build(outdir: Path, promote=()):
         z.SetDoNotAllowVias(True)
         z.SetDoNotAllowPads(False)
         z.SetDoNotAllowFootprints(False)
-        z.SetLayerSet(pcbnew.LSET.AllCuMask())
+        ls = pcbnew.LSET()
+        for lay in (pcbnew.F_Cu, pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu):
+            ls.AddLayer(lay)
+        z.SetLayerSet(ls)
         o = z.Outline()
         o.NewOutline()
         for x, y in poly:
