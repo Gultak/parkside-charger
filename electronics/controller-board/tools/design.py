@@ -88,7 +88,7 @@ _SC = ["5", "7", "9", "11", "14", "16", "18", "20"]
 # connectors, the channel 0-3 row the lower four, ordered so no pair has to cross.
 # (ESPHome: esphome/parkside-charger.yaml uses the same table.)
 CHANNEL_SLOT = {
-    "U3": {7: 1, 6: 2, 5: 3, 4: 4, 0: 5, 1: 6, 2: 7, 3: 8},          # 0x70
+    "U3": {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8},          # 0x70 (rotated 270 deg)
     "U4": {7: 9, 6: 10, 5: 11, 4: 12, 3: 13, 2: 14, 1: 15, 0: 16},   # 0x71
 }
 for k, (ref, a0) in enumerate((("U3", "GND"), ("U4", "+3V3"))):   # U3 = 0x70 (slots 1-8), U4 = 0x71 (9-16)

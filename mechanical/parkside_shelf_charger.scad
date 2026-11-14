@@ -122,7 +122,7 @@ ctl_gap  = 4;             // PCB to inner wall
 ctl_in   = [ctl_pcb[0] + 2 * ctl_gap, ctl_pcb[1] + 2 * ctl_gap, 42];   // inner dims (X, Y, Z)
 ctl_wall = 2.4;
 ctl_standoff = 8;         // PCB above the base
-ctl_holes = [[5, 78.5], [105, 78.5], [13.5, 4.5], [96.5, 4.5]];      // PCB mounting holes (board coords)
+ctl_holes = [[5, 78.5], [105, 78.5], [18, 3.8], [91, 3.8]];      // PCB mounting holes (board coords)
 
 $fn = 48;
 eps = 0.01;

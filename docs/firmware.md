@@ -100,9 +100,9 @@ Global: `Charger status`, `Total charging power`, `Batteries charging`, `Batteri
 | 0 / 1 | PSU voltage / switched slot-bus voltage, through 100 k / 10 k dividers (×11) |
 | 5, 6, 7, 16, 17 | Spare, on the 7-pin expansion header |
 
-The two multiplexers don't map channels to slots in order. The order follows the board layout:
-slots 1–4 are channels 7–4 and slots 5–8 are channels 0–3 on 0x70, and the same pattern applies on
-0x71. `parkside-charger.yaml` already contains the right table.
+Channel-to-slot mapping follows the board layout. On 0x70, slots 1–8 are channels 0–7. On 0x71,
+slots 9–12 are channels 7–4 and slots 13–16 are channels 3–0. `parkside-charger.yaml` already
+contains the right table.
 
 ### Health heuristics: please calibrate
 

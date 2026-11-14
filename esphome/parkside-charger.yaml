@@ -57,14 +57,14 @@ tca9548a:
     i2c_id: i2c_main
     address: 0x70
     channels:
-      - { bus_id: slot1_bus, channel: 7 }
-      - { bus_id: slot2_bus, channel: 6 }
-      - { bus_id: slot3_bus, channel: 5 }
-      - { bus_id: slot4_bus, channel: 4 }
-      - { bus_id: slot5_bus, channel: 0 }
-      - { bus_id: slot6_bus, channel: 1 }
-      - { bus_id: slot7_bus, channel: 2 }
-      - { bus_id: slot8_bus, channel: 3 }
+      - { bus_id: slot1_bus, channel: 0 }
+      - { bus_id: slot2_bus, channel: 1 }
+      - { bus_id: slot3_bus, channel: 2 }
+      - { bus_id: slot4_bus, channel: 3 }
+      - { bus_id: slot5_bus, channel: 4 }
+      - { bus_id: slot6_bus, channel: 5 }
+      - { bus_id: slot7_bus, channel: 6 }
+      - { bus_id: slot8_bus, channel: 7 }
   - id: mux_b
     i2c_id: i2c_main
     address: 0x71
