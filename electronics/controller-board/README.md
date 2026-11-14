@@ -41,8 +41,10 @@ The 24 V input, the switched 24 V, and the PSU-to-switch section are pours on bo
 
 ## Before ordering: check these
 
-1. **Review the routing in KiCad.** The custom router routed this board automatically; DRC
-   status is in `drc_report.txt`.
+1. **Review the routing in KiCad.** The custom router routed this board automatically, and
+   the KiCad DRC shows **no errors or unconnected items**. What's left: silkscreen cosmetics, one
+   0.3 mm dangling +3V3 stub (you can delete it), and `lib_footprint_issues`, which only appears
+   because the generator runs without the global library table.
 2. Check that your pogo headers fit 1.1 mm holes.
 3. **Terminal block orientation:** check the wire-entry direction of J1–J3 in the 3D viewer. It
    should face the bottom edge, where the box has its cable notch.
