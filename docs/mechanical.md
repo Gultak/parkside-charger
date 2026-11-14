@@ -107,7 +107,7 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 | 4 | M3 heat-set inserts (4.2 mm hole) for the rear lid + 4 × M3×8 screws |
 | 3–4 | Contact tabs: **male 6.3 × 0.8 mm Faston tabs** (solder or crimp type), or strips cut from 0.8 mm brass, tinned. Push them in from the bay side, bend the tail 90° behind the end stop and glue with a drop of epoxy. **Check the blade thickness against your pack's terminals first.** |
 | 1 | Microswitch Omron D2F-01L (or SS-5GL with lever) + 2 × M2 × 8 self-tapping screws |
-| 1 | 5 mm (T-1¾) RGB LED, **common anode**, diffused, e.g. Kingbright L-154A4SUREQBFZGEW. Any standard 5 mm LED with a 5.8 mm flange fits. 4-wire cable to the slot PCB |
+| 1 | 5 mm (T-1¾) RGB LED, **common cathode**, diffused, e.g. Kingbright L-154A4SUREQBFZGEW. Any standard 5 mm LED with a 5.8 mm flange fits. 4-wire cable to the slot PCB |
 | 1 | Slot PCB 72 × 60 mm (slides into the card guides from the rear) |
 
 ## Mounting

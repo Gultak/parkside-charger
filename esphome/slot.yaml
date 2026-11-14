@@ -4,7 +4,8 @@
 #
 # Slot board I2C devices (identical on every board, each slot has its own bus):
 #   0x68  LTC4162-L charger
-#   0x20  PCA9554 I/O expander: IO0 microswitch, IO1..3 RGB LED (sink),
+#   0x20  PCA9554 I/O expander (on 5 V): IO0 microswitch, IO1..3 RGB LED anodes
+#         (common-cathode LED, active high),
 #         IO4 bleed-resistor MOSFET, IO5..7 spare
 
 pca9554:
@@ -33,7 +34,6 @@ output:
       number: 1
       mode:
         output: true
-      inverted: true
   - platform: gpio
     id: slot${n}_led_g
     pin:
@@ -41,7 +41,6 @@ output:
       number: 2
       mode:
         output: true
-      inverted: true
   - platform: gpio
     id: slot${n}_led_b
     pin:
@@ -49,7 +48,6 @@ output:
       number: 3
       mode:
         output: true
-      inverted: true
   - platform: gpio
     id: slot${n}_bleed
     pin:

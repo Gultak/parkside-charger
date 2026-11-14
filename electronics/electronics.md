@@ -6,15 +6,15 @@
  230 V AC ──[IEC inlet, switch, 2 A fuse]──[KSD301 70 °C thermal cut-out, NC]──► Mean Well LRS-200-24 (trim to 24.5 V)
                                                                                      │ 24 V
                                                          ┌───────────────────────────┴──────────────── MAIN BOARD ───┐
-                                                         │  F1 10 A ── always-on ──► 24→5 V buck ──► ESP32-C6 (5V pin) │
-                                                         │                 └──────► 24→3.3 V buck ──► "3V3_SLOT" rail   │
+                                                         │  F1 10 A ── always-on ──► 24→5 V buck ─┬─► ESP32-C6 (5V pin)│
+                                                         │                                        └─► polyfuse ─► "5V_SLOT"│
                                                          │  F1 ──► Q1 P-MOSFET bus switch (GPIO21, soft-start) ──► 24 V BUS
                                                          │  ESP32-C6 GPIO22/23 (I2C, 100 kHz) ──► TCA9548A @0x70 ch0..7  │
                                                          │                                   └──► TCA9548A @0x71 ch0..1  │
                                                          │                                   └──► SHT40 @0x44 (enclosure)│
                                                          │  GPIO20 ──► buzzer                                            │
                                                          └──────┬──────────────────────────┬────────────────────────────┘
-                                24 V BUS: 2 × 2.5 mm², Wago 221 tap per slot │             │ 10 × 4-wire cable (3V3, GND, SDA, SCL)
+                                24 V BUS: 2 × 2.5 mm², Wago 221 tap per slot │             │ 10 × 4-wire cable (5V, GND, SDA, SCL)
                            ┌──────────────┬──────────────┬──────── … ───────┘             │  one per slot, star topology
                            ▼              ▼              ▼                                 ▼
                      SLOT BOARD 1   SLOT BOARD 2   …  SLOT BOARD 10   (each: LTC4162-L charger @0x68 + PCA9554 @0x20)
@@ -73,8 +73,8 @@ with a good layout, so reuse the proven one. Make these choices:
 | Input FET (INFET) | per datasheet | Blocks back-feed from the battery into the 24 V bus |
 | Battery FET (BGATE) | per datasheet | |
 | NTCBIAS → NTC | **10 kΩ 0.1 %** bias to the pack's T contact | Firmware converts using `ntc_bias_resistor`, `ntc_r25`, `ntc_beta` |
-| DVCC (I²C supply) | **3V3_SLOT** | Sets the I²C logic level |
-| SDA/SCL | 100 Ω series + ESD diode (e.g. PESD3V3S2UT) | The cable comes from outside the board |
+| DVCC (I²C supply) | **5V_SLOT** | Sets the I²C logic level (slot-side bus runs at 5 V). Check that DVCC accepts 5 V in the datasheet's absolute maximum ratings; otherwise feed DVCC from a 3.3 V LDO and keep the slot bus at 3.3 V (see §4 note) |
+| SDA/SCL | 100 Ω series + ESD diode (e.g. PESD5V0S2UT) | The cable comes from outside the board |
 | SMBALERT | to PCA9554 IO5 (optional) | Not used by the firmware yet |
 | VOUT (PowerPath system output) | only the datasheet's minimum capacitance, no load | |
 
@@ -95,9 +95,9 @@ same NTC.
 | Pin | Function | Circuit |
 |---|---|---|
 | IO0 | Battery-present microswitch (Omron D2F-01L or similar) | Switch to GND; uses the internal 100 k pull-up plus 100 nF to GND |
-| IO1 | LED red (cathode) | 5 mm RGB LED, common anode to 3V3_SLOT. 220 Ω (R), 120 Ω (G), 120 Ω (B) |
-| IO2 | LED green (cathode) | |
-| IO3 | LED blue (cathode) | |
+| IO1 | LED red (anode) | 5 mm RGB LED, **common cathode to GND** (e.g. Kingbright L-154A4SUREQBFZGEW). PCA9554 runs on 5V_SLOT and **sources** the current (push-pull outputs, active high). Series resistors: **560 Ω** red (V_F ≈ 2.0 V), **270 Ω** green and blue (V_F ≈ 3.3 V), about 5 mA each, which is plenty for a diffused LED indoors |
+| IO2 | LED green (anode) | |
+| IO3 | LED blue (anode) | |
 | IO4 | Bleed-resistor MOSFET gate | 2N7002K or AO3422 (≥ 55 V), 100 k gate pull-down |
 | IO5 | LTC4162 SMBALERT (optional) | |
 | IO6/7 | spare, to a test header | |
@@ -112,27 +112,35 @@ off the PCB and away from plastic. If you don't fit them, delete `bleed_output:`
 | Connector | Type | Pins |
 |---|---|---|
 | J1 power | 5.08 mm screw terminal, 2-pin | +24 V, GND (from the Wago tap, 1.0 mm² wire) |
-| J2 I²C | JST-XH 4-pin | 3V3_SLOT, GND, SDA, SCL |
+| J2 I²C | JST-XH 4-pin | 5V_SLOT, GND, SDA, SCL |
 | J3 battery | 3.5 mm screw terminal, 3-pin (+1 spare) | B+, B−, T. Use 1.0 mm² silicone wire for B+/B− and keep it short |
 | J4 switch | JST-PH 2-pin | IO0, GND |
-| J5 LED | JST-PH 4-pin | 3V3, R, G, B |
+| J5 LED | JST-PH 4-pin | GND (common cathode), R, G, B |
 
 ## 4. Main board (perfboard is fine, or a simple 2-layer PCB, 100 × 60 mm holes)
 
 | Function | Part | Connection |
 |---|---|---|
 | MCU | **ESP32-C6-DevKitC-1** on headers (or Seeed XIAO ESP32C6) | 5 V from the buck |
-| 5 V supply | 24→5 V buck module ≥ 1 A (e.g. Pololu D24V10F5) | always on |
-| 3V3_SLOT | 24→3.3 V buck ≥ 1 A (e.g. Pololu D24V10F3) + 500 mA polyfuse | Feeds the I²C pull-ups, PCA9554 and LEDs (≤ 15 mA per slot) |
-| I²C | GPIO22 = SDA, GPIO23 = SCL, 4.7 k pull-ups to 3.3 V | |
+| 5 V supply | 24→5 V buck module **≥ 1.5 A** (e.g. Pololu D24V22F5) | always on. Feeds the ESP board and, via a 500 mA polyfuse, the **5V_SLOT** rail |
+| 5V_SLOT | from the 5 V buck through a 500 mA polyfuse | Feeds the slot-side I²C pull-ups, the PCA9554s, the LTC4162 DVCC and the LEDs (≤ 15 mA per slot) |
+| I²C | GPIO22 = SDA, GPIO23 = SCL, 4.7 k pull-ups to **3.3 V** (ESP side) | |
 | Mux A | TCA9548A, A0..A2 = 000 → **0x70**, channels 0–7 → slots 1–8 | RESET pulled high |
 | Mux B | TCA9548A, A0 = 1 → **0x71**, channels 0–1 → slots 9–10 | |
-| Pull-ups per mux channel | 2 × 4.7 kΩ to 3V3_SLOT per channel | Cheap TCA9548A breakouts often lack downstream pull-ups |
+| TCA9548A supply | **VCC = 3.3 V** | The TCA9548A's pass switches translate levels: with VCC at 3.3 V the ESP side stays at 3.3 V while each slot channel is pulled up to 5 V |
+| Pull-ups per mux channel | 2 × 4.7 kΩ to **5V_SLOT** per channel | Cheap TCA9548A breakouts often lack downstream pull-ups, and some have them to VCC (3.3 V). Remove those |
 | Enclosure temperature | SHT40 breakout, **0x44** | Mount it in the controller box, near the PSU |
 | 24 V bus switch | P-MOSFET (e.g. SQD40P06-15L or AOD4185, ≥ 40 V, ≥ 20 A), 12 V gate zener, 100 k gate–source, NPN/2N7002 driver from **GPIO21**, 100 nF + 47 k on the gate for about 10 ms soft-start | Default off: if the ESP is in reset or crashes, nothing charges |
 | Buzzer | 5 V active buzzer + 2N7002 from **GPIO20** | Sounds on any slot fault or enclosure > 50 °C |
 | Main fuse | 10 A blade fuse after the PSU | |
 | Slot cables | 10 × JST-XH 4-pin | 4-wire cable such as LiYY 4 × 0.14 mm², ≤ 1.5 m |
+
+**Why the slot side runs at 5 V:** the green and blue chips of a typical RGB LED have
+V_F ≈ 3.0–3.4 V. At 3.3 V they would barely light, whichever way the LED is wired. At 5 V the PCA9554
+can source the LED current directly into a common-cathode LED with no extra transistors. The ESP32
+never sees 5 V: the TCA9548A does the level shifting. Alternative if you prefer 3.3 V logic on the
+slot board: keep the bus at 3.3 V, power only the LED from 5 V, and switch each colour with a
+high-side transistor. That takes 6 extra parts per slot.
 
 GPIO choice for the ESP32-C6: avoid the strapping pins 8, 9 and 15, USB pins 12/13, and the JTAG
 pins 4–7. Pins 20–23 are free on both suggested boards.
