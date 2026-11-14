@@ -44,6 +44,6 @@ Qty,References,Value,Footprint,MPN / notes
 2,R9 R10,4k7,R_0603_1608Metric,
 8,RN1 RN2 RN3 RN4 RN5 RN6 RN7 RN8,4k7 x4,R_Array_Convex_4x0603,slot bus pull-ups
 1,U1,TSR 1-2450,Converter_DCDC_RECOM_R-78E-0.5_THT,"TRACO TSR 1-2450 (6.5-36 V in, 5 V 1 A) or RECOM R-78E5.0-1.0"
-1,U2,ESP32-C6-D1,ESP32_C6_D1_Pogo,"xyzroe ESP32_C6_D1 on 2x 1x8 pogo-pin headers (2.54 mm, rows 22.86 mm apart)"
+1,U2,ESP32-C6-D1,ESP32_C6_D1_Socket,"xyzroe ESP32_C6_D1 in 2x 1x8 female Dupont headers (2.54 mm, rows 22.86 mm apart)"
 1,U3,TCA9548APWR,TSSOP-24_4.4x7.8mm_P0.65mm,"TI TCA9548APWR, address 0x70"
 1,U4,TCA9548APWR,TSSOP-24_4.4x7.8mm_P0.65mm,"TI TCA9548APWR, address 0x71"
