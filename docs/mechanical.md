@@ -127,5 +127,6 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 
    This requires about 20 cm of free space in front of the shelf edge, as you slide each module
    on. To replace a module later, unscrew it and slide it out to the front.
-4. Run the 24 V bus (2 × 2.5 mm²) behind the bays with one Wago 221 tap per slot. Run the 4-wire
-   I²C cables to the controller box in a cable channel along the rear.
+4. Daisy-chain the 24 V from slot to slot: each slot board has a 24 V IN (J1) and a 24 V OUT
+   (J6) screw terminal. Use short 1.5 mm² jumpers with ferrules. Run the 4-wire I²C cables (one per
+   slot) to the controller box in a cable channel along the rear.

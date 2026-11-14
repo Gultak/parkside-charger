@@ -10,7 +10,7 @@ slot board (x10),1,TVS 26 V,SMBJ26A,0.20,
 slot board (x10),1,ESD diode I2C (5 V),PESD5V0S2UT,0.10,
 slot board (x10),1,N-MOSFET for bleed,2N7002K or AO3422,0.10,
 slot board (x10),2,Resistor 100 Ohm 2 W,metal film/oxide,0.25,bleed (optional)
-slot board (x10),1,Connector set (5.08 screw 2p; 3.5 screw 4p; JST-XH 4p; JST-PH 2p+4p),,1.20,
+slot board (x10),1,Connector set (2x 5.08 screw 2p; 3.5 screw 3p; JST-XH 4p; JST-PH 2p+4p),,1.60,24 V IN + OUT for daisy chaining
 slot board (x10),1,PCB 72x60 2-layer 2oz,JLCPCB/PCBWay,1.00,per board in a 10-pcs order
 slot module (x10),1,Microswitch with lever,Omron D2F-01L,1.50,clones ~0.30
 slot module (x10),1,LED 5 mm RGB common cathode diffused,Kingbright L-154A4SUREQBFZGEW,0.60,standard T-1 3/4: 5.8 mm flange; driven from PCA9554 at 5 V
@@ -18,7 +18,7 @@ slot module (x10),4,Male Faston tab 6.3x0.8 / brass strip,,0.05,check blade thic
 slot module (x10),4,M3 heat-set insert + M3x8 screw,,0.10,
 slot module (x10),1,Wood screw 4x16 countersunk (flat head),,0.03,front - centre of the channel ceiling
 slot module (x10),1,Wood screw 4x16 pan head,,0.03,rear tab - centre
-slot module (x10),1,Wago 221-413 lever connector,,0.80,24 V bus tap
+slot module (x10),1,2-wire jumper 1.5 mm2 with ferrules (24 V daisy chain),,0.50,slot J6 OUT -> next slot J1 IN
 main,1,ESP32-C6 dev board,Espressif ESP32-C6-DevKitC-1 (or Seeed XIAO ESP32C6),9.00,
 main,2,I2C multiplexer 8 ch,TI TCA9548A (breakout ok),3.00,0x70 + 0x71
 main,1,Temperature/humidity sensor,Sensirion SHT40 breakout,4.00,enclosure 0x44

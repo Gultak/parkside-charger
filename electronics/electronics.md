@@ -14,7 +14,7 @@
                                                          │                                   └──► SHT40 @0x44 (enclosure)│
                                                          │  GPIO20 ──► buzzer                                            │
                                                          └──────┬──────────────────────────┬────────────────────────────┘
-                                24 V BUS: 2 × 2.5 mm², Wago 221 tap per slot │             │ 10 × 4-wire cable (5V, GND, SDA, SCL)
+          24 V daisy chain: slot J1 IN -> J6 OUT -> next slot │             │ 10 × 4-wire cable (5V, GND, SDA, SCL)
                            ┌──────────────┬──────────────┬──────── … ───────┘             │  one per slot, star topology
                            ▼              ▼              ▼                                 ▼
                      SLOT BOARD 1   SLOT BOARD 2   …  SLOT BOARD 10   (each: LTC4162-L charger @0x68 + PCA9554 @0x20)
@@ -52,7 +52,10 @@ build ten boards, check on one pack:
    "Performance" packs should be checked.
 4. Measure the blade/slot geometry for the 3D model (see `docs/mechanical.md`).
 
-## 3. Slot board (×10), about 72 × 60 mm, 2 layers, 2 oz copper recommended
+## 3. Slot board (×10), 72 × 60 mm, 4 layers
+
+**The complete KiCad 7 design (schematic, routed PCB, Gerbers, BOM, pick-and-place) is in
+[`slot-board/`](slot-board/README.md).** This section summarises the design decisions.
 
 The board slides into the card guides of the printed bay. Components go on the top side. The
 connectors face the rear lid.
@@ -117,7 +120,7 @@ off the PCB and away from plastic. If you don't fit them, delete `bleed_output:`
 
 | Connector | Type | Pins |
 |---|---|---|
-| J1 power | 5.08 mm screw terminal, 2-pin | +24 V, GND (from the Wago tap, 1.0 mm² wire) |
+| J1 24 V IN / J6 24 V OUT | 2 × 5.08 mm screw terminal, 2-pin (Phoenix MKDS 1,5/2) | Connected straight through, so the slots **daisy-chain**: `GND +24V | +24V GND`. Use 1.5 mm² wire for the chain jumpers. Each terminal is rated 13.5 A |
 | J2 I²C | JST-XH 4-pin | 5V_SLOT, GND, SDA, SCL |
 | J3 battery | 3.5 mm screw terminal, 3-pin (+1 spare) | B+, B−, T. Use 1.0 mm² silicone wire for B+/B− and keep it short |
 | J4 switch | JST-PH 2-pin | IO0, GND |
