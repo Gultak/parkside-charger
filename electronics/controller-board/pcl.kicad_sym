@@ -86,9 +86,9 @@
   (symbol "ESP32_C6_D1" (in_bom yes) (on_board yes)
     (property "Reference" "U" (at -8.89 11.43 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
     (property "Value" "ESP32-C6-D1" (at 8.89 11.43 0) (effects (font (size 1.27 1.27)) (justify right bottom)))
-    (property "Footprint" "pcl:ESP32_C6_D1_Pogo" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+    (property "Footprint" "pcl:ESP32_C6_D1_Socket" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
     (property "Datasheet" "https://github.com/xyzroe/ESP32_C6_D1" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-    (property "ki_description" "ESP32-C6 dev board in Wemos D1 form factor (xyzroe), plugged on 2x8 pogo pins" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
+    (property "ki_description" "ESP32-C6 dev board in Wemos D1 form factor (xyzroe), plugged into 2x 1x8 female Dupont headers" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
     (symbol "ESP32_C6_D1_0_1"
       (rectangle (start -8.89 10.16) (end 8.89 -12.7) (stroke (width 0.254) (type default)) (fill (type background)))
     )

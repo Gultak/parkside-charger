@@ -6,7 +6,7 @@
  230 V AC ─[IEC inlet, switch, 2 A fuse]─[KSD301 70 °C cut-out, NC]─► Mean Well PSU 24 V (LRS-200-24 or LRS-350-24)
                                                                             │ 24 V
    ┌─────────────────────────────────── CONTROLLER BOARD ──────────────────┴──────────────────────────┐
-   │ J1 ─ 10 A fuse ─┬─ always on ─► TSR 1-2450 5 V ─┬─► ESP32-C6 D1 (pogo pins) ─ 3V3 ─► I2C side      │
+   │ J1 ─ 10 A fuse ─┬─ always on ─► TSR 1-2450 5 V ─┬─► ESP32-C6 D1 (Dupont sockets) ─ 3V3 ─► I2C side │
    │                 │                              └─► 0.5 A PTC ─► 5V_SLOT (slot logic + pull-ups)   │
    │                 └─► P-MOSFET bus switch (GPIO19, soft start) ─► J2 OUT A / J3 OUT B (24 V)         │
    │ GPIO22/23 I2C ─► TCA9548A 0x70 (slots 1-8) + TCA9548A 0x71 (slots 9-16), RESET GPIO4             │
@@ -129,7 +129,7 @@ up to **16 slots**.
 
 | Function | Part | Connection |
 |---|---|---|
-| MCU | **xyzroe ESP32-C6 D1** (ESP32-C6-MINI-1-N4, Wemos D1 form factor), plugged onto **2 × 1×8 pogo-pin headers** soldered into the board (holes 1.1 mm, rows 22.86 mm apart). USB-C points at the box wall | 5 V pin from the regulator. Its own 3.3 V LDO feeds the I²C side |
+| MCU | **xyzroe ESP32-C6 D1** (ESP32-C6-MINI-1-N4, Wemos D1 form factor), plugged into **2 × 1×8 female Dupont headers** soldered into the board (holes 1.0 mm, rows 22.86 mm apart). USB-C points at the box wall | 5 V pin from the regulator. Its own 3.3 V LDO feeds the I²C side |
 | 24 V input | J1 (5.08 mm screw terminal), **10 A mini blade fuse**, SMBJ26A, 47 µF | From the PSU |
 | 24 V bus switch | AOD4185 P-MOSFET (−40 V/−40 A, TO-252). 12 V gate zener, 100 k gate pull-up, 2N7002 driver from **GPIO19**, 47 k + 1 µF soft start (about 50 ms) | Default off. Switches **OUT A (J2)** and **OUT B (J3)**: two slot daisy chains, e.g. one per shelf row |
 | 5 V | TRACO TSR 1-2450 (or RECOM R-78E5.0-1.0), 3-pin SIP, 1 A | Always on. Feeds the ESP and, via a 500 mA PTC, the **5V_SLOT** rail |

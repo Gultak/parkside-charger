@@ -88,11 +88,11 @@ SYMBOLS["ESD_2CH"] = ic_symbol(
     left=[("1", "IO1", "passive"), ("2", "IO2", "passive")], right=[], bottom=[("3", "GND", "passive")],
     width=7.62, desc="Double ESD protection diode array, common anode")
 
-# ESP32-C6 D1 (xyzroe/ESP32_C6_D1, Wemos D1 form factor) plugged onto pogo headers.
+# ESP32-C6 D1 (xyzroe/ESP32_C6_D1, Wemos D1 form factor) plugged into 2x 1x8 female Dupont headers.
 # Pin numbers = footprint pads: left row 1..8 top->bottom, right row 9..16 top->bottom
 # (seen from the top, antenna up, USB down).
 SYMBOLS["ESP32_C6_D1"] = ic_symbol(
-    "ESP32_C6_D1", "U", "ESP32-C6-D1", "pcl:ESP32_C6_D1_Pogo",
+    "ESP32_C6_D1", "U", "ESP32-C6-D1", "pcl:ESP32_C6_D1_Socket",
     "https://github.com/xyzroe/ESP32_C6_D1",
     left=[("1", "RST", "input"), ("2", "IO4", "bidirectional"), ("3", "IO5", "bidirectional"),
           ("4", "IO0/ADC", "bidirectional"), ("5", "IO1/ADC", "bidirectional"), ("6", "IO6", "bidirectional"),
@@ -100,7 +100,7 @@ SYMBOLS["ESP32_C6_D1"] = ic_symbol(
     right=[("9", "TX/IO16", "bidirectional"), ("10", "RX/IO17", "bidirectional"), ("11", "IO23", "bidirectional"),
            ("12", "IO22", "bidirectional"), ("13", "IO19", "bidirectional"), ("14", "IO18", "bidirectional"),
            ("15", "GND", "power_in"), ("16", "5V", "power_in")],
-    width=17.78, desc="ESP32-C6 dev board in Wemos D1 form factor (xyzroe), plugged on 2x8 pogo pins")
+    width=17.78, desc="ESP32-C6 dev board in Wemos D1 form factor (xyzroe), plugged into 2x 1x8 female Dupont headers")
 
 SYMBOLS["DCDC_3PIN"] = ic_symbol(
     "DCDC_3PIN", "U", "TSR_1-2450", "Converter_DCDC:Converter_DCDC_RECOM_R-78E-0.5_THT",

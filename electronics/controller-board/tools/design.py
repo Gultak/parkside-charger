@@ -1,6 +1,6 @@
 """Controller board - single source of truth for parts and nets.
 
-ESP32-C6 D1 (xyzroe) on pogo pins, 2x TCA9548A = 16 slot I2C channels (each with
+ESP32-C6 D1 (xyzroe) in female Dupont headers, 2x TCA9548A = 16 slot I2C channels (each with
 4.7 k pull-ups to the 5 V slot rail - the TCA9548A at 3.3 V level-shifts), switched
 24 V output to two slot daisy chains, 24 V -> 5 V SIP regulator, supply voltage
 sensing, buzzer, SHT40 + Qwiic + expansion headers.
@@ -51,11 +51,11 @@ PARTS = {
            {"1": "+5V", "2": "+5V_SLOT"}, "Bourns MF-NSMF050 - slot 5 V rail"),
     "C7": ("22u 10V", "Device:C", "Capacitor_SMD:C_1206_3216Metric", {"1": "+5V_SLOT", "2": "GND"}, ""),
     # --------------------------------------------------------------- ESP ---
-    "U2": ("ESP32-C6-D1", "pcl:ESP32_C6_D1", "pcl:ESP32_C6_D1_Pogo",
+    "U2": ("ESP32-C6-D1", "pcl:ESP32_C6_D1", "pcl:ESP32_C6_D1_Socket",
            {"2": "MUX_RST", "3": "IO5", "4": "VS_IN", "5": "VS_OUT", "6": "IO6", "7": "IO7", "8": "+3V3",
             "9": "TX", "10": "RX", "11": "SCL", "12": "SDA", "13": "BUS_EN_IO", "14": "BUZ_IO",
             "15": "GND", "16": "+5V"},
-           "xyzroe ESP32_C6_D1 on 2x 1x8 pogo-pin headers (2.54 mm, rows 22.86 mm apart)"),
+           "xyzroe ESP32_C6_D1 in 2x 1x8 female Dupont headers (2.54 mm, rows 22.86 mm apart)"),
     "R9": ("4k7", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "+3V3", "2": "SDA"}, ""),
     "R10": ("4k7", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "+3V3", "2": "SCL"}, ""),
     "R11": ("10k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "+3V3", "2": "MUX_RST"}, ""),

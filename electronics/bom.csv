@@ -19,8 +19,8 @@ per slot: module,4,M3 heat-set insert + M3x8 screw,,0.10,
 per slot: module,1,Wood screw 4x16 countersunk (flat head),,0.03,front - centre of the channel ceiling
 per slot: module,1,Wood screw 4x16 pan head,,0.03,rear tab - centre
 per slot: module,1,2-wire jumper 1.5 mm2 with ferrules (24 V daisy chain),,0.50,slot J6 OUT -> next slot J1 IN
-controller,1,ESP32-C6 D1 dev board,xyzroe ESP32_C6_D1 (Tindie / Elecrow / Lectronz),12.0,plugs onto the pogo headers
-controller,2,Pogo-pin header 1x8 2.54 mm,spring-loaded pin header (e.g. Mill-Max 0906 / generic P75),2.5,soldered into the controller board
+controller,1,ESP32-C6 D1 dev board,xyzroe ESP32_C6_D1 (Tindie / Elecrow / Lectronz),12.0,plugs into the female headers (module needs male pin headers)
+controller,2,Female Dupont header 1x8 2.54 mm,standard pin socket (8.5 mm high),0.3,soldered into the controller board
 controller,1,Controller PCB 110x100 4-layer,electronics/controller-board/fab,4.0,per board in a 5 pcs order
 controller,2,I2C mux 8 ch,TI TCA9548APWR,1.5,0x70 + 0x71
 controller,8,Resistor array 4x4.7k 0603,Yageo YC164-JR-074K7L,0.05,slot bus pull-ups

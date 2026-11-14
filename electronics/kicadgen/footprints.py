@@ -4,8 +4,8 @@ from pathlib import Path
 LIB = "pcl"
 
 
-def _esp32_c6_d1_pogo():
-    """xyzroe ESP32_C6_D1 on two 1x8 pogo-pin headers.
+def _esp32_c6_d1_socket():
+    """xyzroe ESP32_C6_D1 plugged into two 1x8 female Dupont headers (2.54 mm).
 
     Hole positions from the board's own drill file (Drill_PTH_Through.DRL, 1.0 mm
     holes): rows 22.86 mm apart, 2.54 mm pitch. Origin = centre of the 2x8 grid.
@@ -17,9 +17,9 @@ def _esp32_c6_d1_pogo():
     for i in range(8):
         y = -8.89 + 2.54 * i
         shape = "rect" if i == 0 else "circle"
-        pads.append(f'  (pad "{i + 1}" thru_hole {shape} (at -11.43 {y:.2f}) (size 1.8 1.8) (drill 1.1) '
+        pads.append(f'  (pad "{i + 1}" thru_hole {shape} (at -11.43 {y:.2f}) (size 1.8 1.8) (drill 1.0) '
                     f'(layers "*.Cu" "*.Mask"))')
-        pads.append(f'  (pad "{i + 9}" thru_hole circle (at 11.43 {y:.2f}) (size 1.8 1.8) (drill 1.1) '
+        pads.append(f'  (pad "{i + 9}" thru_hole circle (at 11.43 {y:.2f}) (size 1.8 1.8) (drill 1.0) '
                     f'(layers "*.Cu" "*.Mask"))')
     labels = []
     for i in range(8):
@@ -29,12 +29,12 @@ def _esp32_c6_d1_pogo():
         labels.append(f'  (fp_text user "{names_r[i]}" (at 9.0 {y:.2f}) (layer "F.SilkS") '
                       f'(effects (font (size 0.8 0.8) (thickness 0.12)) (justify right)))')
     x0, y0, x1, y1 = -13.5, -18.1, 13.5, 17.9
-    return f'''(footprint "ESP32_C6_D1_Pogo" (version 20221018) (generator kicadgen) (layer "F.Cu")
-  (descr "xyzroe ESP32_C6_D1 (Wemos D1 form factor) on 2x8 pogo pins, 2.54 mm, rows 22.86 mm apart. Antenna -y, USB +y. Keep copper out from under the antenna.")
-  (tags "ESP32-C6 D1 mini pogo")
+    return f'''(footprint "ESP32_C6_D1_Socket" (version 20221018) (generator kicadgen) (layer "F.Cu")
+  (descr "xyzroe ESP32_C6_D1 (Wemos D1 form factor) in 2x 1x8 female Dupont headers, 2.54 mm, rows 22.86 mm apart. Antenna -y, USB +y. Keep copper out from under the antenna.")
+  (tags "ESP32-C6 D1 mini socket dupont")
   (attr through_hole)
   (fp_text reference "REF**" (at 0 -19.3) (layer "F.SilkS") (effects (font (size 1 1) (thickness 0.15))))
-  (fp_text value "ESP32_C6_D1_Pogo" (at 0 19.2) (layer "F.Fab") (effects (font (size 1 1) (thickness 0.15))))
+  (fp_text value "ESP32_C6_D1_Socket" (at 0 19.2) (layer "F.Fab") (effects (font (size 1 1) (thickness 0.15))))
   (fp_rect (start {x0} {y0}) (end {x1} {y1}) (stroke (width 0.12) (type solid)) (fill none) (layer "F.SilkS"))
   (fp_rect (start {x0} {y0}) (end {x1} {y1}) (stroke (width 0.1) (type solid)) (fill none) (layer "F.Fab"))
   (fp_rect (start {x0 - 0.25} {y0 - 0.25}) (end {x1 + 0.25} {y1 + 0.25}) (stroke (width 0.05) (type solid)) (fill none) (layer "F.CrtYd"))
@@ -47,7 +47,7 @@ def _esp32_c6_d1_pogo():
 '''
 
 
-FOOTPRINTS = {"ESP32_C6_D1_Pogo": _esp32_c6_d1_pogo}
+FOOTPRINTS = {"ESP32_C6_D1_Socket": _esp32_c6_d1_socket}
 
 
 def write_library(board_dir):
