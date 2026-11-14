@@ -11,7 +11,7 @@ Home Assistant.
 
 | | |
 |---|---|
-| Slots | 10 printed modules, 96 mm pitch (96 cm of shelf), one per battery |
+| Slots | 10 printed modules, 96 mm pitch (96 cm of shelf), one per battery. They **slot into each other** with a full-length sliding dovetail |
 | Charger per slot | LTC4162-L: 5S Li-ion, I²C-programmable 3.81–4.20 V/cell, 0.1–3.2 A, telemetry and battery-resistance measurement |
 | Controller | ESP32-C6, 2 × TCA9548A I²C mux (one channel per slot), SHT40 enclosure sensor |
 | Power | Mean Well LRS-200-24 (fanless), 8 A battery-side budget shared across the slots |
@@ -23,7 +23,7 @@ Home Assistant.
 
 | Path | What |
 |---|---|
-| `mechanical/parkside_shelf_charger.scad` | Parametric OpenSCAD model: slot module, bay lid, fit-test gauge, controller box |
+| `mechanical/parkside_shelf_charger.scad` | Parametric OpenSCAD model: slot module (interlocking), end modules, bay lid, rail and joint test gauges, controller box |
 | `mechanical/stl/` | STLs exported with the **placeholder** rail dimensions. Calibrate first |
 | `docs/mechanical.md` | How to measure the pack, the gauge print, printing and mounting |
 | `electronics/electronics.md` | Architecture, slot-board and main-board design, pin map, power budget, safety |

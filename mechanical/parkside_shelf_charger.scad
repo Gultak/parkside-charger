@@ -15,6 +15,8 @@
 //    openscad -D 'part="slot"'           -o slot.stl            parkside_shelf_charger.scad
 //    openscad -D 'part="slot_lid"'       -o slot_lid.stl        parkside_shelf_charger.scad
 //    openscad -D 'part="gauge"'          -o gauge.stl           parkside_shelf_charger.scad
+//    openscad -D 'part="joint_gauge"'    -o joint_gauge.stl     parkside_shelf_charger.scad
+//  End modules: add -D joint_left=false (leftmost) or -D joint_right=false (rightmost).
 //    openscad -D 'part="controller"'     -o controller.stl      parkside_shelf_charger.scad
 //    openscad -D 'part="controller_lid"' -o controller_lid.stl  parkside_shelf_charger.scad
 //  part="assembly" shows everything in mounted orientation (not for printing).
@@ -25,7 +27,7 @@
 //  plate occupies 0..plate_t and its top face touches the shelf.
 // =====================================================================
 
-part = "assembly"; // [slot, slot_lid, gauge, controller, controller_lid, assembly, single]
+part = "assembly"; // [slot, slot_lid, gauge, joint_gauge, controller, controller_lid, assembly, single, joint_section, joint_check]
 
 /* [Battery interface: MEASURE YOUR PACK] */
 chan_w   = 61.0;  // clear width between the rail walls, above the lips (tongue width + 0.6)
@@ -52,14 +54,32 @@ tab_vertical = true; // blade plane vertical (true) or horizontal (false)
 
 /* [Module frame] */
 pitch    = 96;    // module width = slot spacing (battery body ~80 + finger room)
-plate_t  = 5;     // mounting plate thickness
+plate_t  = 6;     // mounting plate thickness
 wall_t   = 5;     // rail wall thickness
 stop_t   = 8;     // end-stop / contact block thickness
 bay_l    = 66;    // electronics bay length (behind the end stop)
 bay_h    = 34;    // electronics bay height below the plate (must clear the battery body)
 bay_wall = 2.4;
-screw_d  = 4.5;   // wood screws 4 x 12 (max 3/4 of shelf thickness!)
+screw_d  = 4.5;   // wood screws 4 x 16 (max ~3/4 of plate + shelf thickness!)
 screw_head_d = 9;
+csk_d    = 8.6;   // countersink for the flat-head screws inside the channel
+csk_recess = 0.4; // heads sit this far below the channel ceiling (battery slides over)
+
+/* [Interlocking joint between neighbouring modules] */
+// Sliding dovetail along the full length: tongue on the right (+X) edge,
+// groove on the left (-X) edge. A new module slides on from the front;
+// the groove is closed at the front so all front edges end up flush.
+joint_left  = true;   // groove on the left edge  (false for the leftmost module)
+joint_right = true;   // tongue on the right edge (false for the rightmost module)
+jt_gap   = 0.4;       // gap between neighbouring plates
+jt_d     = 5;         // dovetail depth
+jt_root  = 6;         // dovetail height at the root (narrow end)
+jt_tip   = 9;         // dovetail height at the tip (wide end)
+jt_zc    = -2;        // dovetail centre height (0 = channel ceiling)
+jt_clear = 0.2;       // clearance per side (raise to 0.25-0.3 if it binds)
+jt_front = 3;         // closed front end of the groove (front-edge alignment stop)
+bar_w    = 9;         // width of the edge bar carrying the joint
+bar_bot  = -10;       // underside of the edge bar (must stay above the battery body)
 
 /* [Slot PCB (slides into card guides from the rear)] */
 pcb_w = 72;     // across (X); edges ride 0.8 mm deep in the card guides
@@ -86,18 +106,43 @@ eps = 0.01;
 wall_h   = lip_gap + lip_t;          // rail wall height below the plate
 inner_x  = chan_w / 2;               // inner face of a rail wall
 outer_x  = inner_x + wall_t;         // outer face
-mod_w    = pitch - 1;                // 1 mm gap between neighbours
+mod_w    = pitch - jt_gap;           // neighbours interlock with a small gap
 y_stop   = rail_len;                 // end-stop front face
 y_bay0   = rail_len + stop_t;        // start of bay
 mod_l    = y_bay0 + bay_l;           // total length
 bay_x    = pcb_w / 2 - 0.8;          // bay inner half-width
 rear_tab = 15;                       // plate extension behind the bay for the rear screws
+total_l  = mod_l + rear_tab;
+front_screw_x = inner_x - 8;         // flat-head screws in the channel ceiling
+rear_screw_x  = 25;                  // pan-head screws in the rear tab
 
 module teardrop_y(d, l) {           // horizontal hole along Y, printable without support
     rotate([-90, 0, 0]) linear_extrude(l)
         union() { circle(d = d); rotate(45) square(d / 2); }
 }
 module hole_z(d, h) { translate([0, 0, -h]) cylinder(d = d, h = h + 2 * eps); }
+
+// ------------------- interlocking dovetail (XZ profile, extruded along Y) --
+// c = clearance; x = 0 is where the dovetail starts to widen
+module dovetail_2d(c = 0, neck = 0) {
+    polygon([
+        [-neck - eps, jt_zc - jt_root / 2 - c], [0, jt_zc - jt_root / 2 - c],
+        [jt_d + c, jt_zc - jt_tip / 2 - c], [jt_d + c, jt_zc + jt_tip / 2 + c],
+        [0, jt_zc + jt_root / 2 + c], [-neck - eps, jt_zc + jt_root / 2 + c]
+    ]);
+}
+module joint_tongue() {     // on the right edge, reaches across the gap
+    translate([mod_w / 2 + jt_gap, total_l, 0]) rotate([90, 0, 0])
+        linear_extrude(total_l - jt_front - jt_clear) dovetail_2d(0, jt_gap + 0.5);
+}
+module joint_groove() {     // cut into the left edge, open at the rear
+    translate([-mod_w / 2, total_l + 1, 0]) rotate([90, 0, 0])
+        linear_extrude(total_l + 1 - jt_front) dovetail_2d(jt_clear, 1);
+}
+module edge_bars() {
+    for (sx = [-1, 1]) translate([sx > 0 ? mod_w / 2 - bar_w : -mod_w / 2, 0, bar_bot])
+        cube([bar_w, total_l, plate_t - bar_bot]);
+}
 
 // ------------------- the rail profile (XZ), extruded along Y ----------
 module rail_profile_2d() {
@@ -133,7 +178,10 @@ module slot_module() {
     difference() {
         union() {
             // mounting plate (full module width, with a rear screw tab)
-            translate([-mod_w / 2, 0, 0]) cube([mod_w, mod_l + rear_tab, plate_t]);
+            translate([-mod_w / 2, 0, 0]) cube([mod_w, total_l, plate_t]);
+            // edge bars carrying the interlocking joint
+            edge_bars();
+            if (joint_right) joint_tongue();
             // rails
             rails(y_stop + eps);
             // end stop / contact block across the channel
@@ -152,6 +200,9 @@ module slot_module() {
                             translate([7, 0, wall_h - eps]) cube([eps, 3, eps]);
                         }
         }
+
+        // groove for the neighbour's tongue
+        if (joint_left) joint_groove();
 
         // lip lead-in
         lip_lead_in();
@@ -193,11 +244,17 @@ module slot_module() {
         // rear lid screw holes (M3 heat-set inserts, along Y)
         for (p = bay_lid_holes()) translate([p[0], mod_l - 8 + eps, p[1]]) teardrop_y(4.2, 8.1);
 
-        // mounting screw holes (vertical): 2 in the front flanges, 2 in the rear tab
-        for (sx = [-1, 1]) for (y = [22, mod_l + rear_tab / 2 + 1]) {
-            x = sx * (mod_w / 2 - 6.5);
-            translate([x, y, plate_t + eps]) hole_z(screw_d, plate_t + 3);
-            translate([x, y, -40]) cylinder(d = screw_head_d + 1, h = 40);   // head/driver room
+        // mounting screws (vertical). Front: flat-head, countersunk flush into the
+        // channel ceiling (fit before the battery goes in). Rear: pan-head in the rear tab.
+        for (sx = [-1, 1]) {
+            translate([sx * front_screw_x, 26, plate_t + eps]) hole_z(screw_d, plate_t + 1);
+            translate([sx * front_screw_x, 26, -csk_recess - 1])
+                cylinder(d1 = csk_d, d2 = csk_d, h = 1 + eps);
+            translate([sx * front_screw_x, 26, -csk_recess - eps])
+                cylinder(d1 = csk_d, d2 = 0, h = csk_d / 2);
+            translate([sx * rear_screw_x, mod_l + rear_tab / 2 + 1, plate_t + eps]) hole_z(screw_d, plate_t + 1);
+            translate([sx * rear_screw_x, mod_l + rear_tab / 2 + 1, -40])
+                cylinder(d = screw_head_d + 1, h = 40);   // head/driver room
         }
 
         // status LED hole in the front bezel ...
@@ -307,12 +364,25 @@ else if (part == "gauge") rotate([90, 0, 0]) gauge();
 else if (part == "controller") controller_box();
 else if (part == "controller_lid") controller_lid();
 else if (part == "single") slot_module();
+// two neighbours overlapped: renders EMPTY if the joint does not collide
+// cross-section through two neighbours at y = 60 (for checking the joint fit)
+else if (part == "joint_section") projection(cut = true) rotate([-90, 0, 0]) translate([0, -60, 0])
+    for (i = [0, 1]) translate([i * pitch, 0, 0]) slot_module();
+// 20 mm test pieces of both edges (tongue + groove) to check the joint clearance
+else if (part == "joint_gauge") rotate([90, 0, 0]) for (sx = [-1, 1])
+    translate([-sx * (mod_w / 2 - 20), 0, 0]) intersection() {
+        slot_module();
+        translate([sx > 0 ? mod_w / 2 - bar_w - 2 : -mod_w / 2 - 1, -1, bar_bot - 1])
+            cube([bar_w + 3 + jt_gap + jt_d + 1, 21, plate_t - bar_bot + 2]);
+    }
+else if (part == "joint_check") intersection() { slot_module(); translate([pitch, 0, 0]) slot_module(); }
 else if (part == "assembly") {
-    for (i = [0:2]) translate([(i - 1) * pitch, 0, 0]) {
+    // the right-hand module is shown half slid on, to show the dovetail joint
+    for (i = [0:2]) translate([(i - 1) * pitch, i == 2 ? -80 : 0, 0]) {
         color("lightgray") slot_module();
         color("dimgray") translate([0, mod_l, -bay_h]) slot_lid();
         if (i != 1) dummy_battery();
     }
-    translate([2 * pitch, 0, plate_t]) mirror([0, 0, 1]) color("silver") controller_box();
+    translate([2.4 * pitch, 0, plate_t]) mirror([0, 0, 1]) color("silver") controller_box();
     %translate([-1.6 * pitch, -10, plate_t]) cube([4.2 * pitch, mod_l + 40, 18]); // shelf
 }

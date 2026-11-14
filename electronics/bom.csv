@@ -16,7 +16,8 @@ slot module (x10),1,Microswitch with lever,Omron D2F-01L,1.50,clones ~0.30
 slot module (x10),1,LED 5 mm RGB common anode,,0.20,
 slot module (x10),4,Male Faston tab 6.3x0.8 / brass strip,,0.05,check blade thickness against pack
 slot module (x10),4,M3 heat-set insert + M3x8 screw,,0.10,
-slot module (x10),4,Wood screw 4x12 pan head,,0.03,
+slot module (x10),2,Wood screw 4x16 countersunk (flat head),,0.03,front - in the channel ceiling
+slot module (x10),2,Wood screw 4x16 pan head,,0.03,rear tab
 slot module (x10),1,Wago 221-413 lever connector,,0.80,24 V bus tap
 main,1,ESP32-C6 dev board,Espressif ESP32-C6-DevKitC-1 (or Seeed XIAO ESP32C6),9.00,
 main,2,I2C multiplexer 8 ch,TI TCA9548A (breakout ok),3.00,0x70 + 0x71

@@ -2,13 +2,20 @@
 
 ![3 modules + controller box, seen from below/front](img/assembly_below.png)
 ![Rear view with dummy batteries, bay lids and controller box](img/assembly_rear.png)
-![One slot module from the battery side: rails with lips, latch recess, contact slots, switch window, LED bezel](img/slot_from_front_below.png)
+![One slot module from the battery side: rails with lips, latch recess, countersunk screws, contact slots, switch window, LED bezel, dovetail edge bars](img/slot_from_front_below.png)
+![Cross-section through two neighbouring modules: the sliding dovetail](img/joint_section.png)
 
 ## Concept
 
-- **One printed module per battery** (95 × 177 mm footprint, 34 mm tall). Modules sit side by
+- **One printed module per battery** (95.6 × 181 mm footprint, 34 mm tall). Modules sit side by
   side at a 96 mm pitch, so 10 slots need **96 cm** of shelf. If the shelf is narrower, mount two
-  rows of 5 on two shelves, or put the 10th slot on the side wall. Every module stands alone.
+  rows of 5 on two shelves, or put the 10th slot on the side wall.
+- **Neighbouring modules slot into each other** with a **sliding dovetail** that runs along the
+  full length of each side. Every module has a tongue on its right edge and a groove on its left
+  edge. The groove is closed for the first 3 mm at the front, so a module slid onto its neighbour
+  stops with its front edge flush. This locks the row sideways and in height, and keeps every
+  rail exactly parallel. Each layer of the print contains the full dovetail profile (front face on
+  the bed), so it prints strong and without support.
 - The battery **slides in from the front and hangs from two rails**, as it does on a tool. Its
   own latch clicks into the recess in the channel ceiling. Press the release button to pull it out.
 - At the end of the rails, the **end stop holds the contact tabs** and the **presence
@@ -37,10 +44,13 @@ it, and packs differ slightly between generations. With calipers, measure:
 
 Then:
 
-1. Print `stl/gauge.stl`. It is 20 mm long, takes about 15 min, and includes the lead-in and the
+1. Print `stl/joint_gauge.stl` (two 20 mm pieces, about 10 min) and slide the tongue piece into
+   the groove piece from the open end. It should slide firmly without play. If it binds, raise
+   `jt_clear` (default 0.2 mm per side). If it is loose, lower it.
+2. Print `stl/gauge.stl`. It is 20 mm long, takes about 15 min, and includes the lead-in and the
    latch recess. Slide it onto the pack. It should run smoothly without wobbling up and down, and
    the latch should click. Adjust, re-render, and repeat.
-2. Print **one** full slot module and test it with the contacts in place before printing ten.
+3. Print **one** full slot module and test it with the contacts in place before printing ten.
 
 Export the parts:
 
@@ -48,14 +58,20 @@ Export the parts:
 openscad -D 'part="slot"' -o slot.stl parkside_shelf_charger.scad
 ```
 
-The other parts work the same way: `slot_lid`, `gauge`, `controller`, `controller_lid`. Use
-`part="assembly"` for a preview.
+The other parts work the same way: `slot_lid`, `gauge`, `joint_gauge`, `controller`,
+`controller_lid`. Use `part="assembly"` for a preview, `part="joint_section"` for a cross-section of
+the joint, and `part="joint_check"`, which must render empty, to confirm neighbours don't collide.
+For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D joint_right=false`
+(rightmost, no tongue that sticks out).
 
 ## Printing
 
 | Part | Qty | Orientation | Notes |
 |---|---|---|---|
-| `slot.stl` | 10 | **Front face on the bed** (as exported) | Every layer then contains the full rail profile, so the lips that carry the battery are as strong as possible and need no support. Use a brim, 4 walls, 30–40 % gyroid, 0.2 mm layers |
+| `slot.stl` | 8 | **Front face on the bed** (as exported) | Every layer then contains the full rail and dovetail profile, so the lips that carry the battery are as strong as possible and nothing needs support. Use a brim, 4 walls, 30–40 % gyroid, 0.2 mm layers |
+| `slot_end_left.stl` | 1 | same | Leftmost module (no groove). Optional: a normal `slot.stl` works too |
+| `slot_end_right.stl` | 1 | same | Rightmost module (no protruding tongue). Optional |
+| `joint_gauge.stl` | 1 | as exported | Tests the dovetail fit |
 | `slot_lid.stl` | 10 | flat | |
 | `controller.stl` | 1 | open side up | |
 | `controller_lid.stl` | 1 | flat | |
@@ -67,7 +83,8 @@ The other parts work the same way: `slot_lid`, `gauge`, `controller`, `controlle
 
 | Qty | Part |
 |---|---|
-| 4 | Wood screws 4 × 12 mm, pan head. On an 18 mm shelf never go above 14 mm |
+| 2 | Wood screws **4 × 16 mm countersunk (flat head)**, front, in the channel ceiling. The heads sit 0.4 mm below the surface so the battery slides over them |
+| 2 | Wood screws **4 × 16 mm pan head**, rear tab. The plate is 6 mm thick, leaving 10 mm in the shelf. On an 18 mm shelf never go above 18 mm |
 | 4 | M3 heat-set inserts (4.2 mm hole) for the rear lid + 4 × M3×8 screws |
 | 3–4 | Contact tabs: **male 6.3 × 0.8 mm Faston tabs** (solder or crimp type), or strips cut from 0.8 mm brass, tinned. Push them in from the bay side, bend the tail 90° behind the end stop and glue with a drop of epoxy. **Check the blade thickness against your pack's terminals first.** |
 | 1 | Microswitch Omron D2F-01L (or SS-5GL with lever) + 2 × M2 × 8 self-tapping screws |
@@ -80,6 +97,15 @@ The other parts work the same way: `slot_lid`, `gauge`, `controller`, `controlle
    Use 4 screws per module.
 2. For fire protection on wooden shelves, first screw a 0.5–1 mm steel or aluminium sheet to the
    underside of the shelf, then mount the modules through it.
-3. Align the modules at their front edges. The 1 mm gap between neighbours is intended.
+3. Mount the modules **from left to right**, one at a time:
+   1. Screw the first (leftmost) module in place, square to the front edge of the shelf.
+   2. Put the next module against the shelf underside about 20 cm further forward. Engage its
+      groove (left edge, open at the rear) with the tongue of the module already mounted, and
+      push it backwards until it stops. Its front edge is now flush.
+   3. Drive its 4 screws: 2 countersunk in the channel, 2 in the rear tab.
+   4. Repeat for the rest of the row. The 0.4 mm gap between the plates is intended.
+
+   This requires about 20 cm of free space in front of the shelf edge, as you slide each module
+   on. To replace a module later, unscrew it and slide it out to the front.
 4. Run the 24 V bus (2 × 2.5 mm²) behind the bays with one Wago 221 tap per slot. Run the 4-wire
    I²C cables to the controller box in a cable channel along the rear.
