@@ -1,0 +1,36 @@
+section,qty,part,example / MPN,approx. unit price EUR,notes
+slot board (x10),1,Li-ion step-down charger 1-8 cells I2C,Analog Devices LTC4162-LEUFD#PBF,9.50,core of each slot
+slot board (x10),1,Power inductor several uH Isat>=5A shielded,per LTC4162 datasheet / DC2038A,1.00,
+slot board (x10),2,Current sense resistor 10 mOhm 1% >=0.5W,e.g. Vishay WSL1206R0100,0.30,RSNSB + RSNSI
+slot board (x10),2,MOSFETs per LTC4162 typical application (INFET / BATFET),per datasheet,0.50,
+slot board (x10),1,Passives set (caps 50 V X7R + polymer; resistors; NTC bias 10k 0.1%),,1.50,
+slot board (x10),1,I/O expander 8-bit I2C,NXP PCA9554PW / TI TCA9554,0.80,address 0x20
+slot board (x10),2,Fuse 5 A fast SMD,Littelfuse 0451005.MRL,0.50,input + battery side
+slot board (x10),1,TVS 26 V,SMBJ26A,0.20,
+slot board (x10),1,ESD diode I2C,PESD3V3S2UT,0.10,
+slot board (x10),1,N-MOSFET for bleed,2N7002K or AO3422,0.10,
+slot board (x10),2,Resistor 100 Ohm 2 W,metal film/oxide,0.25,bleed (optional)
+slot board (x10),1,Connector set (5.08 screw 2p; 3.5 screw 4p; JST-XH 4p; JST-PH 2p+4p),,1.20,
+slot board (x10),1,PCB 72x60 2-layer 2oz,JLCPCB/PCBWay,1.00,per board in a 10-pcs order
+slot module (x10),1,Microswitch with lever,Omron D2F-01L,1.50,clones ~0.30
+slot module (x10),1,LED 5 mm RGB common anode,,0.20,
+slot module (x10),4,Male Faston tab 6.3x0.8 / brass strip,,0.05,check blade thickness against pack
+slot module (x10),4,M3 heat-set insert + M3x8 screw,,0.10,
+slot module (x10),4,Wood screw 4x12 pan head,,0.03,
+slot module (x10),1,Wago 221-413 lever connector,,0.80,24 V bus tap
+main,1,ESP32-C6 dev board,Espressif ESP32-C6-DevKitC-1 (or Seeed XIAO ESP32C6),9.00,
+main,2,I2C multiplexer 8 ch,TI TCA9548A (breakout ok),3.00,0x70 + 0x71
+main,1,Temperature/humidity sensor,Sensirion SHT40 breakout,4.00,enclosure 0x44
+main,1,Buck 24->5 V 1 A,Pololu D24V10F5 or similar,5.00,
+main,1,Buck 24->3.3 V 1 A,Pololu D24V10F3 or similar,5.00,3V3_SLOT rail
+main,1,P-MOSFET bus switch + driver parts,SQD40P06-15L / AOD4185 + 2N7002 + zener,3.00,GPIO21
+main,1,Active buzzer 5 V + 2N7002,,1.00,GPIO20
+main,1,Blade fuse holder + 10 A fuse,,3.00,
+main,10,JST-XH 4p + 4-wire cable (LiYY 4x0.14) up to 1.5 m,,1.00,one per slot
+main,1,Perfboard or simple PCB 100x60,,5.00,
+power,1,PSU 24 V 200 W fanless,Mean Well LRS-200-24,32.00,trim to 24.5 V
+power,1,IEC inlet with switch and fuse 2 A,,6.00,
+power,1,Thermal cut-out NC 70 C 250 V AC,KSD301 70C,1.50,in AC line - hardware failsafe
+power,3,m wire 2.5 mm2 red/black,,1.50,24 V bus
+print,1.5,kg PETG or ASA filament,,20.00,
+safety,1,Steel/alu sheet 0.5-1 mm for shelf underside,,15.00,recommended on wooden shelves
