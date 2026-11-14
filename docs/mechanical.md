@@ -26,11 +26,20 @@
 - At the end of the rails, the **end stop holds the contact tabs** and the **presence
   microswitch**. Behind it, an **electronics bay** holds the slot PCB in card guides, closed by a
   rear lid with cable entries.
-- A **5 mm RGB LED** sits in the front bezel and is inserted **from behind**. A 5.3 mm front
-  opening takes the dome, and the LED's flange stops against it. Behind it, a 7 mm bore leaves
-  room for the bent leads, solder joints and heat-shrink. The wires go up a 5 × 5 mm channel into
-  a 5 × 3 mm groove on the shelf side of the plate, back to the bay. These are plain round holes:
-  printed face-down they are vertical, so they don't need a teardrop shape.
+- A **5 mm RGB LED** sits in the front bezel and is inserted **from the front**. A 6.3 mm
+  counterbore, 5 mm deep, takes the LED body. Its 5.8 mm flange stops on a 5.0 mm lip, and the
+  dome sticks out about 3.5 mm. Behind the lip, a 7 mm bore holds the solder joints. The wires go
+  up a 5 × 5 mm channel into a 5 × 3 mm groove on the shelf side of the plate, back to the bay.
+  These are plain round holes: printed face-down they are vertical, so they don't need a teardrop
+  shape.
+
+  **Fitting the LED:**
+  1. Push the 4 wires from the bay along the groove and down the channel.
+  2. Bring them out through the front of the bezel.
+  3. Trim the LED leads to about 5 mm. Solder the wires and cover each joint with 1.5 mm
+     heat-shrink.
+  4. Pull the wires back from the groove side and press the LED in until the flange seats. A drop
+     of hot glue or CA glue holds it.
 
   ![Section through the LED bore and wire channel](img/led_bore_section.png)
 - A separate **controller box** holds the ESP32-C6 main board. The Mean Well PSU mounts with its
@@ -93,18 +102,19 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 
 | Qty | Part |
 |---|---|
-| 2 | Wood screws **4 × 16 mm countersunk (flat head)**, front, in the channel ceiling. The heads sit 0.4 mm below the surface so the battery slides over them |
-| 2 | Wood screws **4 × 16 mm pan head**, rear tab. The plate is 6 mm thick, leaving 10 mm in the shelf. On an 18 mm shelf never go above 18 mm |
+| 1 | Wood screw **4 × 16 mm countersunk (flat head)**, front, in the centre of the channel ceiling. The head sits 0.4 mm below the surface so the battery slides over it |
+| 1 | Wood screw **4 × 16 mm pan head**, rear tab, centre. The plate is 6 mm thick, leaving 10 mm in the shelf. On an 18 mm shelf never go above 18 mm |
 | 4 | M3 heat-set inserts (4.2 mm hole) for the rear lid + 4 × M3×8 screws |
 | 3–4 | Contact tabs: **male 6.3 × 0.8 mm Faston tabs** (solder or crimp type), or strips cut from 0.8 mm brass, tinned. Push them in from the bay side, bend the tail 90° behind the end stop and glue with a drop of epoxy. **Check the blade thickness against your pack's terminals first.** |
 | 1 | Microswitch Omron D2F-01L (or SS-5GL with lever) + 2 × M2 × 8 self-tapping screws |
-| 1 | 5 mm RGB LED, common anode, 4-wire cable to the slot PCB |
+| 1 | 5 mm (T-1¾) RGB LED, **common anode**, diffused, e.g. Kingbright L-154A4SUREQBFZGEW. Any standard 5 mm LED with a 5.8 mm flange fits. 4-wire cable to the slot PCB |
 | 1 | Slot PCB 72 × 60 mm (slides into the card guides from the rear) |
 
 ## Mounting
 
 1. Shelf thickness: at least 16 mm of solid wood or chipboard. Ten 8 Ah packs weigh about 11 kg.
-   Use 4 screws per module.
+   Use 2 screws per module, one front and one rear, both on the centre line. The dovetail joint
+   carries the sideways and twisting loads between neighbouring modules.
 2. For fire protection on wooden shelves, first screw a 0.5–1 mm steel or aluminium sheet to the
    underside of the shelf, then mount the modules through it.
 3. Mount the modules **from left to right**, one at a time:
@@ -112,7 +122,7 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
    2. Put the next module against the shelf underside about 20 cm further forward. Engage its
       groove (left edge, open at the rear) with the tongue of the module already mounted, and
       push it backwards until it stops. Its front edge is now flush.
-   3. Drive its 4 screws: 2 countersunk in the channel, 2 in the rear tab.
+   3. Drive its 2 screws: the countersunk one in the channel, the pan-head one in the rear tab.
    4. Repeat for the rest of the row. The 0.4 mm gap between the plates is intended.
 
    This requires about 20 cm of free space in front of the shelf edge, as you slide each module

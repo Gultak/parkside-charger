@@ -95,10 +95,15 @@ sw_x    = -24;  // switch window centre from channel centre
 sw_z    = 6;
 sw_win  = [9, 4];   // window through the end stop for the lever (X, Z)
 
-/* [Status LED: 5 mm RGB in the front bezel, inserted from behind] */
-led_d      = 5.3;   // front aperture (LED dome)
-led_front  = 2;     // length of the front aperture; the LED flange stops against it
-led_bore_d = 7.0;   // bore behind it: LED flange (5.8) + room for leads and wires
+/* [Status LED: 5 mm RGB (T-1 3/4) in the front bezel, inserted FROM THE FRONT] */
+// Standard 5 mm LED: 5.0 mm body, 5.8 mm flange, ~8.6 mm flange-to-dome-tip.
+// Thread the wires out through the front, solder + heat-shrink them to the
+// trimmed leads, pull them back and push the LED in until the flange seats.
+led_cb_d   = 6.3;   // front counterbore for the LED body + flange
+led_cb_l   = 5;     // its depth; the dome sticks out ~3.5 mm
+led_lip_d  = 5.0;   // lip the flange stops against (wires + heat-shrink pass through)
+led_lip_l  = 1;
+led_bore_d = 7.0;   // bore behind the lip for the solder joints
 bezel_l    = 14;    // bezel length along Y
 led_x_off  = 5.5;   // LED axis from the rail wall's outer face
 led_z      = -6.5;  // LED axis height
@@ -123,8 +128,9 @@ mod_l    = y_bay0 + bay_l;           // total length
 bay_x    = pcb_w / 2 - 0.8;          // bay inner half-width
 rear_tab = 15;                       // plate extension behind the bay for the rear screws
 total_l  = mod_l + rear_tab;
-front_screw_x = inner_x - 8;         // flat-head screws in the channel ceiling
-rear_screw_x  = 25;                  // pan-head screws in the rear tab
+// One screw front, one rear, both on the centre line: the dovetail joint
+// carries the sideways and twisting loads between neighbouring modules.
+front_screw_y = 26;                  // flat-head screw in the channel ceiling (behind the latch recess)
 
 module hole_y(d, l) {               // hole along Y: vertical when printed face-down, so plain round
     rotate([-90, 0, 0]) cylinder(d = d, h = l);
@@ -268,24 +274,22 @@ module slot_module() {
 
         // mounting screws (vertical). Front: flat-head, countersunk flush into the
         // channel ceiling (fit before the battery goes in). Rear: pan-head in the rear tab.
-        for (sx = [-1, 1]) {
-            translate([sx * front_screw_x, 26, plate_t + eps]) hole_z(screw_d, plate_t + 1);
-            translate([sx * front_screw_x, 26, -csk_recess - 1])
-                cylinder(d1 = csk_d, d2 = csk_d, h = 1 + eps);
-            translate([sx * front_screw_x, 26, -csk_recess - eps])
-                cylinder(d1 = csk_d, d2 = 0, h = csk_d / 2);
-            translate([sx * rear_screw_x, mod_l + rear_tab / 2 + 1, plate_t + eps]) hole_z(screw_d, plate_t + 1);
-            translate([sx * rear_screw_x, mod_l + rear_tab / 2 + 1, -40])
-                cylinder(d = screw_head_d + 1, h = 40);   // head/driver room
-        }
+        translate([0, front_screw_y, plate_t + eps]) hole_z(screw_d, plate_t + 1);
+        translate([0, front_screw_y, -csk_recess - 1]) cylinder(d = csk_d, h = 1 + eps);
+        translate([0, front_screw_y, -csk_recess - eps]) cylinder(d1 = csk_d, d2 = 0, h = csk_d / 2);
+        translate([0, mod_l + rear_tab / 2 + 1, plate_t + eps]) hole_z(screw_d, plate_t + 1);
+        translate([0, mod_l + rear_tab / 2 + 1, -40]) cylinder(d = screw_head_d + 1, h = 40);   // head/driver room
 
         // status LED in the front bezel: round holes (vertical when printed face-down).
-        // Front aperture for the dome, wider bore behind for flange, leads and wires.
+        // Counterbore for body + flange from the front, a lip as flange stop, and a
+        // wider bore behind for the solder joints.
         led_x = outer_x + led_x_off;
         wy = bezel_l - wire_ch - 1;          // wire channel position along Y
         gx = outer_x - 3;                    // wire groove (shelf side), runs over the rail wall
-        translate([led_x, -eps, led_z]) rotate([-90, 0, 0]) cylinder(d = led_d, h = led_front + 2 * eps);
-        translate([led_x, led_front, led_z]) rotate([-90, 0, 0]) cylinder(d = led_bore_d, h = bezel_l - led_front - 1);
+        translate([led_x, -eps, led_z]) rotate([-90, 0, 0]) cylinder(d = led_cb_d, h = led_cb_l + eps);
+        translate([led_x, led_cb_l - eps, led_z]) rotate([-90, 0, 0]) cylinder(d = led_lip_d, h = led_lip_l + 2 * eps);
+        translate([led_x, led_cb_l + led_lip_l, led_z]) rotate([-90, 0, 0])
+            cylinder(d = led_bore_d, h = bezel_l - led_cb_l - led_lip_l - 1);
         // ... wires go straight up into a groove on the shelf side of the plate and back to the bay
         translate([led_x - wire_ch / 2, wy, led_z]) cube([wire_ch, wire_ch, plate_t - led_z + eps]);
         translate([gx, wy, plate_t - wire_gd]) cube([led_x + wire_ch / 2 - gx, wire_ch, wire_gd + eps]);
@@ -379,6 +383,16 @@ module controller_lid() {
 // Every layer then contains the complete rail profile, so the load-bearing
 // lips are strong and nothing needs support. Use PETG/ASA, 4 walls, 30 % gyroid.
 
+// generic 5 mm LED (T-1 3/4) for the previews: 5.0 body, 5.8 x 1 mm flange,
+// 8.6 mm flange-to-tip, 4 leads 0.5 mm square trimmed to 5 mm
+module dummy_led() {
+    color("white", 0.9) rotate([90, 0, 0]) {
+        cylinder(d = 5.8, h = 1);
+        cylinder(d = 5, h = 8.6 - 2.5);
+        translate([0, 0, 8.6 - 2.5]) sphere(d = 5);
+    }
+    color("silver") for (i = [0:3]) translate([-1.9 + i * 1.27, 0, -0.25]) cube([0.5, 5, 0.5]);
+}
 module dummy_battery() {
     color("forestgreen", 0.85) translate([-40, 3, -wall_h - 75]) cube([80, rail_len - 3, 75]);
     color("darkgreen", 0.85) translate([-chan_w / 2 + 0.3, 3, -wall_h + 0.2])
@@ -391,6 +405,11 @@ else if (part == "gauge") rotate([90, 0, 0]) gauge();
 else if (part == "controller") controller_box();
 else if (part == "controller_lid") controller_lid();
 else if (part == "single") slot_module();
+// cut through the LED bezel with the LED in place
+else if (part == "led_section") intersection() {
+    union() { slot_module(); translate([outer_x + led_x_off, led_cb_l, led_z]) dummy_led(); }
+    translate([outer_x + led_x_off - 30, -10, -20]) cube([30, 40, 30]);
+}
 // two neighbours overlapped: renders EMPTY if the joint does not collide
 // cross-section through two neighbours at y = 60 (for checking the joint fit)
 else if (part == "joint_section") projection(cut = true) rotate([-90, 0, 0]) translate([0, -60, 0])
