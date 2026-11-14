@@ -4,6 +4,7 @@
 ![Rear view with dummy batteries, bay lids and controller box](img/assembly_rear.png)
 ![One slot module from the battery side: rails with lips, latch recess, countersunk screws, contact slots, switch window, LED bezel, dovetail edge bars](img/slot_from_front_below.png)
 ![Cross-section through two neighbouring modules: the sliding dovetail](img/joint_section.png)
+![Top-view section at the front of the joint: 45° bevel on the tongue and the groove end](img/joint_bevel_top_section.png)
 
 ## Concept
 
@@ -15,14 +16,23 @@
   edge. The groove is closed for the first 3 mm at the front, so a module slid onto its neighbour
   stops with its front edge flush. This locks the row sideways and in height, and keeps every
   rail exactly parallel. Each layer of the print contains the full dovetail profile (front face on
-  the bed), so it prints strong and without support.
+  the bed), so it prints strong and without support. The tongue's front end and the groove's
+  closed end are both **bevelled at 45°, rising towards the back**, so neither has a flat
+  overhang. The bevels also form the front stop: a full contact face, not just an edge. The
+  tongue's edges are **rounded** (`jt_r` = 1 mm), and the groove follows with r + clearance, so
+  the joint slides smoothly and doesn't catch on elephant's foot or blobs.
 - The battery **slides in from the front and hangs from two rails**, as it does on a tool. Its
   own latch clicks into the recess in the channel ceiling. Press the release button to pull it out.
 - At the end of the rails, the **end stop holds the contact tabs** and the **presence
   microswitch**. Behind it, an **electronics bay** holds the slot PCB in card guides, closed by a
   rear lid with cable entries.
-- A **5 mm RGB LED** sits in the front bezel. Its wires run in a groove on the shelf side of the
-  plate, back to the bay.
+- A **5 mm RGB LED** sits in the front bezel and is inserted **from behind**. A 5.3 mm front
+  opening takes the dome, and the LED's flange stops against it. Behind it, a 7 mm bore leaves
+  room for the bent leads, solder joints and heat-shrink. The wires go up a 5 × 5 mm channel into
+  a 5 × 3 mm groove on the shelf side of the plate, back to the bay. These are plain round holes:
+  printed face-down they are vertical, so they don't need a teardrop shape.
+
+  ![Section through the LED bore and wire channel](img/led_bore_section.png)
 - A separate **controller box** holds the ESP32-C6 main board. The Mean Well PSU mounts with its
   own screw holes, at least 5 cm away from the batteries.
 

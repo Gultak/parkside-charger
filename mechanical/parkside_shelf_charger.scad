@@ -78,6 +78,9 @@ jt_tip   = 9;         // dovetail height at the tip (wide end)
 jt_zc    = -2;        // dovetail centre height (0 = channel ceiling)
 jt_clear = 0.2;       // clearance per side (raise to 0.25-0.3 if it binds)
 jt_front = 3;         // closed front end of the groove (front-edge alignment stop)
+jt_r     = 1.0;       // radius on the tongue's edges (groove follows with r + clearance)
+// The tongue's front end and the groove's closed end are both bevelled at 45 deg
+// (rising towards the back), so neither has a flat overhang when printed face-down.
 bar_w    = 9;         // width of the edge bar carrying the joint
 bar_bot  = -10;       // underside of the edge bar (must stay above the battery body)
 
@@ -92,8 +95,15 @@ sw_x    = -24;  // switch window centre from channel centre
 sw_z    = 6;
 sw_win  = [9, 4];   // window through the end stop for the lever (X, Z)
 
-/* [Status LED: 5 mm RGB in the front bezel] */
-led_d = 5.1;
+/* [Status LED: 5 mm RGB in the front bezel, inserted from behind] */
+led_d      = 5.3;   // front aperture (LED dome)
+led_front  = 2;     // length of the front aperture; the LED flange stops against it
+led_bore_d = 7.0;   // bore behind it: LED flange (5.8) + room for leads and wires
+bezel_l    = 14;    // bezel length along Y
+led_x_off  = 5.5;   // LED axis from the rail wall's outer face
+led_z      = -6.5;  // LED axis height
+wire_ch    = 5;     // wire channel / groove width
+wire_gd    = 3;     // depth of the wire groove on the shelf side of the plate
 
 /* [Controller box] */
 ctl_in = [120, 80, 36];   // inner dims (X, Y, Z)
@@ -116,28 +126,40 @@ total_l  = mod_l + rear_tab;
 front_screw_x = inner_x - 8;         // flat-head screws in the channel ceiling
 rear_screw_x  = 25;                  // pan-head screws in the rear tab
 
-module teardrop_y(d, l) {           // horizontal hole along Y, printable without support
-    rotate([-90, 0, 0]) linear_extrude(l)
-        union() { circle(d = d); rotate(45) square(d / 2); }
+module hole_y(d, l) {               // hole along Y: vertical when printed face-down, so plain round
+    rotate([-90, 0, 0]) cylinder(d = d, h = l);
 }
 module hole_z(d, h) { translate([0, 0, -h]) cylinder(d = d, h = h + 2 * eps); }
 
 // ------------------- interlocking dovetail (XZ profile, extruded along Y) --
-// c = clearance; x = 0 is where the dovetail starts to widen
+// c = clearance; x = 0 is where the dovetail starts to widen.
+// offset(r) offset(delta=-r) rounds the convex (tip) corners.
 module dovetail_2d(c = 0, neck = 0) {
-    polygon([
+    offset(r = jt_r + c) offset(delta = -(jt_r + c)) polygon([
         [-neck - eps, jt_zc - jt_root / 2 - c], [0, jt_zc - jt_root / 2 - c],
         [jt_d + c, jt_zc - jt_tip / 2 - c], [jt_d + c, jt_zc + jt_tip / 2 + c],
         [0, jt_zc + jt_root / 2 + c], [-neck - eps, jt_zc + jt_root / 2 + c]
     ]);
 }
+// keeps the region behind a 45 deg plane: y >= y0 + (x - x0) * dir
+module bevel_45(x0, y0, dir = 1) {
+    translate([x0, y0, -60]) linear_extrude(120)
+        polygon([[-100 * dir, -100], [100 * dir, 100], [100 * dir, 500], [-100 * dir, 500]]);
+}
 module joint_tongue() {     // on the right edge, reaches across the gap
-    translate([mod_w / 2 + jt_gap, total_l, 0]) rotate([90, 0, 0])
-        linear_extrude(total_l - jt_front - jt_clear) dovetail_2d(0, jt_gap + 0.5);
+    xm = mod_w / 2 + jt_gap;    // the neighbour's edge = groove mouth
+    intersection() {
+        translate([xm, total_l, 0]) rotate([90, 0, 0])
+            linear_extrude(total_l) dovetail_2d(0, jt_gap + 0.5);
+        bevel_45(xm, jt_front + jt_clear);
+    }
 }
 module joint_groove() {     // cut into the left edge, open at the rear
-    translate([-mod_w / 2, total_l + 1, 0]) rotate([90, 0, 0])
-        linear_extrude(total_l + 1 - jt_front) dovetail_2d(jt_clear, 1);
+    intersection() {
+        translate([-mod_w / 2, total_l + 1, 0]) rotate([90, 0, 0])
+            linear_extrude(total_l + 2) dovetail_2d(jt_clear, 1);
+        bevel_45(-mod_w / 2, jt_front);
+    }
 }
 module edge_bars() {
     for (sx = [-1, 1]) translate([sx > 0 ? mod_w / 2 - bar_w : -mod_w / 2, 0, bar_bot])
@@ -190,7 +212,7 @@ module slot_module() {
             translate([-bay_x - bay_wall, y_bay0 - eps, -bay_h])
                 cube([2 * (bay_x + bay_wall), bay_l + eps, bay_h + eps]);
             // LED bezel at the front, beside the right rail
-            translate([outer_x, 0, -12]) cube([10, 10, 12 + eps]);
+            translate([outer_x, 0, -13]) cube([11, bezel_l, 13 + eps]);
             // stiffening ribs from rail walls to the plate flange
             for (m = [0, 1]) mirror([m, 0, 0])
                 for (y = [rail_len * 0.45, rail_len * 0.8])
@@ -227,7 +249,7 @@ module slot_module() {
         translate([sw_x - sw_win[0] / 2, y_stop - eps, -sw_z - sw_win[1] / 2])
             cube([sw_win[0], stop_t + 2 * eps, sw_win[1]]);
         for (dx = [-3.25, 3.25])
-            translate([sw_x + dx, y_stop + 2, -sw_z - 5.5]) teardrop_y(1.8, stop_t);
+            translate([sw_x + dx, y_stop + 2, -sw_z - 5.5]) hole_y(1.8, stop_t);
 
         // bay cavity, open to the rear; the end stop is its front wall
         difference() {
@@ -242,7 +264,7 @@ module slot_module() {
                 cube([1.2, bay_l, pcb_t + 0.4]);
 
         // rear lid screw holes (M3 heat-set inserts, along Y)
-        for (p = bay_lid_holes()) translate([p[0], mod_l - 8 + eps, p[1]]) teardrop_y(4.2, 8.1);
+        for (p = bay_lid_holes()) translate([p[0], mod_l - 8 + eps, p[1]]) hole_y(4.2, 8.1);
 
         // mounting screws (vertical). Front: flat-head, countersunk flush into the
         // channel ceiling (fit before the battery goes in). Rear: pan-head in the rear tab.
@@ -257,15 +279,20 @@ module slot_module() {
                 cylinder(d = screw_head_d + 1, h = 40);   // head/driver room
         }
 
-        // status LED hole in the front bezel ...
-        translate([outer_x + 5, -eps, -6]) teardrop_y(led_d, 10 + 2 * eps);
-        // ... wires go up into a groove on the shelf side of the plate and back to the bay
-        translate([outer_x + 5 - 1.5, 7, -6]) cube([3, 3, plate_t + 6 + eps]);
-        translate([outer_x - 2.5, 7, plate_t - 2]) cube([9.5, 3, 2 + eps]);
-        translate([outer_x - 2.5, 7, plate_t - 2]) cube([4, y_bay0 - 7 + 10, 2 + eps]);
-        hull() for (x = [outer_x - 2.5, bay_x - col - 6])
-            translate([x, y_bay0 + 6, plate_t - 2]) cube([4, 4, 2 + eps]);
-        translate([bay_x - col - 6, y_bay0 + 6, -bay_wall]) cube([4, 4, plate_t + bay_wall + eps]);
+        // status LED in the front bezel: round holes (vertical when printed face-down).
+        // Front aperture for the dome, wider bore behind for flange, leads and wires.
+        led_x = outer_x + led_x_off;
+        wy = bezel_l - wire_ch - 1;          // wire channel position along Y
+        gx = outer_x - 3;                    // wire groove (shelf side), runs over the rail wall
+        translate([led_x, -eps, led_z]) rotate([-90, 0, 0]) cylinder(d = led_d, h = led_front + 2 * eps);
+        translate([led_x, led_front, led_z]) rotate([-90, 0, 0]) cylinder(d = led_bore_d, h = bezel_l - led_front - 1);
+        // ... wires go straight up into a groove on the shelf side of the plate and back to the bay
+        translate([led_x - wire_ch / 2, wy, led_z]) cube([wire_ch, wire_ch, plate_t - led_z + eps]);
+        translate([gx, wy, plate_t - wire_gd]) cube([led_x + wire_ch / 2 - gx, wire_ch, wire_gd + eps]);
+        translate([gx, wy, plate_t - wire_gd]) cube([wire_ch, y_bay0 + 12 - wy, wire_gd + eps]);
+        hull() for (x = [gx, bay_x - col - 8])
+            translate([x, y_bay0 + 6, plate_t - wire_gd]) cube([wire_ch, wire_ch + 1, wire_gd + eps]);
+        translate([bay_x - col - 8, y_bay0 + 6, -bay_wall]) cube([wire_ch, wire_ch + 1, plate_t + bay_wall + eps]);
     }
 }
 function bay_lid_holes() = [
