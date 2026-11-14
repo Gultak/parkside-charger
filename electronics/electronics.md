@@ -3,23 +3,19 @@
 ## 1. System overview
 
 ```
- 230 V AC ──[IEC inlet, switch, 2 A fuse]──[KSD301 70 °C thermal cut-out, NC]──► Mean Well LRS-200-24 (trim to 24.5 V)
-                                                                                     │ 24 V
-                                                         ┌───────────────────────────┴──────────────── MAIN BOARD ───┐
-                                                         │  F1 10 A ── always-on ──► 24→5 V buck ─┬─► ESP32-C6 (5V pin)│
-                                                         │                                        └─► polyfuse ─► "5V_SLOT"│
-                                                         │  F1 ──► Q1 P-MOSFET bus switch (GPIO21, soft-start) ──► 24 V BUS
-                                                         │  ESP32-C6 GPIO22/23 (I2C, 100 kHz) ──► TCA9548A @0x70 ch0..7  │
-                                                         │                                   └──► TCA9548A @0x71 ch0..1  │
-                                                         │                                   └──► SHT40 @0x44 (enclosure)│
-                                                         │  GPIO20 ──► buzzer                                            │
-                                                         └──────┬──────────────────────────┬────────────────────────────┘
-          24 V daisy chain: slot J1 IN -> J6 OUT -> next slot │             │ 10 × 4-wire cable (5V, GND, SDA, SCL)
-                           ┌──────────────┬──────────────┬──────── … ───────┘             │  one per slot, star topology
-                           ▼              ▼              ▼                                 ▼
-                     SLOT BOARD 1   SLOT BOARD 2   …  SLOT BOARD 10   (each: LTC4162-L charger @0x68 + PCA9554 @0x20)
-                           │
-                     Parkside battery: B+, B−, T (NTC)
+ 230 V AC ─[IEC inlet, switch, 2 A fuse]─[KSD301 70 °C cut-out, NC]─► Mean Well PSU 24 V (LRS-200-24 or LRS-350-24)
+                                                                            │ 24 V
+   ┌─────────────────────────────────── CONTROLLER BOARD ──────────────────┴──────────────────────────┐
+   │ J1 ─ 10 A fuse ─┬─ always on ─► TSR 1-2450 5 V ─┬─► ESP32-C6 D1 (pogo pins) ─ 3V3 ─► I2C side      │
+   │                 │                              └─► 0.5 A PTC ─► 5V_SLOT (slot logic + pull-ups)   │
+   │                 └─► P-MOSFET bus switch (GPIO19, soft start) ─► J2 OUT A / J3 OUT B (24 V)         │
+   │ GPIO22/23 I2C ─► TCA9548A 0x70 (slots 1-8) + TCA9548A 0x71 (slots 9-16), RESET GPIO4             │
+   │ GPIO0/1: PSU / bus voltage   GPIO18: buzzer   headers: SHT40, Qwiic, expansion                    │
+   └──────┬───────────────────────────────┬────────────────────────────────┬───────────────────────────┘
+          │ OUT A: 24 V daisy chain        │ OUT B: 24 V daisy chain         │ 16 × 4-wire cable (5V GND SDA SCL)
+          ▼                                ▼                                 │ one per slot, star topology
+   SLOT 1 J1 IN ─ J6 OUT ─► SLOT 2 … ─► SLOT 8      SLOT 9 … ─► SLOT 16 ◄─────┘
+   (each slot board: LTC4162-L charger @0x68 + PCA9554 @0x20; battery B+, B−, NTC)
 ```
 
 **Why one charger IC per slot, and why the LTC4162-L?**
@@ -34,7 +30,7 @@
 - It works with 1–8 cells (5 cells for X20V), takes inputs up to 35 V and charges at up to
   3.2 A with integrated switches. JEITA temperature control is built in.
 - Its I²C address is fixed (0x68). Every slot therefore gets its own TCA9548A channel. As a side
-  effect, all ten slot boards are identical and any I²C wiring fault stays within one slot.
+  effect, all slot boards are identical and any I²C wiring fault stays within one slot.
 
 ## 2. Parkside X20V battery interface: check this first
 
@@ -52,7 +48,7 @@ build ten boards, check on one pack:
    "Performance" packs should be checked.
 4. Measure the blade/slot geometry for the 3D model (see `docs/mechanical.md`).
 
-## 3. Slot board (×10), 72 × 60 mm, 4 layers
+## 3. Slot board (×16 max), 72 × 60 mm, 4 layers
 
 **The complete KiCad 7 design (schematic, routed PCB, Gerbers, BOM, pick-and-place) is in
 [`slot-board/`](slot-board/README.md).** This section summarises the design decisions.
@@ -126,23 +122,24 @@ off the PCB and away from plastic. If you don't fit them, delete `bleed_output:`
 | J4 switch | JST-PH 2-pin | IO0, GND |
 | J5 LED | JST-PH 4-pin | GND (common cathode), R, G, B |
 
-## 4. Main board (perfboard is fine, or a simple 2-layer PCB, 100 × 60 mm holes)
+## 4. Controller board, 110 × 100 mm, 4 layers
+
+**The complete KiCad 7 design is in [`controller-board/`](controller-board/README.md).** It covers
+up to **16 slots**.
 
 | Function | Part | Connection |
 |---|---|---|
-| MCU | **ESP32-C6-DevKitC-1** on headers (or Seeed XIAO ESP32C6) | 5 V from the buck |
-| 5 V supply | 24→5 V buck module **≥ 1.5 A** (e.g. Pololu D24V22F5) | always on. Feeds the ESP board and, via a 500 mA polyfuse, the **5V_SLOT** rail |
-| 5V_SLOT | from the 5 V buck through a 500 mA polyfuse | Feeds the slot-side I²C pull-ups, the PCA9554s, the LTC4162 DVCC and the LEDs (≤ 15 mA per slot) |
-| I²C | GPIO22 = SDA, GPIO23 = SCL, 4.7 k pull-ups to **3.3 V** (ESP side) | |
-| Mux A | TCA9548A, A0..A2 = 000 → **0x70**, channels 0–7 → slots 1–8 | RESET pulled high |
-| Mux B | TCA9548A, A0 = 1 → **0x71**, channels 0–1 → slots 9–10 | |
-| TCA9548A supply | **VCC = 3.3 V** | The TCA9548A's pass switches translate levels: with VCC at 3.3 V the ESP side stays at 3.3 V while each slot channel is pulled up to 5 V |
-| Pull-ups per mux channel | 2 × 4.7 kΩ to **5V_SLOT** per channel | Cheap TCA9548A breakouts often lack downstream pull-ups, and some have them to VCC (3.3 V). Remove those |
-| Enclosure temperature | SHT40 breakout, **0x44** | Mount it in the controller box, near the PSU |
-| 24 V bus switch | P-MOSFET (e.g. SQD40P06-15L or AOD4185, ≥ 40 V, ≥ 20 A), 12 V gate zener, 100 k gate–source, NPN/2N7002 driver from **GPIO21**, 100 nF + 47 k on the gate for about 10 ms soft-start | Default off: if the ESP is in reset or crashes, nothing charges |
-| Buzzer | 5 V active buzzer + 2N7002 from **GPIO20** | Sounds on any slot fault or enclosure > 50 °C |
-| Main fuse | 10 A blade fuse after the PSU | |
-| Slot cables | 10 × JST-XH 4-pin | 4-wire cable such as LiYY 4 × 0.14 mm², ≤ 1.5 m |
+| MCU | **xyzroe ESP32-C6 D1** (ESP32-C6-MINI-1-N4, Wemos D1 form factor), plugged onto **2 × 1×8 pogo-pin headers** soldered into the board (holes 1.1 mm, rows 22.86 mm apart). USB-C points at the box wall | 5 V pin from the regulator. Its own 3.3 V LDO feeds the I²C side |
+| 24 V input | J1 (5.08 mm screw terminal), **10 A mini blade fuse**, SMBJ26A, 47 µF | From the PSU |
+| 24 V bus switch | AOD4185 P-MOSFET (−40 V/−40 A, TO-252). 12 V gate zener, 100 k gate pull-up, 2N7002 driver from **GPIO19**, 47 k + 1 µF soft start (about 50 ms) | Default off. Switches **OUT A (J2)** and **OUT B (J3)**: two slot daisy chains, e.g. one per shelf row |
+| 5 V | TRACO TSR 1-2450 (or RECOM R-78E5.0-1.0), 3-pin SIP, 1 A | Always on. Feeds the ESP and, via a 500 mA PTC, the **5V_SLOT** rail |
+| I²C | GPIO22 = SDA, GPIO23 = SCL, 4.7 k to 3.3 V | |
+| Muxes | 2 × TCA9548APWR: **0x70** (slots 1–8) and **0x71** (slots 9–16). VCC = 3.3 V, RESET on **GPIO4** (10 k pull-up) | Channel → slot order follows the layout; ESPHome uses the same table |
+| Slot bus pull-ups | 8 × 4.7 k ×4 resistor arrays to 5V_SLOT | The TCA9548A shifts the level between 3.3 V and 5 V |
+| Slot connectors | 16 × JST-XH 4 (5V, GND, SDA, SCL): slots 1–8 on the left edge, 9–16 on the right | Same pin order as the slot board's J2, so cables are wired 1:1 |
+| Supply sensing | 100 k / 10 k dividers: PSU voltage → **GPIO0**, switched bus voltage → **GPIO1** | Firmware entities *PSU voltage* and *Slot bus voltage* |
+| Buzzer | 12 mm 5 V active buzzer, 2N7002 from **GPIO18** | Sounds on any slot fault or enclosure > 50 °C |
+| Headers | SHT40 breakout (3V3 GND SCL SDA, on a cable near the PSU), Qwiic (spare I²C), 7-pin expansion (3V3 GND IO5 IO6 IO7 TX RX) | |
 
 **Why the slot side runs at 5 V:** the green and blue chips of a typical RGB LED have
 V_F ≈ 3.0–3.4 V. At 3.3 V they would barely light, whichever way the LED is wired. At 5 V the PCA9554
@@ -151,21 +148,20 @@ never sees 5 V: the TCA9548A does the level shifting. Alternative if you prefer 
 slot board: keep the bus at 3.3 V, power only the LED from 5 V, and switch each colour with a
 high-side transistor. That takes 6 extra parts per slot.
 
-GPIO choice for the ESP32-C6: avoid the strapping pins 8, 9 and 15, USB pins 12/13, and the JTAG
-pins 4–7. Pins 20–23 are free on both suggested boards.
+The ESP32-C6 D1 breaks out only GPIO 0, 1, 4–7, 16–19, 22 and 23, so GPIO20/21 (used in the
+first draft) are not available. The bus switch and buzzer therefore use GPIO19/18.
 
 ## 5. Power budget
 
 | | |
 |---|---|
-| PSU | Mean Well LRS-200-24 (fanless, 200 W, 8.8 A). Trim to 24.5 V |
-| Battery-side current budget | `max_total_current: 8A` (8 A × 21 V = 168 W + about 6 % charger loss, roughly 180 W) |
+| PSU, up to about 10 slots | Mean Well **LRS-200-24** (fanless, 200 W). Trim to 24.5 V. `max_total_current: 8A` |
+| PSU, 16 slots | Mean Well **LRS-350-24** (350 W, has a fan) or **HLG-320H-24** (sealed, fanless). `max_total_current: 14A` |
+| Battery-side current budget | The firmware shares `max_total_current` between the slots. 8 A × 21 V = 168 W, plus about 6 % charger loss |
 | Per slot | 0.3–3.0 A, set in Home Assistant. Default 1.5 A (0.37C on 4 Ah, 0.75C on 2 Ah) |
-| Typical | 5 packs charging at 1.5 A at once. The rest wait, served in order: "charge to 100 %" requests first, then the emptiest pack |
-| Idle consumption | About 1.5 W (ESP + 10 × LTC4162 quiescent) |
-
-Bigger budget: use an LRS-350-24 (it has a fan) or an HLG-320H-24 (sealed, fanless) and raise
-`max_total_current`.
+| Typical | 5 packs (8 A) or 9 packs (14 A) charging at 1.5 A at once. The rest wait: "charge to 100 %" requests first, then the emptiest pack |
+| Chain wiring | Two chains (OUT A/B) of up to 8 slots each. Use 1.5 mm² jumpers: worst case each chain carries the whole budget (≤ 14 A, terminals rated 13.5 A, so set ≤ 13 A when running a single chain of 16) |
+| Idle consumption | About 2 W (ESP + 16 × LTC4162 quiescent) |
 
 ## 6. Safety: Li-ion charging under a shelf
 

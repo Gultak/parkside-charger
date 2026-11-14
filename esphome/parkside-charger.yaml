@@ -1,5 +1,9 @@
-# Parkside X20V 10-slot shelf charger - ESPHome configuration
-# Controller: ESP32-C6-DevKitC-1 (or Seeed XIAO ESP32C6: same I2C pins 22/23)
+# Parkside X20V shelf charger (up to 16 slots) - ESPHome configuration
+# Controller: xyzroe ESP32-C6 D1 (ESP32-C6-MINI-1-N4) on the controller board
+# (electronics/controller-board). GPIO map (controller board):
+#   GPIO22 SDA, GPIO23 SCL, GPIO19 24 V bus switch, GPIO18 buzzer,
+#   GPIO4 TCA9548A reset (active low), GPIO0 PSU voltage /11, GPIO1 bus voltage /11
+# Fewer slots? Delete the unused "slotN" packages at the end.
 
 substitutions:
   name: parkside-charger
@@ -13,6 +17,7 @@ esphome:
 esp32:
   board: esp32-c6-devkitc-1
   variant: esp32c6
+  flash_size: 4MB # ESP32-C6-MINI-1-N4
   framework:
     type: esp-idf
 
@@ -44,35 +49,48 @@ i2c:
     scan: true
 
 # Each slot board has the same addresses (LTC4162 0x68 fixed), so every
-# slot gets its own mux channel. Mux A: slots 1-8, mux B: slots 9-10.
+# slot gets its own mux channel. Mux A (0x70): slots 1-8, mux B (0x71): slots 9-16.
 tca9548a:
+  # channel -> slot mapping follows the controller board layout (see
+  # electronics/controller-board/tools/design.py CHANNEL_SLOT)
   - id: mux_a
     i2c_id: i2c_main
     address: 0x70
     channels:
-      - { bus_id: slot1_bus, channel: 0 }
-      - { bus_id: slot2_bus, channel: 1 }
-      - { bus_id: slot3_bus, channel: 2 }
-      - { bus_id: slot4_bus, channel: 3 }
-      - { bus_id: slot5_bus, channel: 4 }
-      - { bus_id: slot6_bus, channel: 5 }
-      - { bus_id: slot7_bus, channel: 6 }
-      - { bus_id: slot8_bus, channel: 7 }
+      - { bus_id: slot1_bus, channel: 7 }
+      - { bus_id: slot2_bus, channel: 6 }
+      - { bus_id: slot3_bus, channel: 5 }
+      - { bus_id: slot4_bus, channel: 4 }
+      - { bus_id: slot5_bus, channel: 0 }
+      - { bus_id: slot6_bus, channel: 1 }
+      - { bus_id: slot7_bus, channel: 2 }
+      - { bus_id: slot8_bus, channel: 3 }
   - id: mux_b
     i2c_id: i2c_main
     address: 0x71
     channels:
-      - { bus_id: slot9_bus, channel: 0 }
-      - { bus_id: slot10_bus, channel: 1 }
+      - { bus_id: slot9_bus, channel: 7 }
+      - { bus_id: slot10_bus, channel: 6 }
+      - { bus_id: slot11_bus, channel: 5 }
+      - { bus_id: slot12_bus, channel: 4 }
+      - { bus_id: slot13_bus, channel: 3 }
+      - { bus_id: slot14_bus, channel: 2 }
+      - { bus_id: slot15_bus, channel: 1 }
+      - { bus_id: slot16_bus, channel: 0 }
 
 # ---------------------------------------------------- main board I/O ----
 output:
   - platform: gpio
     id: bus_switch # P-MOSFET switch for the 24 V bus to all slot boards (default off)
-    pin: GPIO21
+    pin: GPIO19
   - platform: gpio
     id: buzzer_out
-    pin: GPIO20
+    pin: GPIO18
+  - platform: gpio
+    id: mux_reset # TCA9548A RESET, active low
+    pin:
+      number: GPIO4
+      inverted: true
 
 sensor:
   - platform: sht4x
@@ -87,6 +105,24 @@ sensor:
   - platform: wifi_signal
     name: "WiFi signal"
     update_interval: 120s
+  - platform: adc
+    pin: GPIO0
+    id: psu_voltage
+    name: "PSU voltage"
+    attenuation: 12db
+    filters:
+      - multiply: 11.0 # 100k / 10k divider
+    accuracy_decimals: 1
+    update_interval: 10s
+  - platform: adc
+    pin: GPIO1
+    id: bus_voltage
+    name: "Slot bus voltage"
+    attenuation: 12db
+    filters:
+      - multiply: 11.0
+    accuracy_decimals: 1
+    update_interval: 10s
 
 number:
   - platform: template
@@ -122,10 +158,18 @@ button:
       - lambda: id(charger).request_full_all();
   - platform: restart
     name: "Restart"
+  - platform: template
+    name: "Reset I2C multiplexers"
+    entity_category: diagnostic
+    on_press:
+      - output.turn_on: mux_reset
+      - delay: 5ms
+      - output.turn_off: mux_reset
 
 parkside_charger:
   id: charger
-  # Mean Well LRS-200-24: 200 W -> ~8.5 A battery-side at 21 V incl. losses
+  # Battery-side current budget shared by all slots. Size it to the PSU:
+  #   LRS-200-24 (200 W): 8A    LRS-350-24 / HLG-320H-24 (320-350 W): 14A
   max_total_current: 8A
   enable_output: bus_switch
   ambient_temperature: enclosure_temp
@@ -146,8 +190,7 @@ interval:
     then:
       - lambda: |-
           bool alarm = id(enclosure_temp).has_state() && id(enclosure_temp).state > 50;
-          for (auto *s : {id(slot1), id(slot2), id(slot3), id(slot4), id(slot5),
-                          id(slot6), id(slot7), id(slot8), id(slot9), id(slot10)})
+          for (auto *s : id(charger)->slots())
             alarm |= s->phase() == esphome::parkside_charger::Phase::FAULT;
           id(buzzer_out).set_state(alarm);
 
@@ -163,3 +206,9 @@ packages:
   slot8: !include { file: slot.yaml, vars: { n: 8 } }
   slot9: !include { file: slot.yaml, vars: { n: 9 } }
   slot10: !include { file: slot.yaml, vars: { n: 10 } }
+  slot11: !include { file: slot.yaml, vars: { n: 11 } }
+  slot12: !include { file: slot.yaml, vars: { n: 12 } }
+  slot13: !include { file: slot.yaml, vars: { n: 13 } }
+  slot14: !include { file: slot.yaml, vars: { n: 14 } }
+  slot15: !include { file: slot.yaml, vars: { n: 15 } }
+  slot16: !include { file: slot.yaml, vars: { n: 16 } }

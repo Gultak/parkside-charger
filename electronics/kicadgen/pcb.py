@@ -1,14 +1,14 @@
-"""Generate slot_board.kicad_pcb (KiCad 7, 4 layers) from design.py.
+"""Generic PCB generator (KiCad 7) driven by a board's design + layout modules.
 
-  * placement follows the LTC4162 datasheet layout rules (p.34/35): VOUT bypass
-    caps directly at pins 27/28 -> 23/24, SW leaves between their pads straight
-    into the inductor, Kelvin sense traces to the sense resistor pads,
-    In1/In2 = unbroken GND planes
-  * power nets are copper pours on F.Cu, small signals are routed by a simple
-    grid maze router (A*, F.Cu/B.Cu, 0.1 mm grid), every GND pad gets a via
-  * finally zones are filled and the KiCad DRC is run
+  * places footprints, adds copper pours / fixed copper / keepouts from the layout
+  * routes pad->pad priority connections (Kelvin etc.), then every other net with
+    a grid maze router (A*, F.Cu/B.Cu, 0.1 mm grid), gives every SMD GND pad a via
+  * GND planes on the inner layers + GND fill on the outer layers, zone fill, DRC
 
-Run with the system python that has the pcbnew module:  /usr/bin/python3 gen_pcb.py ..
+design module: PARTS, NET_WIDTH, DEFAULT_WIDTH
+layout module: PROJECT, BW, BH, EDGE_KEEP, PLACE, POURS, FIXED_TRACKS, FIXED_VIAS,
+               KELVIN, ROUTE_ORDER_FIRST, ROUTE_ORDER_LAST, LABELS, [KEEPOUTS]
+Run with the system python that has the pcbnew module.
 """
 import heapq
 import math
@@ -18,85 +18,34 @@ from pathlib import Path
 import numpy as np
 import pcbnew
 
-from design import DEFAULT_WIDTH, NET_WIDTH, PARTS
 
 FPLIB = "/usr/share/kicad/footprints"
 OX, OY = 100.0, 100.0          # board origin on the sheet (mm)
-BW, BH = 72.0, 60.0            # board size: 72 wide (rides in the card guides), 60 long
-EDGE_KEEP = 2.0                # card guides: keep parts this far from the long edges
+BW, BH, EDGE_KEEP = 0.0, 0.0, 2.0   # set by configure()
 CLEAR = 0.15                   # copper clearance (DRC rule)
 RMARGIN = 0.03                 # extra margin the router keeps
 VIA_D, VIA_DRILL = 0.6, 0.3
 GRID = 0.1
-DEBUG_DIR = "/tmp/claude-0/dbg"
+DEBUG_DIR = __import__("os").environ.get("KICADGEN_DEBUG")  # dump router maps on failure
 PAD_HALO = 0.3
 HW = 1.6                       # weighted A*: heuristic weight (>1 = faster, slightly longer paths)
 
-# ref: (x, y, rotation)  board coordinates, y = 0 is the FRONT edge (towards the
-# battery / end stop), y = 60 the REAR edge (bay lid)
-PLACE = {
-    # input: J1 rear-left, fuse, TVS, bulk cap, reverse-blocking FET, RSNSI
-    "J1": (5.5, 54.5, 0), "J6": (16.8, 54.5, 0), "F1": (13.6, 45.5, 90), "D1": (4.6, 34.5, 90), "C1": (11.7, 39.2, 0),
-    "Q1": (17.0, 33.0, 90), "R1": (17.0, 25.5, 90),
-    # LTC4162 + hot loop + LDO caps
-    "U1": (26.0, 30.0, 0), "C3": (26.0, 24.6, 0), "C4": (26.0, 21.9, 0), "C6": (24.6, 19.9, 0),
-    "L1": (28.0, 15.4, 0), "R2": (33.6, 15.4, 90), "C7": (36.9, 15.0, 270), "C8": (39.4, 15.0, 270),
-    "Q2": (31.5, 25.0, 0),
-    "C9": (21.4, 27.4, 180), "C5": (21.4, 29.05, 180), "C2": (21.4, 31.9, 180), "C10": (22.5, 34.5, 270),
-    # bottom-row parts kept ~4 mm below the pins so pins 9..14 can fan out
-    "R3": (24.0, 37.2, 0), "R4": (27.1, 37.2, 0), "R5": (30.2, 37.2, 0), "C11": (30.4, 32.6, 0),
-    # battery output, front edge
-    "F2": (40.0, 11.5, 0), "J3": (44.0, 5.5, 180),
-    # logic, right half
-    "U2": (52.0, 34.0, 0), "C13": (56.8, 29.6, 0), "J2": (60.0, 55.5, 180), "U3": (52.0, 49.0, 0),
-    "R6": (47.0, 46.0, 90), "R7": (48.6, 46.0, 90), "C12": (65.0, 51.5, 90),
-    "J4": (54.0, 4.0, 180), "C14": (54.0, 9.0, 0), "J5": (66.5, 4.0, 180),
-    "R8": (63.5, 10.0, 90), "R9": (65.5, 10.0, 90), "R10": (67.5, 10.0, 90),
-    # bleed resistor (2 x 1 W dissipation) along the right edge, away from the IC
-    "R11": (52.5, 41.5, 0), "R12": (52.5, 43.3, 0), "Q3": (57.0, 42.5, 0),
-    "R13": (67.0, 44.0, 90), "R14": (61.5, 28.76, 270),
-}
+PARTS, NET_WIDTH, DEFAULT_WIDTH = {}, {}, 0.2
+PLACE, POURS, FIXED_TRACKS, FIXED_VIAS, KELVIN = {}, [], [], [], []
+ROUTE_ORDER_FIRST, ROUTE_ORDER_LAST, LABELS, KEEPOUTS = [], [], [], []
+PROJECT, BOARD_DIR = "board", Path(".")
+GND_VIA_SKIP = set()
 
-# copper pours on F.Cu: (net, priority, polygon)
-POURS = [
-    ("+24V", 2, [(8.6, 46.0), (18.9, 46.0), (18.9, 57.0), (8.6, 57.0)]),
-    ("VIN", 2, [(2.3, 33.9), (17.55, 33.9), (17.55, 35.2), (19.0, 35.2), (19.0, 37.6), (10.9, 37.6),
-                (10.9, 41.0), (15.0, 41.0), (15.0, 44.7), (2.3, 44.7)]),
-    ("CLP", 3, [(15.1, 27.6), (18.9, 27.6), (18.9, 33.75), (15.1, 33.75)]),
-    ("VOUT", 3, [(15.1, 20.9), (25.4, 20.9), (25.4, 28.05), (24.5, 28.05), (24.5, 26.45), (15.1, 26.45)]),
-    ("GND", 3, [(26.65, 20.9), (28.6, 20.9), (28.6, 27.4), (27.45, 27.4), (27.45, 28.0), (26.6, 28.0)]),
-    ("CSP", 3, [(29.2, 12.5), (30.8, 12.5), (30.8, 16.9), (35.4, 16.9), (35.4, 19.1), (29.2, 19.1)]),
-    ("BAT", 3, [(31.8, 10.3), (40.35, 10.3), (40.35, 14.5), (31.8, 14.5)]),
-    ("BAT_F", 3, [(42.3, 3.9), (46.0, 3.9), (46.0, 12.6), (40.6, 12.6), (40.6, 9.0), (42.3, 9.0)]),
-]
-# hand-placed copper: (net, layer, width, [points])
-FIXED_TRACKS = [
-    ("SW", "F", 0.75, [(26.0, 27.5), (26.0, 17.6)]),   # SW pins 25/26 -> between C3/C4 pads -> L1
-]
-FIXED_VIAS = [("GND", (28.2, 23.25)), ("GND", (27.6, 26.3)), ("GND", (28.25, 26.3)),
-              ("GND", (28.2, 20.95))]
 
-# explicit Kelvin / priority connections: route pad -> specific pad
-KELVIN = [
-    # left pin column of U1, strictly top to bottom so every pin keeps its escape
-    ("U1", "1", "C6", "1"),    # BOOST -> 22 nF (via B.Cu)
-    ("U1", "2", "C9", "1"),    # INTVCC pin -> its 4.7 uF
-    ("U1", "3", "C5", "1"),    # VOUTA pin -> its 100 nF
-    ("U1", "4", "R1", "2"),    # CLN sense (VOUT side of RSNSI)
-    ("U1", "5", "R1", "1"),    # CLP sense
-    ("U1", "6", "Q1", "4"),    # INFET gate
-    ("U1", "7", "C2", "1"),    # VIN pin -> its 100 nF
-    ("U1", "8", "C10", "1"),   # VCC2P5 pin -> its 1 uF
-    # right column: charge-current sense
-    ("U1", "21", "R2", "1"),   # CSP sense
-    ("U1", "20", "R2", "2"),   # CSN sense (BAT)
-    ("U1", "19", "R2", "2"),   # BATSENS+
-    ("U1", "22", "Q2", "4"),   # BATFET gate
-]
-# fine-pitch escapes first; nets that cross under the IC (VCC2P5 to CELLS0/1) last
-ROUTE_ORDER_FIRST = ["SCL", "BOOST", "RT", "NTCBIAS", "NTC", "ALERT", "SCL", "SDA", "+5V", "INFET", "BATFET",
-                     "INTVCC"]
-ROUTE_ORDER_LAST = ["VCC2P5"]
+def configure(design, layout, board_dir):
+    """inject the board-specific design/layout into this module."""
+    g = globals()
+    g.update(PARTS=design.PARTS, NET_WIDTH=getattr(design, "NET_WIDTH", {}),
+             DEFAULT_WIDTH=getattr(design, "DEFAULT_WIDTH", 0.2), BOARD_DIR=Path(board_dir))
+    for k in ("PROJECT", "BW", "BH", "EDGE_KEEP", "PLACE", "POURS", "FIXED_TRACKS", "FIXED_VIAS", "KELVIN",
+              "ROUTE_ORDER_FIRST", "ROUTE_ORDER_LAST", "LABELS", "KEEPOUTS", "GND_VIA_SKIP"):
+        if hasattr(layout, k):
+            g[k] = getattr(layout, k)
 
 
 def mm(v):
@@ -400,16 +349,6 @@ def add_zone(board, netobj, layer, poly, priority, clearance=0.2, min_w=0.2):
     return z
 
 
-# silkscreen labels: (text, x, y, size); pin labels read left to right as seen
-# on the board (J2/J3/J4/J5 are rotated 180 deg)
-LABELS = [
-    ("PARKSIDE X20V SLOT rev A", 36.0, 58.6, 1.0), ("FRONT (battery side)", 20.0, 1.3, 0.9),
-    ("IN: GND +24V", 8.0, 50.0, 0.8), ("OUT: +24V GND", 19.2, 50.0, 0.8),
-    ("NTC GND B+", 40.5, 9.6, 0.8), ("SCL SDA GND 5V", 57.6, 50.9, 0.8),
-    ("GND SW", 53.0, 7.6, 0.8), ("B G R GND", 63.5, 7.6, 0.8),
-]
-
-
 def place_references(fps, boxes, size=0.8):
     """put every reference designator next to its part where it overlaps nothing."""
     placed = [(x - 0.31 * sz * len(t) - 0.1, y - sz / 2 - 0.1, x + 0.31 * sz * len(t) + 0.1, y + sz / 2 + 0.1)
@@ -487,7 +426,8 @@ def build(outdir: Path, promote=()):
     fps = {}
     for ref, (value, _sym, fpid, pins, _mpn) in PARTS.items():
         lib, name = fpid.split(":")
-        fp = pcbnew.FootprintLoad(f"{FPLIB}/{lib}.pretty", name)
+        libdir = BOARD_DIR / f"{lib}.pretty" if lib == "pcl" else Path(FPLIB) / f"{lib}.pretty"
+        fp = pcbnew.FootprintLoad(str(libdir), name)
         fp.SetFPID(pcbnew.LIB_ID(lib, name))
         fp.SetReference(ref)
         fp.SetValue(value)
@@ -535,9 +475,27 @@ def build(outdir: Path, promote=()):
     router.add_pad_shapes()
 
     # ---- pours, fixed copper
-    for net, prio, poly in POURS:
-        add_zone(board, netobjs[net], pcbnew.F_Cu, poly, prio)
-        router.add_zone(net, 0, poly)
+    for pour in POURS:
+        net, prio, poly = pour[:3]
+        lay = pour[3] if len(pour) > 3 else "F"
+        add_zone(board, netobjs[net], LAYER[lay], poly, prio)
+        router.add_zone(net, 0 if lay == "F" else 1, poly)
+    for poly in KEEPOUTS:   # no copper at all (e.g. under an antenna)
+        z = pcbnew.ZONE(board)
+        z.SetIsRuleArea(True)
+        z.SetDoNotAllowCopperPour(True)
+        z.SetDoNotAllowTracks(True)
+        z.SetDoNotAllowVias(True)
+        z.SetDoNotAllowPads(False)
+        z.SetDoNotAllowFootprints(False)
+        z.SetLayerSet(pcbnew.LSET.AllCuMask())
+        o = z.Outline()
+        o.NewOutline()
+        for x, y in poly:
+            o.Append(pcbnew.FromMM(OX + x), pcbnew.FromMM(OY + y))
+        board.Add(z)
+        router.add_zone("<keepout>", 0, poly)
+        router.add_zone("<keepout>", 1, poly)
     for net, lay, w, pts in FIXED_TRACKS:
         for a, b in zip(pts, pts[1:]):
             t = pcbnew.PCB_TRACK(board)
@@ -606,8 +564,9 @@ def build(outdir: Path, promote=()):
             if n:
                 netpads.setdefault(n, []).append(p)
     pour_of = {}
-    for net, _pr, poly in POURS:
-        pour_of.setdefault(net, []).append(poly)
+    for pour in POURS:
+        if len(pour) == 3 or pour[3] == "F":
+            pour_of.setdefault(pour[0], []).append(pour[2])
     first = list(dict.fromkeys(list(promote) + ROUTE_ORDER_FIRST))
     order = first + sorted(n for n in netpads if n not in first and n not in ROUTE_ORDER_LAST and n != "GND")
     order += [n for n in ROUTE_ORDER_LAST if n not in first]
@@ -662,10 +621,10 @@ def build(outdir: Path, promote=()):
 
     # ---- 3. GND: a via (with a short stub) next to every SMD GND pad
     gnd = netobjs["GND"]
-    gnd_poly = [poly for net, _p, poly in POURS if net == "GND"]
+    gnd_poly = [pour[2] for pour in POURS if pour[0] == "GND" and (len(pour) == 3 or pour[3] == "F")]
     for p in netpads["GND"]:
-        if p.GetAttribute() == pcbnew.PAD_ATTRIB_PTH or p.GetParent().GetReference() == "U1":
-            continue  # through-hole pads reach the planes; U1 EP has thermal vias, PGND sits in the pour
+        if p.GetAttribute() == pcbnew.PAD_ATTRIB_PTH or (p.GetParent().GetReference(), p.GetNumber()) in GND_VIA_SKIP:
+            continue  # through-hole pads reach the planes; exposed pads have thermal vias
         pos = p.GetPosition()
         x, y = mm(pos.x) - OX, mm(pos.y) - OY
         if any(in_poly(x, y, poly) for poly in gnd_poly):
@@ -675,12 +634,12 @@ def build(outdir: Path, promote=()):
         src = router.cells_of_pad(p)
         src = [c for c in src if c[0] == 0]
         i0, j0 = int(round(x / GRID)), int(round(y / GRID))
-        win = (i0 - 30, i0 + 31, j0 - 30, j0 + 31)
+        win = (i0 - 60, i0 + 61, j0 - 60, j0 + 61)
         path = router.astar("GND", 0.3, src, [], via_ok=False, window=win,
                             target_fn=lambda L, i, j: L == 0 and vok[j, i] and math.hypot(i - i0, j - j0) > 6
                             and router.via_far(i, j))
-        if path is None:
-            failures.append(f"GND via for {p.GetParent().GetReference()}.{p.GetNumber()}")
+        if path is None:   # not fatal: the GND fill usually reaches it; the DRC checks connectivity
+            print(f"  warning: no GND via next to {p.GetParent().GetReference()}.{p.GetNumber()}")
             continue
         router.commit(gnd, 0.3, path)
         L, i, j = path[-1]
@@ -689,8 +648,6 @@ def build(outdir: Path, promote=()):
 
     # ---- 4. GND everywhere else: inner planes + top/bottom fill
     full = [(0.0, 0.0), (BW, 0.0), (BW, BH), (0.0, BH)]
-    # 24 V pass-through IN -> OUT also on B.Cu (chain current of all following slots)
-    add_zone(board, netobjs["+24V"], pcbnew.B_Cu, POURS[0][2], 2)
     for lay in (pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu, pcbnew.F_Cu):
         add_zone(board, gnd, lay, full, 0, clearance=0.25, min_w=0.25)
 
@@ -709,7 +666,7 @@ def build(outdir: Path, promote=()):
     # ---- fill + DRC
     if failures:
         return None, failures
-    out = outdir / "slot_board.kicad_pcb"
+    out = outdir / f"{PROJECT}.kicad_pcb"
     board.Save(str(out))
     print("saved unfilled board, filling zones ...", flush=True)
     # filling a board built in memory crashes pcbnew 7; reload it from disk first
@@ -728,30 +685,29 @@ def build(outdir: Path, promote=()):
     return out, failures
 
 
-if __name__ == "__main__":
+def run(tools_dir, board_dir, attempts=6):
+    """route in child processes (pcbnew dislikes a 2nd board per process), promoting failed nets."""
     import json
     import os
     import subprocess
-    outdir = Path(sys.argv[1] if len(sys.argv) > 1 else "..")
-    if os.environ.get("GEN_PCB_CHILD"):
-        out, failures = build(outdir, json.loads(os.environ["GEN_PCB_PROMOTE"]))
-        print("RESULT " + json.dumps(failures))
-        sys.exit(0)
-    # pcbnew does not like a second board in one process: one attempt per child
+    tools_dir, board_dir = Path(tools_dir).resolve(), Path(board_dir).resolve()
     promote = []
-    for attempt in range(int(os.environ.get("ATTEMPTS", 6))):
-        env = dict(os.environ, GEN_PCB_CHILD="1", GEN_PCB_PROMOTE=json.dumps(promote))
-        r = subprocess.run([sys.executable, __file__, str(outdir)], env=env, capture_output=True, text=True)
-        print(r.stdout.replace("RESULT", "  result"), r.stderr[-2000:], end="")
+    code = ("import sys, json, os; sys.path[:0] = [%r, %r]; import design, layout; from kicadgen import pcb; "
+            "pcb.configure(design, layout, %r); out, f = pcb.build(pcb.BOARD_DIR, json.loads(os.environ['P'])); "
+            "print('RESULT ' + json.dumps(f))") % (str(tools_dir), str(Path(__file__).resolve().parents[1]),
+                                                   str(board_dir))
+    for attempt in range(attempts):
+        r = subprocess.run([sys.executable, "-c", code], env=dict(os.environ, P=json.dumps(promote)),
+                           capture_output=True, text=True)
+        print(r.stdout.replace("RESULT", "  result"), r.stderr[-3000:], end="")
         res = [ln for ln in r.stdout.splitlines() if ln.startswith("RESULT ")]
         if not res:
             sys.exit(f"attempt {attempt + 1} crashed (rc={r.returncode})")
         failures = json.loads(res[-1][7:])
         if not failures:
             print(f"attempt {attempt + 1}: all nets routed")
-            break
-        nets_failed = list(dict.fromkeys(f.split(":")[0] for f in failures))
+            return True
+        nets_failed = list(dict.fromkeys(f.split(":")[0] for f in failures if not f.startswith("GND via")))
         print(f"attempt {attempt + 1}: {len(failures)} failures -> promoting {nets_failed}")
         promote = list(dict.fromkeys(nets_failed + promote))
-    else:
-        sys.exit("routing failed")
+    return False

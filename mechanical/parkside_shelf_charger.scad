@@ -110,9 +110,19 @@ led_z      = -6.5;  // LED axis height
 wire_ch    = 5;     // wire channel / groove width
 wire_gd    = 3;     // depth of the wire groove on the shelf side of the plate
 
-/* [Controller box] */
-ctl_in = [120, 80, 36];   // inner dims (X, Y, Z)
+/* [Cable access, slot bay] */
+// Rear part of the bay floor is open: 24 V IN/OUT screws and the I2C plug of the
+// slot board (all facing down) are reachable from below with the bay closed.
+floor_window_y = 36;   // window starts this far behind the PCB's front edge
+lid_notch_top  = 12.0; // the lid's U-notch reaches up to this depth below the plate (PCB at 9..10.6)
+
+/* [Controller box (controller board 110 x 100 mm)] */
+ctl_pcb  = [110, 100];
+ctl_gap  = 4;             // PCB to inner wall
+ctl_in   = [ctl_pcb[0] + 2 * ctl_gap, ctl_pcb[1] + 2 * ctl_gap, 42];   // inner dims (X, Y, Z)
 ctl_wall = 2.4;
+ctl_standoff = 8;         // PCB above the base
+ctl_holes = [[5, 78.5], [105, 78.5], [13.5, 4.5], [96.5, 4.5]];      // PCB mounting holes (board coords)
 
 $fn = 48;
 eps = 0.01;
@@ -264,6 +274,9 @@ module slot_module() {
             for (sx = [-1, 1]) for (z = [-col, -bay_h + bay_wall])
                 translate([sx > 0 ? bay_x - col : -bay_x, y_bay0, z]) cube([col, bay_l + eps, col]);
         }
+        // cable-access window in the bay floor (rear part, between the corner columns)
+        translate([-bay_x + col, y_bay0 + 4 + floor_window_y, -bay_h - eps])
+            cube([2 * (bay_x - col), mod_l - (y_bay0 + 4 + floor_window_y) + eps, bay_wall + 2 * eps]);
         // card guides for the PCB (stop 4 mm short of the end stop)
         for (m = [0, 1]) mirror([m, 0, 0])
             translate([bay_x - eps, y_bay0 + 4, -pcb_z - pcb_t - 0.2])
@@ -306,17 +319,18 @@ function bay_lid_holes() = [
 
 // Rear lid of the bay: power + I2C cable entries, vents
 module slot_lid() {
+    // Rear lid: a wide U-notch open at the bottom, so it slides on over the 24 V
+    // chain jumpers and the I2C cable when they are already plugged in. It also
+    // keeps the PCB from sliding out of the card guides.
     lid_t = 2.4;
+    col = 7;
     w = 2 * (bay_x + bay_wall);
+    notch_w = 2 * (bay_x - col - 0.5);
     difference() {
         translate([-w / 2, 0, 0]) cube([w, lid_t, bay_h]);
         for (p = bay_lid_holes())
             translate([p[0], -eps, p[1] + bay_h]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = lid_t + 1);
-        // cable entries: 24 V bus (2 x 1.5 mm^2) and 4-wire I2C cable
-        translate([-18, -eps, 12]) rotate([-90, 0, 0]) cylinder(d = 9, h = lid_t + 1);
-        translate([12, -eps, 12]) rotate([-90, 0, 0]) cylinder(d = 6, h = lid_t + 1);
-        // vents
-        for (i = [0:5]) translate([-25 + i * 10, -eps, bay_h - 12]) cube([3, lid_t + 1, 8]);
+        translate([-notch_w / 2, -eps, -eps]) cube([notch_w, lid_t + 2 * eps, bay_h - lid_notch_top + eps]);
     }
 }
 
@@ -331,50 +345,61 @@ module gauge() {
 // --------------------------- controller box ---------------------------
 // Holds the main board (ESP32-C6 dev board + 2x TCA9548A + relay + DC/DC).
 // Screws to the shelf next to the slots. Cable glands on the rear face.
+// Tray for the controller board: base on the shelf, board on standoffs with its
+// components facing the lid. Every connector group gets a U-notch open towards the
+// lid, so all cables can be plugged in first and the lid put on afterwards:
+//   left/right walls: slot cables 1-8 / 9-16; bottom wall: 24 V PSU in, OUT A/B;
+//   top wall: ESP32 USB-C, SHT40 / Qwiic / expansion headers.
+function ctl_o() = [ctl_in[0] + 2 * ctl_wall, ctl_in[1] + 2 * ctl_wall, ctl_in[2] + ctl_wall];
+function ctl_pcb_xy(p) = [p[0] - ctl_pcb[0] / 2, ctl_wall + ctl_gap + p[1]];   // board -> box coords
+function ctl_ears() = [[-1, 1], [1, 1], [-1, -1], [1, -1]];
 module controller_box() {
-    o = ctl_in + [2 * ctl_wall, 2 * ctl_wall, ctl_wall];
+    o = ctl_o();
+    top = o[2];
+    pz = ctl_wall + ctl_standoff + 1.6;      // PCB top surface
     difference() {
         union() {
             translate([-o[0] / 2, 0, 0]) cube(o);
-            // mounting flanges
+            // shelf mounting flanges
             for (sx = [-1, 1]) translate([sx * (o[0] / 2 + 6) - 6, 0, 0]) cube([12, o[1], 4]);
+            // lid ears (outside the walls, clear of the PCB)
+            for (e = ctl_ears())
+                translate([e[0] * (o[0] / 2 + 4) - 4, (e[1] > 0 ? o[1] - 22 : 14), top - 10]) cube([8, 8, 10]);
         }
         translate([-ctl_in[0] / 2, ctl_wall, ctl_wall]) cube(ctl_in + [0, 0, eps]);
         for (sx = [-1, 1]) for (y = [12, o[1] - 12])
             translate([sx * (o[0] / 2 + 6), y, -eps]) cylinder(d = screw_d, h = 5);
-        // rear wall: 10 signal cables + 24 V in + 24 V bus out -> two slots with grommet strip
-        translate([-50, o[1] - ctl_wall - eps, 8]) cube([100, ctl_wall + 2 * eps, 12]);
-        translate([-50, o[1] - ctl_wall - eps, 24]) cube([100, ctl_wall + 2 * eps, 8]);
-        // front: USB-C access for the dev board + LED window
-        translate([-6, -eps, 10]) cube([12, ctl_wall + 2 * eps, 7]);
-        translate([30, -eps, 20]) rotate([-90, 0, 0]) cylinder(d = 5.1, h = ctl_wall + 1);
-        // side vents
-        for (sx = [-1, 1]) for (i = [0:5])
-            translate([sx * (ctl_in[0] / 2) - (sx > 0 ? 0 : ctl_wall) - eps, 15 + i * 10, 10])
-                cube([ctl_wall + 2 * eps, 4, 18]);
+        for (e = ctl_ears())
+            translate([e[0] * (o[0] / 2 + 4), (e[1] > 0 ? o[1] - 18 : 18), top - 6]) cylinder(d = 4.2, h = 6 + eps);
+        // ---- cable notches, open towards the lid
+        // left / right: slot connectors (board y 6..72)
+        for (sx = [-1, 1]) translate([sx > 0 ? o[0] / 2 - ctl_wall - eps : -o[0] / 2 - eps,
+                                      ctl_pcb_xy([0, 6])[1], pz + 2])
+            cube([ctl_wall + 2 * eps, 66, top]);
+        // bottom: PSU in, OUT A, OUT B, 5 V regulator (board x 2..96)
+        translate([ctl_pcb_xy([2, 0])[0], o[1] - ctl_wall - eps, pz + 1]) cube([94, ctl_wall + 2 * eps, top]);
+        // top: SHT40 / Qwiic / ESP USB-C / expansion (board x 15..92)
+        translate([ctl_pcb_xy([15, 0])[0], -eps, pz + 1]) cube([77, ctl_wall + 2 * eps, top]);
     }
-    // lid screw bosses (M3 inserts)
-    for (p = ctl_bosses()) translate([p[0], p[1], ctl_wall - eps])
-        difference() { cylinder(d = 8, h = ctl_in[2]); translate([0, 0, ctl_in[2] - 6]) cylinder(d = 4.2, h = 6 + eps); }
-    // board standoffs (M3 inserts), 100 x 60 hole pattern
-    for (x = [-50, 50]) for (y = [12, 72]) translate([x, y, ctl_wall - eps])
-        difference() { cylinder(d = 7, h = 6); translate([0, 0, 1]) cylinder(d = 4.2, h = 5 + eps); }
+    // board standoffs (M3 heat-set inserts)
+    for (h = ctl_holes) translate([ctl_pcb_xy(h)[0], ctl_pcb_xy(h)[1], ctl_wall - eps])
+        difference() { cylinder(d = 7, h = ctl_standoff); translate([0, 0, 1]) cylinder(d = 4.2, h = ctl_standoff); }
 }
-function ctl_bosses() = [
-    [-ctl_in[0] / 2 + 3.5, ctl_wall + 3.5], [ctl_in[0] / 2 - 3.5, ctl_wall + 3.5],
-    [-ctl_in[0] / 2 + 3.5, ctl_in[1] + ctl_wall - 3.5], [ctl_in[0] / 2 - 3.5, ctl_in[1] + ctl_wall - 3.5]
-];
 module controller_lid() {
-    o = ctl_in + [2 * ctl_wall, 2 * ctl_wall, 0];
+    o = ctl_o();
     difference() {
         union() {
             translate([-o[0] / 2, 0, 0]) cube([o[0], o[1], 2.4]);
-            translate([-ctl_in[0] / 2 + 0.3, ctl_wall + 0.3, 2.4 - eps]) difference() {
-                cube([ctl_in[0] - 0.6, ctl_in[1] - 0.6, 3]);
-                translate([2, 2, -eps]) cube([ctl_in[0] - 4.6, ctl_in[1] - 4.6, 3 + 2 * eps]);
-            }
+            for (e = ctl_ears())
+                translate([e[0] * (o[0] / 2 + 4) - 4, (e[1] > 0 ? o[1] - 22 : 14), 0]) cube([8, 8, 2.4]);
+            // locating lip (inside the corners only, so the notches stay free)
+            for (sx = [-1, 1]) for (y = [ctl_wall + 0.3, o[1] - ctl_wall - 8.3])
+                translate([sx > 0 ? ctl_in[0] / 2 - 8.3 : -ctl_in[0] / 2 + 0.3, y, 2.4 - eps]) cube([8, 8, 3]);
         }
-        for (p = ctl_bosses()) translate([p[0], p[1], -eps]) cylinder(d = 3.4, h = 10);
+        for (e = ctl_ears())
+            translate([e[0] * (o[0] / 2 + 4), (e[1] > 0 ? o[1] - 18 : 18), -eps]) cylinder(d = 3.4, h = 10);
+        // vent slots above the regulator / bus switch area
+        for (i = [0:7]) translate([-30 + i * 8, o[1] - 30, -eps]) cube([3, 20, 3]);
     }
 }
 

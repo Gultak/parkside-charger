@@ -1,5 +1,5 @@
 """Render the slot board copper layers coloured by net (PNG) for review/docs.
-Usage: /usr/bin/python3 render_pcb.py ../slot_board.kicad_pcb out_dir"""
+"""
 import colorsys
 import sys
 from pathlib import Path
@@ -21,7 +21,7 @@ def color(net):
     return int(r * 255), int(g * 255), int(b * 255)
 
 
-def main(pcb, outdir):
+def render(pcb, outdir, layers=("top", "bottom")):
     board = pcbnew.LoadBoard(pcb)
     bb = board.GetBoardEdgesBoundingBox()
     x0, y0 = pcbnew.ToMM(bb.GetX()), pcbnew.ToMM(bb.GetY())
@@ -37,6 +37,8 @@ def main(pcb, outdir):
     out = Path(outdir)
     out.mkdir(parents=True, exist_ok=True)
     for lname, layer in (("top", pcbnew.F_Cu), ("bottom", pcbnew.B_Cu), ("inner1", pcbnew.In1_Cu)):
+        if lname not in layers:
+            continue
         img = Image.new("RGB", (int(W * SCALE) + 1, int(H * SCALE) + 1), (15, 15, 20))
         d = ImageDraw.Draw(img)
         for z in board.Zones():
@@ -89,4 +91,4 @@ def main(pcb, outdir):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+    render(sys.argv[1], sys.argv[2])

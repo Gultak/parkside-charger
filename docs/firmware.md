@@ -4,8 +4,8 @@
 
 ```
 esphome/
-  parkside-charger.yaml      main config: ESP32-C6, I2C, 2x TCA9548A, SHT40, bus switch, hub
-  slot.yaml                  per-slot package (included 10x with vars: n)
+  parkside-charger.yaml      main config: ESP32-C6 D1, I2C, 2x TCA9548A, SHT40, bus switch, ADCs, hub
+  slot.yaml                  per-slot package (included up to 16x with vars: n; delete unused ones)
   secrets.yaml.example       copy to secrets.yaml
   components/
     parkside_charger/        C++: LTC4162-L driver, slot state machine, power-budget hub
@@ -86,8 +86,23 @@ Plus:
 | Config: `charge mode`, `max charge current`, `nominal capacity` | Kept across reboots |
 
 Global: `Charger status`, `Total charging power`, `Batteries charging`, `Batteries present`,
-`Enclosure temperature`, the `Charging enabled` switch, `Auto mode: storage after (days)`, and
-`Charge all to 100 %`.
+`Enclosure temperature`, `PSU voltage`, `Slot bus voltage`, the `Charging enabled` switch,
+`Auto mode: storage after (days)`, `Charge all to 100 %`, and (diagnostic) `Reset I2C multiplexers`.
+
+### Controller GPIOs (controller board, ESP32-C6 D1)
+
+| GPIO | Function |
+|---|---|
+| 22 / 23 | I²C SDA / SCL (3.3 V side) |
+| 19 | 24 V bus switch (high = on; pulled low while the ESP boots) |
+| 18 | Buzzer |
+| 4 | TCA9548A reset, active low |
+| 0 / 1 | PSU voltage / switched slot-bus voltage, through 100 k / 10 k dividers (×11) |
+| 5, 6, 7, 16, 17 | Spare, on the 7-pin expansion header |
+
+The two multiplexers don't map channels to slots in order. The order follows the board layout:
+slots 1–4 are channels 7–4 and slots 5–8 are channels 0–3 on 0x70, and the same pattern applies on
+0x71. `parkside-charger.yaml` already contains the right table.
 
 ### Health heuristics: please calibrate
 
@@ -130,7 +145,9 @@ action:
 
 ## Bring-up checklist
 
-1. Main board only, no slots: `i2c scan` must show 0x44, 0x70 and 0x71.
+1. Controller board only, no slots, SHT40 plugged in: the `i2c scan` must show 0x44, 0x70 and
+   0x71. *PSU voltage* should read about 24.5 V. *Slot bus voltage* should read 0 V, then about
+   24.5 V after *Charging enabled* is switched on.
 2. One slot board **without a battery**: the log shows the slot's LTC4162 and PCA9554, with no
    "strap" or "wrong charger IC" error. `cell_count` only reads 5 while the charger is running
    and 0 otherwise, so the strapping check takes effect during the first charge.

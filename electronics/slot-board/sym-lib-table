@@ -1,3 +1,3 @@
 (sym_lib_table
-  (lib (name "slot_board")(type "KiCad")(uri "${KIPRJMOD}/slot_board.kicad_sym")(options "")(descr "Parkside slot board custom symbols"))
+  (lib (name "pcl")(type "KiCad")(uri "${KIPRJMOD}/pcl.kicad_sym")(options "")(descr "parkside-charger custom symbols"))
 )

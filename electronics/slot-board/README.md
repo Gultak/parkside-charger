@@ -10,12 +10,12 @@ One per battery slot. It holds the LTC4162-LAD 5S Li-ion charger, the PCA9554 sl
 | File | |
 |---|---|
 | `slot_board.kicad_pro / .kicad_sch / .kicad_pcb` | KiCad 7 project: open with KiCad 7 or newer |
-| `slot_board.kicad_sym`, `sym-lib-table` | Custom symbols (LTC4162-LAD, PCA9554, Power33 MOSFET, ESD array) |
+| `pcl.kicad_sym`, `sym-lib-table` | Custom symbols (LTC4162-LAD, PCA9554, Power33 MOSFET, ESD array, ...) |
 | `slot_board_schematic.pdf` | Schematic |
 | `fab/slot_board_gerbers.zip` | Gerbers + Excellon drill, ready to upload (e.g. JLCPCB: 4 layers, 1.6 mm, 1 oz) |
 | `fab/slot_board_bom.csv`, `fab/slot_board_cpl.csv` | BOM and pick-and-place positions |
 | `drc_report.txt` | KiCad DRC result |
-| `tools/` | Generators: **edit these, not the KiCad files**, then re-run (see below) |
+| `tools/` | `design.py` + `layout.py`: **edit these, not the KiCad files**, then re-run `build.py` (see below) |
 
 ## Circuit
 
@@ -60,15 +60,14 @@ generator runs without the global library table; KiCad's GUI doesn't show them.
 
 ```bash
 cd tools
-python3 gen_schematic.py .. && python3 gen_project.py ..
-kicad-cli sch export netlist -o /tmp/s.net ../slot_board.kicad_sch && python3 check_netlist.py /tmp/s.net
-/usr/bin/python3 gen_pcb.py ..        # placement, pours, maze router, zone fill, DRC (~1 min)
-/usr/bin/python3 gen_fab.py ..        # PCB-vs-design check, gerbers, drill, CPL, BOM, schematic PDF
-/usr/bin/python3 render_pcb.py ../slot_board.kicad_pcb ../img
+/usr/bin/python3 build.py          # schematic + netlist check, PCB (route, fill, DRC), fab files, renders
+/usr/bin/python3 build.py sch      # only the schematic + netlist check
 ```
 
-`design.py` is the single source of truth for parts and nets. `gen_pcb.py` holds placement,
-pour shapes and routing order. It needs the `pcbnew` Python module that comes with KiCad 7.
+`design.py` is the single source of truth for parts and nets. `layout.py` holds the placement,
+pour shapes, routing priorities, silkscreen and schematic sheet positions. The generator itself
+is shared with the controller board in `../kicadgen/`. It needs KiCad 7 (`kicad-cli` and the
+`pcbnew` Python module).
 
 ## Before ordering: check these
 

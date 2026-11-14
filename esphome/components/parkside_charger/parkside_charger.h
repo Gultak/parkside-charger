@@ -266,6 +266,7 @@ class ParksideCharger : public PollingComponent {
   }
 
   bool is_enabled() const { return this->enabled_ && !this->overtemp_; }
+  const std::vector<ParksideSlot *> &slots() const { return this->slots_; }
   float storage_after_days() const;
 
  protected:

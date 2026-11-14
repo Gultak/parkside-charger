@@ -5,12 +5,14 @@
 ![One slot module from the battery side: rails with lips, latch recess, countersunk screws, contact slots, switch window, LED bezel, dovetail edge bars](img/slot_from_front_below.png)
 ![Cross-section through two neighbouring modules: the sliding dovetail](img/joint_section.png)
 ![Top-view section at the front of the joint: 45° bevel on the tongue and the groove end](img/joint_bevel_top_section.png)
+![Slot module from below/rear: open floor window and U-notched lid for cable access](img/slot_cable_access.png)
+![Controller box: cable notches on all four walls, open towards the lid](img/controller_box.png)
 
 ## Concept
 
 - **One printed module per battery** (95.6 × 181 mm footprint, 34 mm tall). Modules sit side by
-  side at a 96 mm pitch, so 10 slots need **96 cm** of shelf. If the shelf is narrower, mount two
-  rows of 5 on two shelves, or put the 10th slot on the side wall.
+  side at a 96 mm pitch: a row of 8 needs **77 cm** of shelf. The controller drives up to 16 slots
+  through two 24 V outputs, for example **two rows of 8** on two shelves, one chain each.
 - **Neighbouring modules slot into each other** with a **sliding dovetail** that runs along the
   full length of each side. Every module has a tongue on its right edge and a groove on its left
   edge. The groove is closed for the first 3 mm at the front, so a module slid onto its neighbour
@@ -24,8 +26,8 @@
 - The battery **slides in from the front and hangs from two rails**, as it does on a tool. Its
   own latch clicks into the recess in the channel ceiling. Press the release button to pull it out.
 - At the end of the rails, the **end stop holds the contact tabs** and the **presence
-  microswitch**. Behind it, an **electronics bay** holds the slot PCB in card guides, closed by a
-  rear lid with cable entries.
+  microswitch**. Behind it, an **electronics bay** holds the slot PCB in card guides. The board's
+  components face down.
 - A **5 mm RGB LED** sits in the front bezel and is inserted **from the front**. A 6.3 mm
   counterbore, 5 mm deep, takes the LED body. Its 5.8 mm flange stops on a 5.0 mm lip, and the
   dome sticks out about 3.5 mm. Behind the lip, a 7 mm bore holds the solder joints. The wires go
@@ -87,12 +89,12 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 
 | Part | Qty | Orientation | Notes |
 |---|---|---|---|
-| `slot.stl` | 8 | **Front face on the bed** (as exported) | Every layer then contains the full rail and dovetail profile, so the lips that carry the battery are as strong as possible and nothing needs support. Use a brim, 4 walls, 30–40 % gyroid, 0.2 mm layers |
-| `slot_end_left.stl` | 1 | same | Leftmost module (no groove). Optional: a normal `slot.stl` works too |
-| `slot_end_right.stl` | 1 | same | Rightmost module (no protruding tongue). Optional |
+| `slot.stl` | 6 per row of 8 | **Front face on the bed** (as exported) | Every layer then contains the full rail and dovetail profile, so the lips that carry the battery are as strong as possible and nothing needs support. Use a brim, 4 walls, 30–40 % gyroid, 0.2 mm layers |
+| `slot_end_left.stl` | 1 per row | same | Leftmost module (no groove). Optional: a normal `slot.stl` works too |
+| `slot_end_right.stl` | 1 per row | same | Rightmost module (no protruding tongue). Optional |
 | `joint_gauge.stl` | 1 | as exported | Tests the dovetail fit |
-| `slot_lid.stl` | 10 | flat | |
-| `controller.stl` | 1 | open side up | |
+| `slot_lid.stl` | 1 per slot | flat | U-notched rear lid |
+| `controller.stl` | 1 | open side up | All cable notches open to the top, so no support is needed |
 | `controller_lid.stl` | 1 | flat | |
 
 **Material: PETG or ASA** (PC-FR if you can). Do **not** use PLA: it creeps under the constant
@@ -112,7 +114,7 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 
 ## Mounting
 
-1. Shelf thickness: at least 16 mm of solid wood or chipboard. Ten 8 Ah packs weigh about 11 kg.
+1. Shelf thickness: at least 16 mm of solid wood or chipboard. Eight 8 Ah packs weigh about 9 kg.
    Use 2 screws per module, one front and one rear, both on the centre line. The dovetail joint
    carries the sideways and twisting loads between neighbouring modules.
 2. For fire protection on wooden shelves, first screw a 0.5–1 mm steel or aluminium sheet to the
@@ -127,6 +129,33 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 
    This requires about 20 cm of free space in front of the shelf edge, as you slide each module
    on. To replace a module later, unscrew it and slide it out to the front.
-4. Daisy-chain the 24 V from slot to slot: each slot board has a 24 V IN (J1) and a 24 V OUT
-   (J6) screw terminal. Use short 1.5 mm² jumpers with ferrules. Run the 4-wire I²C cables (one per
-   slot) to the controller box in a cable channel along the rear.
+4. Wire it up (next section).
+
+## Cabling: everything plugs in with the enclosures closed
+
+No cable has to be threaded through a part before it is connected.
+
+**Slot module.** The slot board's connectors all face down.
+- **Floor window:** the rear part of the bay floor is open (`floor_window_y`). From below you
+  reach the screws of the **24 V IN (J1) / OUT (J6)** terminals and the **JST-XH I²C plug (J2)**
+  with the board installed.
+- **Rear lid:** it has a wide **U-notch open at the bottom** (up to `lid_notch_top`). Plug in all
+  cables first, then put the lid on over them. It only clamps the board in its card guides.
+- **Internal wiring:** the battery contacts, microswitch and LED connect to the front of the
+  board (J3/J4/J5). Wire these once, before you slide the board in.
+
+**Daisy chain:**
+- Each slot's 24 V OUT (J6) goes to the next slot's IN (J1) with a short 1.5 mm² 2-wire jumper
+  with ferrules. The terminals are mirrored (`GND +24V | +24V GND`), so the jumper wires never cross.
+- The controller's OUT A feeds the first slot of row 1, and OUT B the first slot of row 2.
+- One JST-XH 4-pin cable per slot runs to the controller, wired 1:1 (5V, GND, SDA, SCL). Run them
+  in a cable duct along the rear.
+
+**Controller box.** The board sits on 4 standoffs with its components facing the lid. Every wall
+has a U-notch that is **open towards the lid**:
+- left and right walls: slot cables 1–8 and 9–16
+- bottom wall: PSU input and OUT A/B
+- top wall: the ESP32's USB-C, plus the SHT40, Qwiic and expansion cables
+
+Plug everything in, lay the cables into the notches, then screw the lid on through the four outer
+ears. Mount the box with its base against the shelf, like the slot modules.
