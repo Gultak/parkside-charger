@@ -9,7 +9,7 @@ PROJECT = "controller_board"
 ROOT_UUID = "6b2d1c1b-8e2f-4d4b-8b58-3a7a4d1c0002"
 BW, BH = 110.0, 100.0
 EDGE_KEEP = 0.5
-GND_VIA_SKIP = set()
+GND_VIA_SKIP = {("U3", "12"), ("U4", "12")}   # these get the fixed vias below
 
 ESP_X, ESP_Y = 55.0, 19.5          # module centre; rotated 180 deg: USB at the top edge
 
@@ -55,8 +55,10 @@ _SW = [(40.6, 86.0), (73.0, 86.0), (73.0, 95.6), (67.4, 95.6), (67.4, 90.4), (58
 POURS = [("+24V_IN", 2, _IN), ("+24V_IN", 2, _IN, "B"),
          ("+24V", 2, _V24), ("+24V", 2, _V24, "B"),
          ("+24V_SW", 2, _SW), ("+24V_SW", 2, _SW, "B")]
-FIXED_TRACKS = []
-FIXED_VIAS = []
+# mux GND pins (pin 12) sit at the end of a busy pin row: reserve their GND via before routing
+FIXED_TRACKS = [("GND", "F", 0.3, [(22.425, 35.14), (22.425, 33.4)]),    # U3 (rot 270) pin 12
+                ("GND", "F", 0.3, [(87.575, 40.86), (87.575, 42.6)])]    # U4 (rot 90) pin 12
+FIXED_VIAS = [("GND", (22.425, 33.4)), ("GND", (87.575, 42.6))]
 # no copper under the ESP antenna (module rotated: antenna at y = ESP_Y + 12 .. + 18)
 KEEPOUTS = [[(ESP_X - 15.0, ESP_Y + 11.0), (ESP_X + 15.0, ESP_Y + 11.0),
              (ESP_X + 15.0, ESP_Y + 21.0), (ESP_X - 15.0, ESP_Y + 21.0)]]
