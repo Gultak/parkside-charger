@@ -166,6 +166,8 @@ mod_l    = y_bay0 + bay_l;           // total length
 bay_x    = pcb_w / 2 - 0.8;          // bay inner half-width
 rear_tab = 15;                       // plate extension behind the bay for the rear screws
 total_l  = mod_l + rear_tab;
+cage_l   = total_l - y_bay0;         // bay walls run to the rear edge (module prints standing on it)
+sw_body  = [14, 9];                  // pocket for the microswitch body in the end-wall bevel (X, Z)
 // One screw front, one rear, both on the centre line: the dovetail joint
 // carries the sideways and twisting loads between neighbouring modules.
 front_screw_y = y_lip + 2;           // flat-head screw in the channel ceiling
@@ -285,15 +287,14 @@ module slot_module() {
             wing_tapers();
             // electronics bay shell
             translate([-bay_x - bay_wall, y_bay0 - eps, -bay_h])
-                cube([2 * (bay_x + bay_wall), bay_l + eps, bay_h + eps]);
-            // stiffening ribs from rail walls to the plate flange
+                cube([2 * (bay_x + bay_wall), cage_l + eps, bay_h + eps]);
+            // full-length fillets from the rail walls to the plate (stiffening; inside the trough)
             for (m = [0, 1]) mirror([m, 0, 0])
-                for (y = [y_lip + 8, rail_len - 6])
-                    translate([outer_x - eps, y - 1.5, -wall_h])
-                        hull() {
-                            cube([eps, 3, wall_h]);
-                            translate([trough_x - 0.9 - outer_x, 0, wall_h - eps]) cube([eps, 3, eps]);
-                        }
+                translate([outer_x - eps, 0, -wall_h])
+                    hull() {
+                        cube([eps, y_bay0, wall_h]);
+                        translate([trough_x - 0.9 - outer_x, 0, wall_h - eps]) cube([eps, y_bay0, eps]);
+                    }
         }
 
         // groove for the neighbour's tongue
@@ -313,9 +314,9 @@ module slot_module() {
         for (x = contact_x)
             translate([x, y_stop - cblock_ch - eps, -contact_z])
                 if (tab_vertical) translate([-(tab_t + 0.15) / 2, 0, -(tab_w + 0.3) / 2])
-                    cube([tab_t + 0.15, y_bay0 - y_stop + cblock_ch + 2 * eps, tab_w + 0.3]);
+                    cube([tab_t + 0.15, y_bay0 + wall_h - y_stop + cblock_ch + 2 * eps, tab_w + 0.3]);
                 else translate([-(tab_w + 0.3) / 2, 0, -(tab_t + 0.15) / 2])
-                    cube([tab_w + 0.3, y_bay0 - y_stop + cblock_ch + 2 * eps, tab_t + 0.15]);
+                    cube([tab_w + 0.3, y_bay0 + wall_h - y_stop + cblock_ch + 2 * eps, tab_t + 0.15]);
 
         // microswitch lever window + 2x M2 pilot holes (switch screwed to the
         // rear face of the end stop, inside the bay)
@@ -323,24 +324,33 @@ module slot_module() {
             cube([sw_win[0], stop_t + 2 * eps, sw_win[1]]);
         for (dx = [-3.25, 3.25])
             translate([sw_x + dx, y_wall + 2, -sw_z - 5.5]) hole_y(1.8, stop_t);
+        // pocket for the switch body in the end-wall bevel (its roof bridges 14 mm)
+        translate([sw_x - sw_body[0] / 2, y_bay0 - eps, -wall_h - eps])
+            cube([sw_body[0], wall_h + 1, wall_h + eps]);
 
         // bay cavity, open to the rear; the end stop is its front wall
         difference() {
-            translate([-bay_x, y_bay0, -bay_h + bay_wall]) cube([2 * bay_x, bay_l + eps, bay_h - bay_wall]);
+            translate([-bay_x, y_bay0 - 2 * eps, -bay_h + bay_wall]) cube([2 * bay_x, cage_l + 3 * eps, bay_h - bay_wall]);
             // corner columns for the lid inserts (full length -> no overhangs)
             for (sx = [-1, 1]) for (z = [-col, -bay_h + bay_wall])
-                translate([sx > 0 ? bay_x - col : -bay_x, y_bay0, z]) cube([col, bay_l + eps, col]);
+                translate([sx > 0 ? bay_x - col : -bay_x, y_bay0, z]) cube([col, cage_l + eps, col]);
+            // 45 deg bevel behind the end wall: printed standing on the rear face, the
+            // end wall's rear face would otherwise be a 10 mm overhang
+            translate([bay_x + eps, 0, 0]) rotate([0, -90, 0]) linear_extrude(2 * bay_x + 2 * eps)   // (z, y)
+                polygon([[eps, y_bay0 - 3 * eps], [eps, y_bay0 + wall_h], [-wall_h, y_bay0 - 3 * eps]]);
         }
-        // cable-access window in the bay floor (rear part, between the corner columns)
-        translate([-bay_x + col, y_bay0 + 4 + floor_window_y, -bay_h - eps])
-            cube([2 * (bay_x - col), mod_l - (y_bay0 + 4 + floor_window_y) + eps, bay_wall + 2 * eps]);
+        // cable-access window in the bay floor (rear part, between the corner columns).
+        // Its front edge is a 45 deg point, so the floor needs no bridge when printed upright.
+        let (hw = bay_x - col, yw = y_bay0 + 4 + floor_window_y)
+            translate([0, 0, -bay_h - eps]) linear_extrude(bay_wall + 2 * eps)
+                polygon([[-hw, yw], [0, yw - hw], [hw, yw], [hw, total_l + 1], [-hw, total_l + 1]]);
         // card guides for the PCB (stop 4 mm short of the end stop)
         for (m = [0, 1]) mirror([m, 0, 0])
             translate([bay_x - eps, y_bay0 + 4, -pcb_z - pcb_t - 0.2])
-                cube([1.2, bay_l, pcb_t + 0.4]);
+                cube([1.2, cage_l, pcb_t + 0.4]);
 
         // rear lid screw holes (M3 heat-set inserts, along Y)
-        for (p = bay_lid_holes()) translate([p[0], mod_l - 8 + eps, p[1]]) hole_y(4.2, 8.1);
+        for (p = bay_lid_holes()) translate([p[0], total_l - 8 + eps, p[1]]) hole_y(4.2, 8.1);
 
         // mounting screws (vertical). Front: flat-head, countersunk flush into the
         // channel ceiling (fit before the battery goes in). Rear: pan-head in the rear tab.
@@ -362,10 +372,10 @@ module slot_module() {
         // ... wires go straight up into a groove on the shelf side of the plate and back to the bay
         translate([led_x - wire_ch / 2, wy, led_z]) cube([wire_ch, wire_ch, plate_t - led_z + eps]);
         translate([gx, wy, plate_t - wire_gd]) cube([led_x + wire_ch / 2 - gx, wire_ch, wire_gd + eps]);
-        translate([gx, wy, plate_t - wire_gd]) cube([wire_ch, y_bay0 + 12 - wy, wire_gd + eps]);
+        translate([gx, wy, plate_t - wire_gd]) cube([wire_ch, y_bay0 + 18 - wy, wire_gd + eps]);
         hull() for (x = [gx, bay_x - col - 8])
-            translate([x, y_bay0 + 6, plate_t - wire_gd]) cube([wire_ch, wire_ch + 1, wire_gd + eps]);
-        translate([bay_x - col - 8, y_bay0 + 6, -bay_wall]) cube([wire_ch, wire_ch + 1, plate_t + bay_wall + eps]);
+            translate([x, y_bay0 + 12, plate_t - wire_gd]) cube([wire_ch, wire_ch + 1, wire_gd + eps]);
+        translate([bay_x - col - 8, y_bay0 + 12, -bay_wall]) cube([wire_ch, wire_ch + 1, plate_t + bay_wall + eps]);
     }
 }
 function bay_lid_holes() = [
@@ -388,6 +398,10 @@ module slot_lid() {
             translate([p[0], -eps, p[1] + bay_h]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = lid_t + 1);
         translate([-notch_w / 2, -eps, -eps]) cube([notch_w, lid_t + 2 * eps, bay_h - lid_notch_top + eps]);
     }
+    // two fingers that hold the PCB's rear edge in the card guides
+    finger_l = total_l - (y_bay0 + 4 + pcb_l) - 0.5;
+    for (sx = [-1, 1]) translate([sx * (bay_x - 3) - 2, -finger_l, bay_h - pcb_z - pcb_t - 1.5])
+        cube([4, finger_l + eps, pcb_t + 3]);
 }
 
 // Test print: 20 mm slice of the rail profile incl. lead-in and latch recess
@@ -474,9 +488,10 @@ module controller_lid() {
 }
 
 // ------------------------------ output --------------------------------
-// Print orientation for the slot module: FRONT FACE ON THE BED (Y -> Z).
+// Print orientation for the slot module: REAR FACE ON THE BED (Y -> Z).
 // Every layer then contains the complete rail profile, so the load-bearing
-// lips are strong and nothing needs support. Use PETG/ASA, 4 walls, 30 % gyroid.
+// lips are strong; the bay walls reach the bed, the end wall has a 45 deg bevel
+// behind it and the floor window a pointed front edge, so nothing needs support. Use PETG/ASA, 4 walls, 30 % gyroid.
 
 // generic 5 mm LED (T-1 3/4) for the previews: 5.0 body, 5.8 x 1 mm flange,
 // 8.6 mm flange-to-tip, 4 leads 0.5 mm square trimmed to 5 mm
@@ -496,8 +511,8 @@ module dummy_battery() {
         cube([chan_w - 0.6, rail_len - 3, wall_h - 0.5]);
 }
 
-if (part == "slot") rotate([90, 0, 0]) slot_module();
-else if (part == "slot_lid") rotate([90, 0, 0]) slot_lid();
+if (part == "slot") rotate([-90, 0, 0]) translate([0, -total_l, 0]) slot_module();   // rear face on the bed
+else if (part == "slot_lid") translate([0, 0, 2.4]) rotate([-90, 0, 0]) slot_lid();   // outer face on the bed
 else if (part == "gauge") rotate([-90, 0, 0]) translate([0, -(y_lip + 6), 0]) gauge();
 else if (part == "end_gauge") rotate([-90, 0, 0]) translate([0, -y_bay0, 0]) end_gauge();
 else if (part == "controller") controller_box();
@@ -524,7 +539,7 @@ else if (part == "assembly") {
     // the right-hand module is shown half slid on, to show the dovetail joint
     for (i = [0:2]) translate([(i - 1) * pitch, i == 2 ? -80 : 0, 0]) {
         color("lightgray") slot_module();
-        color("dimgray") translate([0, mod_l, -bay_h]) slot_lid();
+        color("dimgray") translate([0, total_l, -bay_h]) slot_lid();
         if (i != 1) dummy_battery();
     }
     translate([2.4 * pitch, 0, plate_t]) mirror([0, 0, 1]) color("silver") controller_box();
