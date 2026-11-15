@@ -50,6 +50,9 @@ CONF_MIN_CHARGE_TEMPERATURE = "min_charge_temperature"
 CONF_MAX_CHARGE_TEMPERATURE = "max_charge_temperature"
 CONF_PRESENCE_SWITCH = "presence_switch"
 CONF_BMS_FAULT_INPUT = "bms_fault_input"
+CONF_BALANCE_INTERVAL = "balance_interval"
+CONF_BALANCE_TAIL = "balance_tail"
+CONF_BALANCE_CURRENT = "balance_current"
 CONF_BLEED_OUTPUT = "bleed_output"
 CONF_BLEED_RESISTANCE = "bleed_resistance"
 CONF_LED_RED = "led_red"
@@ -176,6 +179,10 @@ CONFIG_SCHEMA = (
             ),
             cv.Optional(CONF_PRESENCE_SWITCH): cv.use_id(binary_sensor.BinarySensor),
             cv.Optional(CONF_BMS_FAULT_INPUT): cv.use_id(binary_sensor.BinarySensor),
+            # balancing charge (4.20 V/cell + low-current CV tail); interval 0s = only on full charges
+            cv.Optional(CONF_BALANCE_INTERVAL, default="30d"): cv.positive_time_period_seconds,
+            cv.Optional(CONF_BALANCE_TAIL, default="120min"): cv.positive_time_period_seconds,
+            cv.Optional(CONF_BALANCE_CURRENT, default="0.2A"): cv.All(cv.current, cv.Range(min=0.1, max=1.0)),
             cv.Optional(CONF_BLEED_OUTPUT): cv.use_id(output.BinaryOutput),
             cv.Optional(CONF_BLEED_RESISTANCE, default=200): cv.resistance,
             cv.Optional(CONF_LED_RED): cv.use_id(output.BinaryOutput),
@@ -230,6 +237,8 @@ async def to_code(config):
 
     if CONF_PRESENCE_SWITCH in config:
         cg.add(var.set_presence_switch(await cg.get_variable(config[CONF_PRESENCE_SWITCH])))
+    cg.add(var.set_balance(config[CONF_BALANCE_INTERVAL].total_seconds / 86400.0,
+                           config[CONF_BALANCE_TAIL].total_seconds / 60.0, config[CONF_BALANCE_CURRENT]))
     if CONF_BMS_FAULT_INPUT in config:
         cg.add(var.set_bms_fault_input(await cg.get_variable(config[CONF_BMS_FAULT_INPUT])))
     if CONF_BLEED_OUTPUT in config:

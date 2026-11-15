@@ -127,6 +127,14 @@ class ParksideSlot : public PollingComponent, public i2c::I2CDevice {
 
   // ---- actions (call from lambdas / buttons) ----
   void request_full_charge() { this->full_override_ = true; }
+  // Balancing charge: the pack balances its cells with small bleed circuits, which only
+  // keep up at low current near full. Every N days (and on full charges) charge to
+  // 4.20 V/cell and hold CV at low current for a while before finishing.
+  void set_balance(float interval_days, float tail_minutes, float current) {
+    this->balance_interval_days_ = interval_days; this->balance_tail_s_ = tail_minutes * 60.0f;
+    this->balance_current_ = current;
+  }
+  bool is_balancing() const { return this->balancing_; }
   void request_resistance_measurement() { this->bsr_requested_ = true; }
 
   // ---- hub interface ----
@@ -220,6 +228,14 @@ class ParksideSlot : public PollingComponent, public i2c::I2CDevice {
   float rest_s_{0};           // seconds without current flowing
   float charge_s_{0};         // seconds in the current charge
   bool full_override_{false};
+  float balance_interval_days_{30.0f};
+  float balance_tail_s_{7200.0f};
+  float balance_current_{0.2f};
+  float last_balance_s_{0};      // session time of the last balancing charge
+  bool balance_due_{false};
+  bool balancing_{false};        // in the low-current CV tail (C/x termination off)
+  float tail_s_{0};
+  bool set_cx_termination_(bool on);
   bool bsr_requested_{false};
   bool bsr_done_this_charge_{false};
   bool bsr_pending_{false};

@@ -60,6 +60,16 @@ Plus:
 - **Bleed-down:** if a pack is more than 50 mV/cell above the target (a full pack in Storage mode,
   or the Auto timer expiring), the slot switches in its 200 Ω bleed resistor (about 0.1 A) until
   it reaches the target.
+- **Balancing charge.** The pack balances its five cells itself, with small transistor + resistor
+  bleeders controlled by its microcontroller (Julian Ilett's teardown). They can only keep up
+  near full and at low current, at the end of a charge. A pack that only ever sees 3.85–4.10 V and
+  a C/20 stop would never be balanced. So every `balance_interval` (default **30 days** in the
+  slot; 0 = off), and on every *charge to 100 %*, the slot:
+  1. charges to 4.20 V/cell,
+  2. switches the LTC4162's C/20 termination off and holds 4.20 V at **≤ 0.2 A**
+     (`balance_current`) for `balance_tail` (default **120 min**), status *Balancing cells*,
+  3. finishes, and returns to the mode's target (Auto/Storage bleed back down).
+  The interval counts from insertion and restarts after a controller reboot.
 - **Pack BMS:** the slot board watches the pack's ID contact (the BMS status line). While the
   BMS reports a fault or deep discharge (line released for more than ~3 s), the slot does not
   charge: status *Pack BMS blocks charging*, entity `Slot n pack BMS fault`.

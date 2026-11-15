@@ -51,9 +51,14 @@ build ten boards, check on one pack:
      ([positron96: PARKSIDE battery protection board](https://positron96.gitlab.io/projects/parkside-battery-protection/),
      [mmame/parkside-x20](https://github.com/mmame/parkside-x20)).
    - **T (DS)** measures about 512 kΩ to − on an idle pack and shows no activity. **Not used.**
-   - **Likely meaning of the names:** CS = *charge status* (the charger's pin is labelled "ID"),
-     DS = *discharge status* for the tools. Julian Ilett's teardown notes call the two middle pins
-     "(C)harge" and "(T)ool". positron96's "10 kΩ NTC + transistor, released on under-voltage"
+   - **Confirmed by Julian Ilett's teardown** ([video, 11:54](https://www.youtube.com/watch?v=CN0q4wZBnBo&t=714s)):
+     the **charger uses ID**, the **tools use T**. So CS = *charge status*, DS = *discharge
+     status*. Inside the pack: 5 × INR18650, a thermistor bonded to the cells, an LGT8P22A
+     microcontroller (programming header 5 V/RST/GND/CLK/DATA), **five transistor + resistor
+     cell-balancing bleeders**, a current-sense resistor in the negative lead that doubles as a
+     fuse, **no cut-off MOSFET** (under-voltage/over-current cut-off is the tool's job, via T),
+     and a separate 3-LED voltage gauge. The balancing only works near full at low current, so
+     the firmware does a periodic balancing charge (`docs/firmware.md`). positron96's "10 kΩ NTC + transistor, released on under-voltage"
      was measured with a tool-style 10 kΩ pull-up and may describe the tool pin (T/DS). Either way
      the slot board reads ID (CS), the pin the Parkside charger uses, with the same pull-up and
      threshold. That works whether ID is an NTC or a fixed resistor: OK ≈ 2.5–3 V, data frames pull

@@ -81,11 +81,9 @@ bool ParksideSlot::configure_chip_() {
   float cap = this->nominal_capacity_();
   float i_term = std::max(0.1f, 0.05f * (cap > 0 ? cap : 2.0f));
   ok &= this->write16_(REG_C_OVER_X_THRESHOLD, (uint16_t) (i_term * this->rsnsb_ / 1.466e-6f));
-  // Terminate on C/x (not only on the CV timer); keep JEITA temperature control on
-  uint16_t ccfg;
-  ok &= this->read16_(REG_CHARGER_CONFIG_BITS, ccfg);
-  if (ok)
-    ok &= this->write16_(REG_CHARGER_CONFIG_BITS, ccfg | CCFG_EN_C_OVER_X_TERM | CCFG_EN_JEITA);
+  // Terminate on C/x (not only on the CV timer) - except during a balancing tail, where
+  // the firmware ends the charge itself; keep JEITA temperature control on
+  ok &= this->set_cx_termination_(!this->balancing_);
   // Suspend state as we believe it should be, telemetry always on
   uint16_t cfg;
   ok &= this->read16_(REG_CONFIG_BITS, cfg);
@@ -140,7 +138,7 @@ float ParksideSlot::target_cell_voltage_() const {
   SlotMode m = this->mode_();
   if (m == SlotMode::OFF)
     return NAN;
-  if (this->full_override_)
+  if (this->full_override_ || this->balance_due_)
     return V_FULL;
   switch (m) {
     case SlotMode::STORAGE:
@@ -211,6 +209,9 @@ void ParksideSlot::on_inserted_() {
   this->rest_s_ = 0;
   this->charge_s_ = 0;
   this->full_override_ = false;
+  this->balance_due_ = false;
+  this->balancing_ = false;
+  this->last_balance_s_ = 0;
   this->bsr_requested_ = false;
   this->bsr_pending_ = false;
   this->bsr_done_this_charge_ = false;
@@ -270,9 +271,21 @@ void ParksideSlot::start_charging_(float amps, float ocv_cell) {
   }
 }
 
+bool ParksideSlot::set_cx_termination_(bool on) {
+  uint16_t ccfg;
+  if (!this->read16_(REG_CHARGER_CONFIG_BITS, ccfg))
+    return false;
+  ccfg = on ? (ccfg | CCFG_EN_C_OVER_X_TERM) : (ccfg & ~CCFG_EN_C_OVER_X_TERM);
+  return this->write16_(REG_CHARGER_CONFIG_BITS, ccfg | CCFG_EN_JEITA);
+}
+
 void ParksideSlot::stop_charging_(Phase next) {
   if (!this->suspended_)
     this->set_suspended_(true);
+  if (this->balancing_) {
+    this->set_cx_termination_(true);
+    this->balancing_ = false;
+  }
   if (this->bleeding_ && this->bleed_out_ != nullptr)
     this->bleed_out_->turn_off();
   this->bleeding_ = false;
@@ -283,6 +296,14 @@ void ParksideSlot::stop_charging_(Phase next) {
 
 void ParksideSlot::finish_charge_() {
   this->set_suspended_(true);
+  if (this->balancing_ || this->programmed_vcell_ >= V_FULL - 0.001f) {
+    if (this->balancing_)
+      ESP_LOGI(TAG, "Slot %u: balancing charge complete", this->slot_number_);
+    this->set_cx_termination_(true);
+    this->balancing_ = false;
+    this->balance_due_ = false;
+    this->last_balance_s_ = this->session_s_;
+  }
   this->phase_ = Phase::DONE;
   this->was_done_ = true;
   this->charge_in_progress_ = false;
@@ -370,6 +391,11 @@ void ParksideSlot::update() {
 
   // ---------- bookkeeping ----------
   this->session_s_ += dt;
+  if (this->balance_interval_days_ > 0 && !this->balance_due_ &&
+      this->session_s_ - this->last_balance_s_ > this->balance_interval_days_ * 86400.0f) {
+    this->balance_due_ = true;
+    ESP_LOGI(TAG, "Slot %u: balancing charge due", this->slot_number_);
+  }
   float i_bleed = this->bleeding_ ? this->vbat_ / this->bleed_r_ : 0.0f;
   bool resting = fabsf(this->ibat_) < 0.03f && !this->bleeding_;
   this->rest_s_ = resting ? this->rest_s_ + dt : 0.0f;
@@ -443,11 +469,28 @@ void ParksideSlot::update() {
       this->stop_charging_(Phase::FAULT);
     } else if (ocv_cell > target + 0.02f && cv) {
       this->finish_charge_();  // target was lowered below the pack voltage
+    } else if (this->balancing_ && this->tail_s_ >= this->balance_tail_s_) {
+      this->finish_charge_();
     } else {
       this->wants_power_ = true;
       float imax = this->max_current_();
       // in CV phase the pack takes less than allowed: give the rest back to the pool
       this->requested_current_ = cv ? std::min(imax, std::max(0.1f, this->ibat_ + 0.3f)) : imax;
+      // balancing tail: at 4.20 V/cell in CV, keep going at low current instead of
+      // terminating at C/x, so the pack's balance bleeders can catch up
+      if (cv && target >= V_FULL - 0.001f && this->balance_tail_s_ > 0) {
+        if (!this->balancing_ && this->set_cx_termination_(false)) {
+          this->balancing_ = true;
+          this->tail_s_ = 0;
+          ESP_LOGI(TAG, "Slot %u: balancing tail (%.0f min at <= %.1f A)", this->slot_number_,
+                   this->balance_tail_s_ / 60.0f, this->balance_current_);
+        }
+        if (this->balancing_) {
+          this->tail_s_ += dt;
+          imax = std::min(imax, this->balance_current_);
+          this->requested_current_ = std::min(this->requested_current_, imax);
+        }
+      }
       if (this->allocation_ < 0.1f) {
         this->stop_charging_(Phase::WAIT_POWER);
       } else if (fabsf(this->allocation_ - this->programmed_current_) > 0.05f ||
@@ -666,6 +709,10 @@ void ParksideSlot::publish_all_() {
     std::string s = phase_str_(this->phase_);
     if (this->phase_ == Phase::FAULT && !this->fault_text_.empty())
       s += ": " + this->fault_text_;
+    if (this->phase_ == Phase::CHARGING && this->balancing_)
+      s = "Balancing cells";
+    else if (this->phase_ == Phase::CHARGING && this->balance_due_ && !this->full_override_)
+      s = "Balancing charge";
     float t = this->phase_ == Phase::CHARGING ? this->programmed_vcell_ : this->target_cell_voltage_();
     if ((this->phase_ == Phase::DONE || this->phase_ == Phase::IDLE) && !std::isnan(t))
       s = t <= V_STORAGE + 0.001f ? "Holding storage level" : t >= V_FULL - 0.001f ? "Full" : "Ready";
@@ -749,9 +796,11 @@ void ParksideCharger::update() {
   float remaining = this->max_total_current_;
   for (auto *s : want) {
     float a = std::min(s->requested_current(), remaining);
-    a = floorf(a * 10.0f) / 10.0f;  // LTC4162 has 100 mA steps with 10 mOhm sense
-    if (a < 0.3f)
-      a = 0;  // not worth starting a charge with a trickle
+    a = floorf(a * 10.0f + 0.001f) / 10.0f;  // LTC4162 has 100 mA steps with 10 mOhm sense
+    // not worth starting a charge with a trickle - unless a trickle is all the slot asks
+    // for (balancing tail)
+    if (a < std::min(0.3f, s->requested_current() - 0.001f))
+      a = 0;
     s->set_allocation(a);
     remaining -= a;
   }

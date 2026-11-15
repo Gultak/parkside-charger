@@ -76,7 +76,7 @@ struct FakeLTC : i2c::FakeBus {
       float icv = (vt - ocv_cell(pack.soc)) / pack.r_cell;
       i = std::fmax(0, std::fmin(iset, icv));
       float iterm = reg[0x1C] * 1.466e-6f / 0.01f;
-      if (icv < iset && i < iterm) { term = true; i = 0; }
+      if ((reg[0x29] & (1 << 2)) && icv < iset && i < iterm) { term = true; i = 0; }  // en_c_over_x_term
     }
     if (bsr_countdown >= 0 && --bsr_countdown < 0) {
       reg[0x41] = (uint16_t) (pack.r_cell * 500 / 0.01f);
@@ -256,6 +256,27 @@ int main(int argc, char **argv) {
     bms.publish_state(true);
     r.run(0.01);
     CHECK(!r.slots[0]->is_charging(), "BMS fault during charge stops it: %s", r.status[0]->state.c_str());
+  }
+  printf("Scenario 7: balancing charge (pack bleeders need a low-current tail at 4.20 V)\n");
+  {
+    Rig r(1, 8);
+    r.slots[0]->set_balance(30, 120, 0.2f);
+    r.insert(0, 60);
+    r.run(24 * 29);
+    CHECK(r.status[0]->state.rfind("Holding storage", 0) == 0, "29 days in Auto: %s", r.status[0]->state.c_str());
+    bool saw_tail = false, saw_cx_off = false;
+    float tail_h = 0;
+    for (int k = 0; k < 24 * 4 * 3; k++) {     // next 3 days in 15 min steps
+      r.run(0.25);
+      if (r.slots[0]->is_balancing()) { saw_tail = true; tail_h += 0.25f; }
+      if (r.slots[0]->is_balancing() && !(r.chips[0]->reg[0x29] & (1 << 2))) saw_cx_off = true;
+    }
+    CHECK(saw_tail && tail_h >= 1.9f && tail_h <= 2.6f, "after 30 days: balancing tail ran %.1f h at 4.20 V", tail_h);
+    CHECK(saw_cx_off, "C/x termination disabled during the tail");
+    CHECK((r.chips[0]->reg[0x29] & (1 << 2)) != 0, "C/x termination restored afterwards");
+    r.run(24);
+    float v = ocv_cell(r.chips[0]->pack.soc);
+    CHECK(v < 3.95f, "back down to storage level afterwards (%.3f V/cell, %s)", v, r.status[0]->state.c_str());
   }
   printf(fails ? "\n%d FAILED\n" : "\nALL PASSED\n", fails);
   return fails != 0;
