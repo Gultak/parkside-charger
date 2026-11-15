@@ -18,7 +18,7 @@ per slot: module,1,LED 5 mm RGB common cathode diffused,Kingbright L-154A4SUREQB
 per slot: module,4,Brass strip 0.8 x 6.3 x 50 mm (contact blade),,0.05,Faston tabs are too short for the contact block + end wall + bevel
 per slot: module,4,M3 heat-set insert + M3x8 screw,,0.10,
 per slot: module,1,Wood screw 4x25 countersunk (flat head),,0.03,front - centre of the channel ceiling
-per slot: module,1,Wood screw 4x25 pan head,,0.03,rear - inside the bay, through the hole in the slot PCB
+per slot: module,1,Wood screw 4x25 pan head,,0.03,"rear - inside the bay, through the hole in the slot PCB"
 per slot: module,1,2-wire jumper 1.5 mm2 with ferrules (24 V daisy chain),,0.50,slot J6 OUT -> next slot J1 IN
 controller,1,ESP32-C6 D1 dev board,xyzroe ESP32_C6_D1 (Tindie / Elecrow / Lectronz),12.0,plugs into the female headers (module needs male pin headers)
 controller,2,Female Dupont header 1x8 2.54 mm,standard pin socket (8.5 mm high),0.3,soldered into the controller board
