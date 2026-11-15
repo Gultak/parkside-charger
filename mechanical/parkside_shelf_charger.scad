@@ -51,13 +51,19 @@ wing_l   = 7;     // the wide part tapers to the groove width over the last 7 mm
 trough_x = 34.9;  // half-width of the free trough beside the tongue
 body_top = 4;     // pack top surface outside the trough, below the tongue top (measured 4-5)
 keep_z   = -(body_top - 0.5);   // nothing outside the trough may reach below this
-lead_in  = 3;     // chamfer on the lip entry
-// latch recess the battery's spring latch snaps into (in the channel ceiling)
-// measured tooth: 4 mm from the tongue end, 29 wide, 4 long; height assumed 4
-latch_y  = 3.5;   // distance from front edge to the recess
-latch_w  = 30;    // across
-latch_l  = 6;     // along the slide direction (ramped at the rear)
-latch_d  = 5;     // depth into the plate
+// Front (latch) end, taken from the reference holder model; distances are measured
+// FORWARD from the contact face. The grooves only start ~29 mm in front of the contact
+// face; further forward the pack rises (45 deg up to the plate face, then higher), and
+// only a narrow nose with the latch pocket reaches over the latch.
+lip_l    = 28.6;  // lips (grooves) start
+lead_in  = 4;     // 45 deg lead-in on the lip entry
+slope_l  = 43;    // rail walls/edge bars slope away at 45 deg, reaching the plate face here
+front_l  = 45.5;  // front edge of the frame (outside the nose)
+nose_l   = 55;    // nose tip
+nose_w   = 41;    // nose width at its root (tapers to ~25 at the tip)
+latch_w  = 25;    // latch pocket width (reference holder)
+// latch pocket profile in the nose: [distance forward of the contact face, depth]
+latch_prof = [[nose_l + 0.2, 1.7], [52.9, 1.8], [50.5, 5], [49.5, 5], [front_l, 2]];
 
 /* [Battery contacts (male 6.3 x 0.8 mm tabs or 0.8 mm brass)] */
 // X positions of the contact tabs, measured from the channel centre line.
@@ -71,13 +77,13 @@ tab_vertical = true; // blade plane vertical (true) or horizontal (false)
 
 /* [Module frame] */
 pitch    = 88;    // module width = slot spacing (battery body 86 + 2, batteries are grabbed from below)
-plate_t  = 8;     // mounting plate thickness (carries the dovetail: edge bars stop at keep_z)
+plate_t  = 10;    // mounting plate thickness (carries the dovetail and the LED; as on the reference holder)
 wall_t   = 5;     // rail wall thickness
 stop_t   = 8;     // end wall thickness (behind the prong tips)
 bay_l    = 66;    // electronics bay length (behind the end stop)
 bay_h    = 34;    // electronics bay height below the plate (must clear the battery body)
 bay_wall = 2.4;
-screw_d  = 4.5;   // wood screws 4 x 20 (plate 8 + shelf, stay 2 mm short of the top)
+screw_d  = 4.5;   // wood screws 4 x 25 (plate 10 + shelf, stay 2 mm short of the top)
 screw_head_d = 9;
 csk_d    = 8.6;   // countersink for the flat-head screws inside the channel
 csk_recess = 0.4; // heads sit this far below the channel ceiling (battery slides over)
@@ -112,18 +118,16 @@ sw_x    = -18;  // switch window centre from channel centre (between + contact a
 sw_z    = 3.5;
 sw_win  = [9, 4];   // window through the end stop for the lever (X, Z)
 
-/* [Status LED: 5 mm RGB (T-1 3/4) in the front bezel, inserted FROM THE FRONT] */
+/* [Status LED: 5 mm RGB (T-1 3/4) in the front face of the right edge bar, inserted FROM THE FRONT] */
 // Standard 5 mm LED: 5.0 mm body, 5.8 mm flange, ~8.6 mm flange-to-dome-tip.
 // Thread the wires out through the front, solder + heat-shrink them to the
 // trimmed leads, pull them back and push the LED in until the flange seats.
 led_cb_d   = 6.3;   // front counterbore for the LED body + flange
-led_cb_l   = 5;     // its depth; the dome sticks out ~3.5 mm
+led_cb_l   = 8.6;   // its depth: the dome ends flush with the front face
 led_lip_d  = 5.0;   // lip the flange stops against (wires + heat-shrink pass through)
 led_lip_l  = 1;
 led_bore_d = 7.0;   // bore behind the lip for the solder joints
-bezel_l    = 14;    // bezel length along Y
-led_x_off  = 1.5;   // LED axis from the rail wall's outer face (bezel stays inside the trough)
-led_z      = -4.6;  // LED axis height (bezel must stay above the battery body)
+bezel_l    = 18;    // LED bore length along Y
 wire_ch    = 5;     // wire channel / groove width
 wire_gd    = 3;     // depth of the wire groove on the shelf side of the plate
 
@@ -150,6 +154,12 @@ inner_x  = chan_w / 2;               // inner face of a rail wall
 outer_x  = inner_x + wall_t;         // outer face
 mod_w    = pitch - jt_gap;           // neighbours interlock with a small gap
 y_stop   = rail_len;                 // contact face (front of the contact block)
+y_front  = rail_len - front_l;       // frame front edge
+y_nose   = rail_len - nose_l;        // nose tip
+y_lip    = rail_len - lip_l;         // lips start
+y_slope  = rail_len - slope_l;       // nothing below the plate face in front of this
+led_x    = mod_w / 2 - bar_w / 2;    // LED in the right edge bar, inside the plate
+led_z    = plate_t / 2;
 y_wall   = rail_len + prong_l + prong_cl;   // end wall front face (prong tips)
 y_bay0   = y_wall + stop_t;          // start of bay
 mod_l    = y_bay0 + bay_l;           // total length
@@ -158,7 +168,7 @@ rear_tab = 15;                       // plate extension behind the bay for the r
 total_l  = mod_l + rear_tab;
 // One screw front, one rear, both on the centre line: the dovetail joint
 // carries the sideways and twisting loads between neighbouring modules.
-front_screw_y = 26;                  // flat-head screw in the channel ceiling (behind the latch recess)
+front_screw_y = y_lip + 2;           // flat-head screw in the channel ceiling
 
 module hole_y(d, l) {               // hole along Y: vertical when printed face-down, so plain round
     rotate([-90, 0, 0]) cylinder(d = d, h = l);
@@ -185,14 +195,14 @@ module joint_tongue() {     // on the right edge, reaches across the gap
     intersection() {
         translate([xm, total_l, 0]) rotate([90, 0, 0])
             linear_extrude(total_l) dovetail_2d(0, jt_gap + 0.5);
-        bevel_45(xm, jt_front + jt_clear);
+        bevel_45(xm, y_front + jt_front + jt_clear);
     }
 }
 module joint_groove() {     // cut into the left edge, open at the rear
     intersection() {
         translate([-mod_w / 2, total_l + 1, 0]) rotate([90, 0, 0])
             linear_extrude(total_l + 2) dovetail_2d(jt_clear, 1);
-        bevel_45(-mod_w / 2, jt_front);
+        bevel_45(-mod_w / 2, y_front + jt_front);
     }
 }
 module edge_bars() {
@@ -217,16 +227,27 @@ module rails(len) {
     translate([0, len, 0]) rotate([90, 0, 0]) linear_extrude(len) rail_profile_2d();
 }
 
-// lead-in chamfer cutter at the front of the lips
-module lip_lead_in() {
+// The lips start at y_lip with a 45 deg lead-in; in front of that the pack has no grooves.
+module lip_front_cut() {
     for (m = [0, 1]) mirror([m, 0, 0])
-        translate([inner_x - lip_in, 0, -wall_h - eps])
-            hull() {
-                translate([-eps, -eps, 0]) cube([eps, eps, lip_t + 2 * eps]);
-                translate([-eps, -eps, 0]) cube([lead_in + eps, eps, lip_t + 2 * eps]);
-                translate([-eps, -eps, 0]) cube([eps, lead_in, lip_t + 2 * eps]);
-            }
+        translate([0, 0, -wall_h - eps]) linear_extrude(lip_t + 2 * eps) polygon([
+            [inner_x - lip_in - eps, -1], [inner_x + eps, -1],
+            [inner_x + eps, y_lip - lead_in], [inner_x - lip_in - eps, y_lip]]);
 }
+// Front envelope of the pack: below the plate face the walls/bars slope away at 45 deg
+// towards the front; in front of y_front only the nose remains.
+module front_cut() {
+    translate([60, 0, 0]) rotate([0, -90, 0]) linear_extrude(120)     // (z, y) polygon
+        polygon([[eps, -1], [eps, y_slope], [-60, y_slope + 60], [-60, -1]]);
+    difference() {
+        translate([-60, -1, -60]) cube([120, y_front + 1, 120]);
+        nose_prism();
+    }
+}
+function nose_pts() = let(h = nose_w / 2) [
+    [-h, y_front + 1], [-h, y_front], [-16.6, y_nose + 1.4], [-12.5, y_nose + 0.5], [-5, y_nose],
+    [5, y_nose], [12.5, y_nose + 0.5], [16.6, y_nose + 1.4], [h, y_front], [h, y_front + 1]];
+module nose_prism() { translate([0, 0, -eps]) linear_extrude(plate_t + 2 * eps) polygon(nose_pts()); }
 
 // Contact block: fills the battery's contact pocket between the two prongs and
 // carries the contact tabs. Front corners chamfered 45 deg (prints without support
@@ -265,11 +286,9 @@ module slot_module() {
             // electronics bay shell
             translate([-bay_x - bay_wall, y_bay0 - eps, -bay_h])
                 cube([2 * (bay_x + bay_wall), bay_l + eps, bay_h + eps]);
-            // LED bezel at the front, beside the right rail
-            translate([outer_x, 0, -9.4]) cube([trough_x - 0.4 - outer_x, bezel_l, 9.4 + eps]);
             // stiffening ribs from rail walls to the plate flange
             for (m = [0, 1]) mirror([m, 0, 0])
-                for (y = [rail_len * 0.45, rail_len * 0.8])
+                for (y = [y_lip + 8, rail_len - 6])
                     translate([outer_x - eps, y - 1.5, -wall_h])
                         hull() {
                             cube([eps, 3, wall_h]);
@@ -280,15 +299,15 @@ module slot_module() {
         // groove for the neighbour's tongue
         if (joint_left) joint_groove();
 
-        // lip lead-in
-        lip_lead_in();
+        // lips only where the pack has grooves; front envelope of the pack
+        lip_front_cut();
+        front_cut();
 
-        // latch recess in the channel ceiling (rear end chamfered: prints w/o support)
-        translate([-latch_w / 2, latch_y, -eps])
-            hull() {
-                cube([latch_w, latch_l, eps]);
-                cube([latch_w, max(latch_l - latch_d, 1), latch_d]);
-            }
+        // latch pocket in the nose (profile from the reference holder; open at the tip)
+        translate([latch_w / 2, 0, 0]) rotate([0, -90, 0]) linear_extrude(latch_w)    // (z, y) polygon
+            polygon(concat([[-eps, rail_len - latch_prof[0][0]]],
+                           [for (q = latch_prof) [q[1], rail_len - q[0]]],
+                           [[-eps, rail_len - front_l + eps]]));
 
         // contact tab slots through the end stop
         for (x = contact_x)
@@ -334,12 +353,11 @@ module slot_module() {
         // status LED in the front bezel: round holes (vertical when printed face-down).
         // Counterbore for body + flange from the front, a lip as flange stop, and a
         // wider bore behind for the solder joints.
-        led_x = outer_x + led_x_off;
-        wy = bezel_l - wire_ch - 1;          // wire channel position along Y
-        gx = outer_x - 3;                    // wire groove (shelf side), runs over the rail wall
-        translate([led_x, -eps, led_z]) rotate([-90, 0, 0]) cylinder(d = led_cb_d, h = led_cb_l + eps);
-        translate([led_x, led_cb_l - eps, led_z]) rotate([-90, 0, 0]) cylinder(d = led_lip_d, h = led_lip_l + 2 * eps);
-        translate([led_x, led_cb_l + led_lip_l, led_z]) rotate([-90, 0, 0])
+        wy = y_front + bezel_l - wire_ch - 1;   // wire channel position along Y
+        gx = led_x - wire_ch / 2;               // wire groove (shelf side) above the LED
+        translate([led_x, y_front - eps, led_z]) rotate([-90, 0, 0]) cylinder(d = led_cb_d, h = led_cb_l + eps);
+        translate([led_x, y_front + led_cb_l - eps, led_z]) rotate([-90, 0, 0]) cylinder(d = led_lip_d, h = led_lip_l + 2 * eps);
+        translate([led_x, y_front + led_cb_l + led_lip_l, led_z]) rotate([-90, 0, 0])
             cylinder(d = led_bore_d, h = bezel_l - led_cb_l - led_lip_l - 1);
         // ... wires go straight up into a groove on the shelf side of the plate and back to the bay
         translate([led_x - wire_ch / 2, wy, led_z]) cube([wire_ch, wire_ch, plate_t - led_z + eps]);
@@ -376,7 +394,7 @@ module slot_lid() {
 module gauge() {
     intersection() {
         slot_module();
-        translate([-outer_x - 1, -1, -wall_h - 1]) cube([2 * outer_x + 2, 21, wall_h + plate_t + 2]);
+        translate([-outer_x - 1, y_nose - 1, -wall_h - 1]) cube([2 * outer_x + 2, y_lip + 6 - y_nose + 1, wall_h + plate_t + 2]);
     }
 }
 
@@ -409,15 +427,20 @@ module controller_box() {
             translate([-o[0] / 2, 0, 0]) cube(o);
             // shelf mounting flanges
             for (sx = [-1, 1]) translate([sx * (o[0] / 2 + 6) - 6, 0, 0]) cube([12, o[1], 4]);
-            // lid ears (outside the walls, clear of the PCB)
+            // lid ears (outside the walls, clear of the PCB), each with a 45 deg gusset
+            // down to the wall so it prints without support (box printed base down)
             for (e = ctl_ears())
-                translate([e[0] * (o[0] / 2 + 4) - 4, (e[1] > 0 ? o[1] - 22 : 14), top - 10]) cube([8, 8, 10]);
+                hull() {
+                    translate([e[0] * (o[0] / 2 + 4) - 4, (e[1] > 0 ? o[1] - 22 : 3), top - 10]) cube([8, 8, 10]);
+                    translate([e[0] > 0 ? o[0] / 2 - eps : -o[0] / 2, (e[1] > 0 ? o[1] - 22 : 3), top - 10 - 8.5])
+                        cube([eps, 8, eps]);
+                }
         }
         translate([-ctl_in[0] / 2, ctl_wall, ctl_wall]) cube(ctl_in + [0, 0, eps]);
-        for (sx = [-1, 1]) for (y = [12, o[1] - 12])
+        for (sx = [-1, 1]) for (y = [25, o[1] - 35])   // clear of the lid ears above
             translate([sx * (o[0] / 2 + 6), y, -eps]) cylinder(d = screw_d, h = 5);
         for (e = ctl_ears())
-            translate([e[0] * (o[0] / 2 + 4), (e[1] > 0 ? o[1] - 18 : 18), top - 6]) cylinder(d = 4.2, h = 6 + eps);
+            translate([e[0] * (o[0] / 2 + 4), (e[1] > 0 ? o[1] - 18 : 7), top - 6]) cylinder(d = 4.2, h = 6 + eps);
         // ---- cable notches, open towards the lid
         // left / right: slot connectors (board y 6..72)
         for (sx = [-1, 1]) translate([sx > 0 ? o[0] / 2 - ctl_wall - eps : -o[0] / 2 - eps,
@@ -438,13 +461,13 @@ module controller_lid() {
         union() {
             translate([-o[0] / 2, 0, 0]) cube([o[0], o[1], 2.4]);
             for (e = ctl_ears())
-                translate([e[0] * (o[0] / 2 + 4) - 4, (e[1] > 0 ? o[1] - 22 : 14), 0]) cube([8, 8, 2.4]);
+                translate([e[0] * (o[0] / 2 + 4) - 4, (e[1] > 0 ? o[1] - 22 : 3), 0]) cube([8, 8, 2.4]);
             // locating lip (inside the corners only, so the notches stay free)
             for (sx = [-1, 1]) for (y = [ctl_wall + 0.3, o[1] - ctl_wall - 8.3])
                 translate([sx > 0 ? ctl_in[0] / 2 - 8.3 : -ctl_in[0] / 2 + 0.3, y, 2.4 - eps]) cube([8, 8, 3]);
         }
         for (e = ctl_ears())
-            translate([e[0] * (o[0] / 2 + 4), (e[1] > 0 ? o[1] - 18 : 18), -eps]) cylinder(d = 3.4, h = 10);
+            translate([e[0] * (o[0] / 2 + 4), (e[1] > 0 ? o[1] - 18 : 7), -eps]) cylinder(d = 3.4, h = 10);
         // vent slots above the regulator / bus switch area
         for (i = [0:7]) translate([-30 + i * 8, o[1] - 30, -eps]) cube([3, 20, 3]);
     }
@@ -475,25 +498,25 @@ module dummy_battery() {
 
 if (part == "slot") rotate([90, 0, 0]) slot_module();
 else if (part == "slot_lid") rotate([90, 0, 0]) slot_lid();
-else if (part == "gauge") rotate([90, 0, 0]) gauge();
+else if (part == "gauge") rotate([-90, 0, 0]) translate([0, -(y_lip + 6), 0]) gauge();
 else if (part == "end_gauge") rotate([-90, 0, 0]) translate([0, -y_bay0, 0]) end_gauge();
 else if (part == "controller") controller_box();
 else if (part == "controller_lid") controller_lid();
 else if (part == "single") slot_module();
 // cut through the LED bezel with the LED in place
 else if (part == "led_section") intersection() {
-    union() { slot_module(); translate([outer_x + led_x_off, led_cb_l, led_z]) dummy_led(); }
-    translate([outer_x + led_x_off - 30, -10, -20]) cube([30, 40, 30]);
+    union() { slot_module(); translate([led_x, y_front + led_cb_l, led_z]) dummy_led(); }
+    translate([led_x - 30, y_front - 10, -20]) cube([30, 40, 40]);
 }
 // two neighbours overlapped: renders EMPTY if the joint does not collide
 // cross-section through two neighbours at y = 60 (for checking the joint fit)
 else if (part == "joint_section") projection(cut = true) rotate([-90, 0, 0]) translate([0, -60, 0])
     for (i = [0, 1]) translate([i * pitch, 0, 0]) slot_module();
 // 20 mm test pieces of both edges (tongue + groove) to check the joint clearance
-else if (part == "joint_gauge") rotate([90, 0, 0]) for (sx = [-1, 1])
+else if (part == "joint_gauge") rotate([90, 0, 0]) translate([0, -y_front, 0]) for (sx = [-1, 1])
     translate([-sx * (mod_w / 2 - 20), 0, 0]) intersection() {
         slot_module();
-        translate([sx > 0 ? mod_w / 2 - bar_w - 2 : -mod_w / 2 - 1, -1, bar_bot - 1])
+        translate([sx > 0 ? mod_w / 2 - bar_w - 2 : -mod_w / 2 - 1, y_front - 1, bar_bot - 1])
             cube([bar_w + 3 + jt_gap + jt_d + 1, 21, plate_t - bar_bot + 2]);
     }
 else if (part == "joint_check") intersection() { slot_module(); translate([pitch, 0, 0]) slot_module(); }

@@ -2,7 +2,8 @@
 
 ![3 modules + controller box, seen from below/front](img/assembly_below.png)
 ![Rear view with dummy batteries, bay lids and controller box](img/assembly_rear.png)
-![One slot module from the battery side: rails with lips, latch recess, countersunk screws, contact slots, switch window, LED bezel, dovetail edge bars](img/slot_from_front_below.png)
+![One slot module from the battery side: rails with lips, nose with the latch pocket, countersunk screws, contact slots, switch window, LED, dovetail edge bars](img/slot_from_front_below.png)
+![Front end: the lips start with a lead-in, walls and edge bars slope away, only the nose with the latch pocket reaches forward; LED in the front face of the right edge bar](img/slot_front_nose.png)
 ![End of the channel: contact block with chamfered corners, prong pockets on both sides, tapered corners above the lips, switch window in the end wall](img/channel_end.png)
 ![Cross-section through two neighbouring modules: the sliding dovetail](img/joint_section.png)
 ![Top-view section at the front of the joint: 45° bevel on the tongue and the groove end](img/joint_bevel_top_section.png)
@@ -11,7 +12,7 @@
 
 ## Concept
 
-- **One printed module per battery** (87.6 × 168 mm footprint, 42 mm tall). Modules sit side by
+- **One printed module per battery** (87.6 × 149 mm footprint plus a 9.5 mm nose, 44 mm tall). Modules sit side by
   side at an **88 mm pitch** (86 mm battery + 2 mm; you take the batteries out from below, so no
   finger room is needed): a row of 8 needs **70.4 cm** of shelf. The controller drives up to 16 slots
   through two 24 V outputs, for example **two rows of 8** on two shelves, one chain each.
@@ -25,8 +26,13 @@
   overhang. The bevels also form the front stop: a full contact face, not just an edge. The
   tongue's edges are **rounded** (`jt_r` = 1 mm), and the groove follows with r + clearance, so
   the joint slides smoothly and doesn't catch on elephant's foot or blobs.
-- The battery **slides in from the front and hangs from two rails**, as it does on a tool. Its
-  own latch clicks into the recess in the channel ceiling. Press the release button to pull it out.
+- The battery **slides in from the front and hangs from two rails**, as it does on a tool. The
+  front end copies the reference holder: the pack only has grooves over the last ~29 mm before
+  the contact face, so the **lips start there** (45° lead-in). In front of that the pack rises: the
+  rail walls and edge bars **slope away at 45°**, and the frame's front edge sits 45.5 mm in front
+  of the contact face. Only a **nose** (41 mm wide, tapering to ~25 mm) reaches 9.5 mm further
+  forward over the latch. The pack's latch clicks into the **pocket in the nose** (25 mm wide,
+  5 mm deep, open at the tip). Press the release button to pull the pack out.
 - The pack's tongue does **not end square**: two prongs, one on each side of the contact pocket,
   reach 14 mm past the contact face, and the wide part above the grooves tapers to the groove
   width over the last 7 mm. The channel follows that shape (taken from a reference holder model).
@@ -34,16 +40,17 @@
   prongs and **holds the contact tabs**. The prong tips stop against the **end wall**, which holds
   the **presence microswitch**: its lever pokes into the left prong pocket. Behind it, an **electronics bay** holds the slot PCB in card guides. The board's
   components face down.
-- A **5 mm RGB LED** sits in the front bezel and is inserted **from the front**. A 6.3 mm
-  counterbore, 5 mm deep, takes the LED body. Its 5.8 mm flange stops on a 5.0 mm lip, and the
-  dome sticks out about 3.5 mm. Behind the lip, a 7 mm bore holds the solder joints. The wires go
-  up a 5 × 5 mm channel into a 5 × 3 mm groove on the shelf side of the plate, back to the bay.
+- A **5 mm RGB LED** sits in the **front face of the right edge bar**, inside the 10 mm plate
+  (outside the area the pack rises into), and is inserted **from the front**. A 6.3 mm
+  counterbore, 8.6 mm deep, takes the LED body, so the dome ends **flush** with the front face.
+  Its 5.8 mm flange stops on a 5.0 mm lip. Behind the lip, a 7 mm bore holds the solder joints.
+  The wires go up into a 5 × 3 mm groove on the shelf side of the plate, back to the bay.
   These are plain round holes: printed face-down they are vertical, so they don't need a teardrop
   shape.
 
   **Fitting the LED:**
   1. Push the 4 wires from the bay along the groove and down the channel.
-  2. Bring them out through the front of the bezel.
+  2. Bring them out through the LED hole in the front face.
   3. Trim the LED leads to about 5 mm. Solder the wires and cover each joint with 1.5 mm
      heat-shrink.
   4. Pull the wires back from the groove side and press the LED in until the flange seats. A drop
@@ -62,9 +69,10 @@
 | Tongue top → groove | 4.8 mm | `lip_gap` = 5.1 |
 | Battery body width | 86 mm | `pitch` = 88 |
 | Rail length | 64 mm, tongue end (release button) to the contact face | `rail_len` = 64 |
-| Latch tooth | 4 mm from the tongue end, 29 mm wide, 4 mm long | `latch_y` = 3.5, `latch_w` = 30, `latch_l` = 6, `latch_d` = 5 (height not measured; 5 mm matches the reference holder) |
+| Latch tooth | Measured: 4 mm from the tongue end, 29 mm wide, 4 mm long, sticks up about as far as the top surface (4–5 mm) | The pocket copies the reference holder: `latch_w` = 25, profile `latch_prof` (5 mm deep, open at the nose tip) |
+| Front end | From the reference holder: lips start 28.6 mm in front of the contact face; walls slope away at 45° and reach the plate face 43 mm in front of it; frame front 45.5 mm, nose tip 55 mm in front of it | `lip_l`, `lead_in`, `slope_l`, `front_l`, `nose_l`, `nose_w` |
 | Tongue end | Prongs beside the contact pocket reach 14 mm past the contact face; pocket 30 mm wide with 4 mm 45° chamfers; wide part tapers 4 mm over the last 7 mm (from the reference holder model) | `prong_l` = 14, `cblock_w` = 29.6, `cblock_ch` = 4, `wing_l` = 7 |
-| Battery top surface | 4–5 mm below the tongue top, about as high as the latch tooth. Beside the tongue there is a trough down to below the grooves, at least ±34.9 mm wide (the reference holder fills it) | `body_top` = 4, `trough_x` = 34.9. Inside the trough: rail walls, ribs and LED bezel. Outside it, nothing reaches more than 3.5 mm below the tongue top: the edge bars and dovetail sit in the 8 mm plate (`plate_t` = 8) |
+| Battery top surface | 4–5 mm below the tongue top, about as high as the latch tooth. Beside the tongue there is a trough down to below the grooves, at least ±34.9 mm wide (the reference holder fills it) | `body_top` = 4, `trough_x` = 34.9. Inside the trough: rail walls and ribs. Outside it, nothing reaches more than 3.5 mm below the tongue top: the edge bars, dovetail and LED sit in the 10 mm plate (`plate_t` = 10) |
 | Contacts | 4 slots at an 8 mm pitch, 9.8 mm deep, 0.8 mm blades fit. Seen from the front (tongue pointing away): **+, ID, nc, −** | `contact_x` = −12, −4, 4, 12; `contact_len` = 8 |
 
 ![Section through two slots with the measured battery profile](img/battery_fit_section.png)
@@ -85,7 +93,8 @@ values in the model come from one measured pack; check them on yours. With calip
 | `lip_t` | Height of the side grooves, **− 0.4 mm** |
 | `lip_gap` | Top of the tongue down to the top edge of the groove, **+ 0.3 mm** |
 | `rail_len` | Front of the tongue (latch end) to the terminal face |
-| `latch_y`, `latch_w`, `latch_l`, `latch_d` | Position and size of the spring latch tooth when it is extended, + 1 mm clearance |
+| `latch_w`, `latch_prof` | Width and depth profile of the latch pocket in the nose |
+| `lip_l`, `slope_l`, `front_l`, `nose_l` | Where the grooves start, and where the pack rises at the latch end, measured forward from the contact face |
 | `contact_x`, `contact_z` | Centre of each terminal slot: X from the pack's centre line, Z down from the top of the tongue |
 | `tab_vertical` | Orientation of the terminal slots |
 
@@ -94,9 +103,10 @@ Then:
 1. Print `stl/joint_gauge.stl` (two 20 mm pieces, about 10 min) and slide the tongue piece into
    the groove piece from the open end. It should slide firmly without play. If it binds, raise
    `jt_clear` (default 0.2 mm per side). If it is loose, lower it.
-2. Print `stl/gauge.stl`. It is 20 mm long, takes about 15 min, and includes the lead-in and the
-   latch recess. Slide it onto the pack. It should run smoothly without wobbling up and down, and
-   the latch should click. Adjust, re-render, and repeat.
+2. Print `stl/gauge.stl` (rear face down, about 20 min): the front 37 mm of the channel with the
+   nose, latch pocket, sloped walls and the start of the lips. Slide it onto the pack from the
+   front until the lips engage. It should run smoothly without wobbling up and down, nothing may
+   touch the raised part of the pack around the latch, and the latch should click into the nose. Adjust, re-render, and repeat.
 3. Print `stl/end_gauge.stl`: the last 28 mm of the channel with the contact block, prong
    pockets, end wall and contact slots, printed standing on its rear face. Slide the pack in: the
    prongs must reach the end wall freely, and the contact face must sit against the block. Push
@@ -119,11 +129,11 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 
 | Part | Qty | Orientation | Notes |
 |---|---|---|---|
-| `slot.stl` | 6 per row of 8 | **Front face on the bed** (as exported) | Every layer then contains the full rail and dovetail profile, so the lips that carry the battery are as strong as possible and nothing needs support. Use a brim, 4 walls, 30–40 % gyroid, 0.2 mm layers |
+| `slot.stl` | 6 per row of 8 | **Front face on the bed** (as exported) | Only the nose touches the bed: **enable supports from the build plate** for the frame's front face (9.5 mm above the bed, beside the nose). Every layer then contains the full rail and dovetail profile, so the lips that carry the battery are as strong as possible and nothing needs support. Use a brim, 4 walls, 30–40 % gyroid, 0.2 mm layers |
 | `slot_end_left.stl` | 1 per row | same | Leftmost module (no groove). Optional: a normal `slot.stl` works too |
 | `slot_end_right.stl` | 1 per row | same | Rightmost module (no protruding tongue). Optional |
 | `joint_gauge.stl` | 1 | as exported | Tests the dovetail fit |
-| `gauge.stl`, `end_gauge.stl` | 1 each | as exported | Test the rail profile + latch, and the channel end + contacts |
+| `gauge.stl`, `end_gauge.stl` | 1 each | as exported (rear face down) | Test the front end + latch, and the channel end + contacts |
 | `slot_lid.stl` | 1 per slot | flat | U-notched rear lid |
 | `controller.stl` | 1 | open side up | All cable notches open to the top, so no support is needed |
 | `controller_lid.stl` | 1 | flat | |
@@ -135,8 +145,8 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 
 | Qty | Part |
 |---|---|
-| 1 | Wood screw **4 × 20 mm countersunk (flat head)**, front, in the centre of the channel ceiling. The head sits 0.4 mm below the surface so the battery slides over it |
-| 1 | Wood screw **4 × 20 mm pan head**, rear tab, centre. The plate is 8 mm thick, leaving 12 mm in an 18 mm shelf. The screw must stay at least 2 mm shorter than plate + shelf |
+| 1 | Wood screw **4 × 25 mm countersunk (flat head)**, front, in the centre of the channel ceiling. The head sits 0.4 mm below the surface so the battery slides over it |
+| 1 | Wood screw **4 × 25 mm pan head**, rear tab, centre. The plate is 10 mm thick, leaving 15 mm in an 18 mm shelf. The screw must stay at least 2 mm shorter than plate + shelf |
 | 4 | M3 heat-set inserts (4.2 mm hole) for the rear lid + 4 × M3×8 screws |
 | 3–4 | Contact blades: strips of **0.8 mm brass, 6.3 mm wide, about 40 mm long**, tinned, with a rounded tip. They pass through the contact block and end wall (22.5 mm) and stick out 8 mm from the contact face, so standard Faston tabs are too short. Push them in from the bay side, bend the tail 90° behind the end wall and glue with a drop of epoxy. **Check the blade thickness against your pack's terminals first.** |
 | 1 | Microswitch Omron D2F-01L (or SS-5GL with lever) + 2 × M2 × 8 self-tapping screws |
@@ -189,4 +199,6 @@ has a U-notch that is **open towards the lid**:
 - top wall: the ESP32's USB-C, plus the SHT40, Qwiic and expansion cables
 
 Plug everything in, lay the cables into the notches, then screw the lid on through the four outer
-ears. Mount the box with its base against the shelf, like the slot modules.
+ears. The ears sit at the four corners, outside the notches, each on a 45° gusset, so the box
+prints base down without support. Mount the box with its base against the shelf, like the slot
+modules.

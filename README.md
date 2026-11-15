@@ -48,7 +48,8 @@ verdict** for every slot to Home Assistant.
 
 ## Open items you need to verify
 
-- **Contact height** (`contact_z`) and the **latch tooth height** are still estimates. Print
+- **Contact height** (`contact_z`) is still an estimate, and the front end/latch pocket are
+  copied from a reference holder. Print
   `gauge.stl` and `end_gauge.stl` and test them on a pack before printing full modules.
 - **Board review:** a custom router routed both PCBs automatically. They pass KiCad's DRC with no
   errors, but have a look in KiCad before ordering. Each board's README lists what to check.
