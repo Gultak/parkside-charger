@@ -58,7 +58,14 @@ build ten boards, check on one pack:
      cell-balancing bleeders**, a current-sense resistor in the negative lead that doubles as a
      fuse, **no cut-off MOSFET** (under-voltage/over-current cut-off is the tool's job, via T),
      and a separate 3-LED voltage gauge. The balancing only works near full at low current, so
-     the firmware does a periodic balancing charge (`docs/firmware.md`). positron96's "10 kΩ NTC + transistor, released on under-voltage"
+     the firmware does a periodic balancing charge (`docs/firmware.md`).
+   - **Pack PCB silkscreen** (2 Ah pack, board "LY758BX V1.1", screenshot from the same video):
+     next to the connector, top to bottom, **+ / CS (pad P1) / DS (pad P10) / −**, which confirms
+     + ID T −. CS has its own transistor (Q13) with diode D2, and DS its own (Q12, R15/C15): both
+     are open-collector outputs switched by the LGT8P22A, which runs from a Zener-regulated 5 V. The
+     balancers are a row of identical transistor + resistor pairs on the cell taps (CELL1–CELL5).
+     Because CS is a transistor output, its "OK" level sits well below the slot board's 4.55 V
+     comparator threshold. positron96's "10 kΩ NTC + transistor, released on under-voltage"
      was measured with a tool-style 10 kΩ pull-up and may describe the tool pin (T/DS). Either way
      the slot board reads ID (CS), the pin the Parkside charger uses, with the same pull-up and
      threshold. That works whether ID is an NTC or a fixed resistor: OK ≈ 2.5–3 V, data frames pull
@@ -66,9 +73,7 @@ build ten boards, check on one pack:
    - **Bring-up check:** with 10 kΩ from 5 V to ID, ID should sit at about 2.5–3 V (or pulse) on a
      healthy pack and go to 5 V on an empty one. If ID instead stays at 5 V on a healthy pack, wire
      J3 pin 3 to the T contact instead (no board change needed).
-   - **Still to check on your pack:** the contact that reads **about 10–12 kΩ to −** (changing when
-     you warm the pack) is the one that goes to J3 pin 3. Per the pinout above that is the ID
-     contact (second from +).
+   - **Wiring:** J3 pin 3 goes to the **ID/CS contact, second from +**.
 2. **What the slot board does with it** (§3.1): it pulls ID up to 5 V through 10 kΩ, like the
    Parkside charger, filters out the short releases (RC about 0.5 s) and compares the result with
    4.55 V. Above that = line released = **BMS fault, deep discharge or no pack**: the firmware does
