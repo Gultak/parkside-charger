@@ -25,7 +25,7 @@ verdict** for every slot to Home Assistant.
 | Path | What |
 |---|---|
 | `mechanical/parkside_shelf_charger.scad` | Parametric OpenSCAD model: slot module (interlocking), end modules, bay lid, rail and joint test gauges, controller box |
-| `mechanical/stl/` | STLs exported with the **placeholder** rail dimensions. Calibrate first |
+| `mechanical/stl/` | STLs exported with the measured rail dimensions. Test-fit the gauges first |
 | `docs/mechanical.md` | How to measure the pack, test prints, printing, mounting, cabling |
 | `electronics/electronics.md` | Architecture, design decisions, pin maps, power budget, safety |
 | `electronics/slot-board/` | KiCad 7 project, Gerbers, BOM and pick-and-place for the slot board |
@@ -48,8 +48,8 @@ verdict** for every slot to Home Assistant.
 
 ## Open items you need to verify
 
-- **Rail and contact geometry** of the X20V pack. The model is fully parametric, but its numbers
-  are educated placeholders.
+- **Contact height** (`contact_z`) and the **latch tooth height** are still estimates. Print
+  `gauge.stl` and `end_gauge.stl` and test them on a pack before printing full modules.
 - **Board review:** a custom router routed both PCBs automatically. They pass KiCad's DRC with no
   errors, but have a look in KiCad before ordering. Each board's README lists what to check.
 - **The LTC4162-L register map and scaling** have been checked against the datasheet (Rev A)

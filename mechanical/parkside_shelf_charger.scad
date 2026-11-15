@@ -6,15 +6,17 @@
 //  side to the underside of the shelf; the battery slides in from the
 //  front and hangs from two rails, like on a tool.
 //
-//  !!! The battery-interface numbers below are PLACEHOLDERS. !!!
-//  Measure your own pack with calipers, then print part="gauge" (a 20 mm
-//  long slice of the rail profile, ~15 min print) and test-fit it before
+//  Battery interface: measured on a real pack (see docs/mechanical.md);
+//  contact_z is still an estimate.
+//  Print part="gauge" and part="end_gauge" (short slices, ~15 min each)
+//  and test-fit them on your pack before
 //  printing the full modules. See docs/mechanical.md.
 //
 //  Export:
 //    openscad -D 'part="slot"'           -o slot.stl            parkside_shelf_charger.scad
 //    openscad -D 'part="slot_lid"'       -o slot_lid.stl        parkside_shelf_charger.scad
 //    openscad -D 'part="gauge"'          -o gauge.stl           parkside_shelf_charger.scad
+//    openscad -D 'part="end_gauge"'      -o end_gauge.stl       parkside_shelf_charger.scad
 //    openscad -D 'part="joint_gauge"'    -o joint_gauge.stl     parkside_shelf_charger.scad
 //  End modules: add -D joint_left=false (leftmost) or -D joint_right=false (rightmost).
 //    openscad -D 'part="controller"'     -o controller.stl      parkside_shelf_charger.scad
@@ -27,27 +29,36 @@
 //  plate occupies 0..plate_t and its top face touches the shelf.
 // =====================================================================
 
-part = "assembly"; // [slot, slot_lid, gauge, joint_gauge, controller, controller_lid, assembly, single, joint_section, joint_check]
+part = "assembly"; // [slot, slot_lid, gauge, end_gauge, joint_gauge, controller, controller_lid, assembly, single, joint_section, joint_check]
 
 /* [Battery interface: MEASURE YOUR PACK] */
 chan_w   = 46.9;  // clear width between the rail walls, above the lips (tongue width 46.3 + 0.6)
 lip_in   = 4.2;   // how far each lip sticks inward (groove depth 4.5 - 0.3)
 lip_t    = 5.0;   // lip thickness (groove height 5.4 - 0.4)
 lip_gap  = 5.1;   // plate face -> top face of lip (tongue top -> groove 4.8 + 0.3)
-rail_len = 92;    // engaged rail length (front edge -> terminal/end-stop face)  PLACEHOLDER - measure
+rail_len = 64;    // measured: tongue end (release button) -> contact face
+// The tongue does not end square: two side prongs (left/right of the contact
+// pocket) reach past the contact face, and the wide part above the grooves
+// tapers off towards their tips. Taken from a reference holder model.
+prong_l  = 14;    // prong tips -> this far beyond the contact face
+prong_cl = 0.5;   // extra room in front of the prong tips
+cblock_w = 29.6;  // contact block width (fills the pocket between the prongs, 30 on the reference)
+cblock_ch = 4;    // 45 deg chamfer on the contact block's front corners
+wing_l   = 7;     // the wide part tapers to the groove width over the last 7 mm
 lead_in  = 3;     // chamfer on the lip entry
 // latch recess the battery's spring latch snaps into (in the channel ceiling)
-latch_y  = 6;     // distance from front edge to the recess  (latch_*: PLACEHOLDERS - measure)
-latch_w  = 18;    // across
-latch_l  = 9;     // along the slide direction
-latch_d  = 4;     // depth into the plate
+// measured tooth: 4 mm from the tongue end, 29 wide, 4 long; height assumed 4
+latch_y  = 3.5;   // distance from front edge to the recess
+latch_w  = 30;    // across
+latch_l  = 6;     // along the slide direction (ramped at the rear)
+latch_d  = 5;     // depth into the plate
 
 /* [Battery contacts (male 6.3 x 0.8 mm tabs or 0.8 mm brass)] */
 // X positions of the contact tabs, measured from the channel centre line.
 // Typical Parkside X20V: B+, (NTC/T), (data), B-  -> verify with a meter!
 contact_x   = [-12, -4, 4, 12];   // measured: 8 mm pitch; seen from the front: +, ID, nc, -
 contact_z   = 5.5;  // tab centre below the plate face
-contact_len = 8;    // how far the tab sticks out of the end-stop (battery slots are 9.8 deep)
+contact_len = 8;    // how far the tab sticks out of the contact face (battery slots are 9.8 deep)
 tab_w       = 6.3;
 tab_t       = 0.8;
 tab_vertical = true; // blade plane vertical (true) or horizontal (false)
@@ -56,7 +67,7 @@ tab_vertical = true; // blade plane vertical (true) or horizontal (false)
 pitch    = 88;    // module width = slot spacing (battery body 86 + 2, batteries are grabbed from below)
 plate_t  = 6;     // mounting plate thickness
 wall_t   = 5;     // rail wall thickness
-stop_t   = 8;     // end-stop / contact block thickness
+stop_t   = 8;     // end wall thickness (behind the prong tips)
 bay_l    = 66;    // electronics bay length (behind the end stop)
 bay_h    = 34;    // electronics bay height below the plate (must clear the battery body)
 bay_wall = 2.4;
@@ -132,8 +143,9 @@ wall_h   = lip_gap + lip_t;          // rail wall height below the plate
 inner_x  = chan_w / 2;               // inner face of a rail wall
 outer_x  = inner_x + wall_t;         // outer face
 mod_w    = pitch - jt_gap;           // neighbours interlock with a small gap
-y_stop   = rail_len;                 // end-stop front face
-y_bay0   = rail_len + stop_t;        // start of bay
+y_stop   = rail_len;                 // contact face (front of the contact block)
+y_wall   = rail_len + prong_l + prong_cl;   // end wall front face (prong tips)
+y_bay0   = y_wall + stop_t;          // start of bay
 mod_l    = y_bay0 + bay_l;           // total length
 bay_x    = pcb_w / 2 - 0.8;          // bay inner half-width
 rear_tab = 15;                       // plate extension behind the bay for the rear screws
@@ -210,6 +222,24 @@ module lip_lead_in() {
             }
 }
 
+// Contact block: fills the battery's contact pocket between the two prongs and
+// carries the contact tabs. Front corners chamfered 45 deg (prints without support
+// face-down, and guides the pack in).
+module contact_block() {
+    h = cblock_w / 2;
+    translate([0, 0, -wall_h]) linear_extrude(wall_h + eps) polygon([
+        [-h + cblock_ch, y_stop], [h - cblock_ch, y_stop], [h, y_stop + cblock_ch],
+        [h, y_wall + eps], [-h, y_wall + eps], [-h, y_stop + cblock_ch]]);
+}
+// The wide part of the tongue (above the grooves) narrows to the groove width
+// over its last wing_l mm: fill the corners of the channel to match.
+module wing_tapers() {
+    for (m = [0, 1]) mirror([m, 0, 0])
+        translate([0, 0, -lip_gap - eps]) linear_extrude(lip_gap + 2 * eps) polygon([
+            [inner_x + eps, y_wall - wing_l], [inner_x + eps, y_wall + eps],
+            [inner_x - lip_in, y_wall + eps]]);
+}
+
 // ---------------------------- slot module -----------------------------
 module slot_module() {
     col = 7;  // corner columns in the bay that take the lid inserts
@@ -221,9 +251,11 @@ module slot_module() {
             edge_bars();
             if (joint_right) joint_tongue();
             // rails
-            rails(y_stop + eps);
-            // end stop / contact block across the channel
-            translate([-outer_x, y_stop, -wall_h]) cube([2 * outer_x, stop_t, wall_h + eps]);
+            rails(y_wall + eps);
+            // end wall across the channel (the prong tips stop against it)
+            translate([-outer_x, y_wall, -wall_h]) cube([2 * outer_x, stop_t, wall_h + eps]);
+            contact_block();
+            wing_tapers();
             // electronics bay shell
             translate([-bay_x - bay_wall, y_bay0 - eps, -bay_h])
                 cube([2 * (bay_x + bay_wall), bay_l + eps, bay_h + eps]);
@@ -254,18 +286,18 @@ module slot_module() {
 
         // contact tab slots through the end stop
         for (x = contact_x)
-            translate([x, y_stop - eps, -contact_z])
+            translate([x, y_stop - cblock_ch - eps, -contact_z])
                 if (tab_vertical) translate([-(tab_t + 0.15) / 2, 0, -(tab_w + 0.3) / 2])
-                    cube([tab_t + 0.15, stop_t + 2 * eps, tab_w + 0.3]);
+                    cube([tab_t + 0.15, y_bay0 - y_stop + cblock_ch + 2 * eps, tab_w + 0.3]);
                 else translate([-(tab_w + 0.3) / 2, 0, -(tab_t + 0.15) / 2])
-                    cube([tab_w + 0.3, stop_t + 2 * eps, tab_t + 0.15]);
+                    cube([tab_w + 0.3, y_bay0 - y_stop + cblock_ch + 2 * eps, tab_t + 0.15]);
 
         // microswitch lever window + 2x M2 pilot holes (switch screwed to the
         // rear face of the end stop, inside the bay)
-        translate([sw_x - sw_win[0] / 2, y_stop - eps, -sw_z - sw_win[1] / 2])
+        translate([sw_x - sw_win[0] / 2, y_wall - eps, -sw_z - sw_win[1] / 2])
             cube([sw_win[0], stop_t + 2 * eps, sw_win[1]]);
         for (dx = [-3.25, 3.25])
-            translate([sw_x + dx, y_stop + 2, -sw_z - 5.5]) hole_y(1.8, stop_t);
+            translate([sw_x + dx, y_wall + 2, -sw_z - 5.5]) hole_y(1.8, stop_t);
 
         // bay cavity, open to the rear; the end stop is its front wall
         difference() {
@@ -339,6 +371,15 @@ module gauge() {
     intersection() {
         slot_module();
         translate([-outer_x - 1, -1, -wall_h - 1]) cube([2 * outer_x + 2, 21, wall_h + plate_t + 2]);
+    }
+}
+
+// Test print: the end of the channel (contact block, prong pockets, end wall,
+// contact slots). Slide the pack in and check it seats against the contact face.
+module end_gauge() {
+    intersection() {
+        slot_module();
+        translate([-outer_x - 1, y_stop - 6, -wall_h - 1]) cube([2 * outer_x + 2, y_bay0 - y_stop + 6, wall_h + plate_t + 2]);
     }
 }
 
@@ -427,6 +468,7 @@ module dummy_battery() {
 if (part == "slot") rotate([90, 0, 0]) slot_module();
 else if (part == "slot_lid") rotate([90, 0, 0]) slot_lid();
 else if (part == "gauge") rotate([90, 0, 0]) gauge();
+else if (part == "end_gauge") rotate([-90, 0, 0]) translate([0, -y_bay0, 0]) end_gauge();
 else if (part == "controller") controller_box();
 else if (part == "controller_lid") controller_lid();
 else if (part == "single") slot_module();
