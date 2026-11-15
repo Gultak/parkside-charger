@@ -37,9 +37,15 @@
 X20V packs are 5S Li-ion: 18 V nominal, **21.0 V charge voltage**, about 15 V empty. Before you
 build ten boards, check on one pack:
 
-1. **Identify the contacts.** B+/B− show the pack voltage. The **T** contact reads about **10 kΩ to B−
-   at 25 °C**, and the value falls when you warm the pack in your hand. That contact is the NTC.
-   Some packs have another signal contact (data/ID). Leave it unconnected.
+1. **Identify the contacts.** Measured: seen from the front (tongue pointing away), the four
+   contacts are **+, ID, nc, −**. The slot board expects the pack's temperature sensor on J3 pin 3
+   ("NTC"), and it is wired to the **ID** contact. **Still to check:** measure ID → − at room
+   temperature and again after warming the pack in your hands.
+   - If the value changes (about 10 kΩ at 25 °C), it is the NTC and the design works as is.
+   - If it stays fixed, it is an identification resistor and the pack has no NTC on its
+     terminals. The charger then has no battery temperature, which needs a design decision before
+     building (for example `require_ntc: false` plus a 10 kΩ resistor on the NTC input, so the
+     LTC4162 sees 25 °C).
 2. **Measure the NTC beta.** Read R at room temperature and again after 30 min in the fridge, then
    compute B = ln(R1/R2) / (1/T1 − 1/T2), with T in kelvin. Enter the result as `ntc_beta`
    (default 3435).

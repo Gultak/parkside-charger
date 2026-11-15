@@ -30,14 +30,14 @@
 part = "assembly"; // [slot, slot_lid, gauge, joint_gauge, controller, controller_lid, assembly, single, joint_section, joint_check]
 
 /* [Battery interface: MEASURE YOUR PACK] */
-chan_w   = 61.0;  // clear width between the rail walls, above the lips (tongue width + 0.6)
-lip_in   = 3.5;   // how far each lip sticks inward (into the battery's side groove)
-lip_t    = 3.0;   // lip thickness (groove height minus 0.4 clearance)
-lip_gap  = 10.5;  // plate face -> top face of lip (tongue height above the groove + 0.3)
-rail_len = 92;    // engaged rail length (front edge -> terminal/end-stop face)
+chan_w   = 46.9;  // clear width between the rail walls, above the lips (tongue width 46.3 + 0.6)
+lip_in   = 4.2;   // how far each lip sticks inward (groove depth 4.5 - 0.3)
+lip_t    = 5.0;   // lip thickness (groove height 5.4 - 0.4)
+lip_gap  = 5.1;   // plate face -> top face of lip (tongue top -> groove 4.8 + 0.3)
+rail_len = 92;    // engaged rail length (front edge -> terminal/end-stop face)  PLACEHOLDER - measure
 lead_in  = 3;     // chamfer on the lip entry
 // latch recess the battery's spring latch snaps into (in the channel ceiling)
-latch_y  = 6;     // distance from front edge to the recess
+latch_y  = 6;     // distance from front edge to the recess  (latch_*: PLACEHOLDERS - measure)
 latch_w  = 18;    // across
 latch_l  = 9;     // along the slide direction
 latch_d  = 4;     // depth into the plate
@@ -45,15 +45,15 @@ latch_d  = 4;     // depth into the plate
 /* [Battery contacts (male 6.3 x 0.8 mm tabs or 0.8 mm brass)] */
 // X positions of the contact tabs, measured from the channel centre line.
 // Typical Parkside X20V: B+, (NTC/T), (data), B-  -> verify with a meter!
-contact_x   = [-16.5, -5.5, 5.5, 16.5];
+contact_x   = [-12, -4, 4, 12];   // measured: 8 mm pitch; seen from the front: +, ID, nc, -
 contact_z   = 5.5;  // tab centre below the plate face
-contact_len = 9;    // how far the tab sticks out of the end-stop into the battery
+contact_len = 8;    // how far the tab sticks out of the end-stop (battery slots are 9.8 deep)
 tab_w       = 6.3;
 tab_t       = 0.8;
 tab_vertical = true; // blade plane vertical (true) or horizontal (false)
 
 /* [Module frame] */
-pitch    = 96;    // module width = slot spacing (battery body ~80 + finger room)
+pitch    = 88;    // module width = slot spacing (battery body 86 + 2, batteries are grabbed from below)
 plate_t  = 6;     // mounting plate thickness
 wall_t   = 5;     // rail wall thickness
 stop_t   = 8;     // end-stop / contact block thickness
@@ -82,7 +82,7 @@ jt_r     = 1.0;       // radius on the tongue's edges (groove follows with r + c
 // The tongue's front end and the groove's closed end are both bevelled at 45 deg
 // (rising towards the back), so neither has a flat overhang when printed face-down.
 bar_w    = 9;         // width of the edge bar carrying the joint
-bar_bot  = -10;       // underside of the edge bar (must stay above the battery body)
+bar_bot  = -9.6;      // underside of the edge bar (must stay above the battery body)
 
 /* [Slot PCB (slides into card guides from the rear)] */
 pcb_w = 72;     // across (X); edges ride 0.8 mm deep in the card guides
@@ -91,8 +91,8 @@ pcb_t = 1.6;
 pcb_z = 9;      // PCB bottom face below plate face
 
 /* [Microswitch: Omron D2F-01L / similar, M2 holes 6.5 mm apart] */
-sw_x    = -24;  // switch window centre from channel centre
-sw_z    = 6;
+sw_x    = -18;  // switch window centre from channel centre (between + contact and wall)
+sw_z    = 3.5;
 sw_win  = [9, 4];   // window through the end stop for the lever (X, Z)
 
 /* [Status LED: 5 mm RGB (T-1 3/4) in the front bezel, inserted FROM THE FRONT] */
@@ -106,7 +106,7 @@ led_lip_l  = 1;
 led_bore_d = 7.0;   // bore behind the lip for the solder joints
 bezel_l    = 14;    // bezel length along Y
 led_x_off  = 5.5;   // LED axis from the rail wall's outer face
-led_z      = -6.5;  // LED axis height
+led_z      = -4.6;  // LED axis height (bezel must stay above the battery body)
 wire_ch    = 5;     // wire channel / groove width
 wire_gd    = 3;     // depth of the wire groove on the shelf side of the plate
 
@@ -228,7 +228,7 @@ module slot_module() {
             translate([-bay_x - bay_wall, y_bay0 - eps, -bay_h])
                 cube([2 * (bay_x + bay_wall), bay_l + eps, bay_h + eps]);
             // LED bezel at the front, beside the right rail
-            translate([outer_x, 0, -13]) cube([11, bezel_l, 13 + eps]);
+            translate([outer_x, 0, -9.4]) cube([11, bezel_l, 9.4 + eps]);
             // stiffening ribs from rail walls to the plate flange
             for (m = [0, 1]) mirror([m, 0, 0])
                 for (y = [rail_len * 0.45, rail_len * 0.8])
@@ -419,7 +419,7 @@ module dummy_led() {
     color("silver") for (i = [0:3]) translate([-1.9 + i * 1.27, 0, -0.25]) cube([0.5, 5, 0.5]);
 }
 module dummy_battery() {
-    color("forestgreen", 0.85) translate([-40, 3, -wall_h - 75]) cube([80, rail_len - 3, 75]);
+    color("forestgreen", 0.85) translate([-43, 3, -wall_h - 75]) cube([86, rail_len - 3, 75]);
     color("darkgreen", 0.85) translate([-chan_w / 2 + 0.3, 3, -wall_h + 0.2])
         cube([chan_w - 0.6, rail_len - 3, wall_h - 0.5]);
 }

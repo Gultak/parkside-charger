@@ -10,8 +10,9 @@
 
 ## Concept
 
-- **One printed module per battery** (95.6 × 181 mm footprint, 34 mm tall). Modules sit side by
-  side at a 96 mm pitch: a row of 8 needs **77 cm** of shelf. The controller drives up to 16 slots
+- **One printed module per battery** (87.6 × 181 mm footprint, 34 mm tall). Modules sit side by
+  side at an **88 mm pitch** (86 mm battery + 2 mm; you take the batteries out from below, so no
+  finger room is needed): a row of 8 needs **70.4 cm** of shelf. The controller drives up to 16 slots
   through two 24 V outputs, for example **two rows of 8** on two shelves, one chain each.
 - **Neighbouring modules slot into each other** with a **sliding dovetail** that runs along the
   full length of each side. Every module has a tongue on its right edge and a groove on its left
@@ -46,6 +47,32 @@
   ![Section through the LED bore and wire channel](img/led_bore_section.png)
 - A separate **controller box** holds the ESP32-C6 main board. The Mean Well PSU mounts with its
   own screw holes, at least 5 cm away from the batteries.
+
+## Measured so far (Parkside X20V)
+
+| Measurement | Value | Model parameter |
+|---|---|---|
+| Tongue width (above the grooves) | 46.3 mm | `chan_w` = 46.9 |
+| Groove depth / height | 4.5 / 5.4 mm | `lip_in` = 4.2, `lip_t` = 5.0 |
+| Tongue top → groove | 4.8 mm | `lip_gap` = 5.1 |
+| Battery body width | 86 mm | `pitch` = 88 |
+| Contacts | 4 slots at an 8 mm pitch, 9.8 mm deep, 0.8 mm blades fit. Seen from the front (tongue pointing away): **+, ID, nc, −** | `contact_x` = −12, −4, 4, 12; `contact_len` = 8 |
+
+![Section through two slots with the measured battery profile](img/battery_fit_section.png)
+
+**Still to measure** (placeholders in the model):
+- **Rail length (`rail_len`):** along the tongue, from the end with the release button to the face
+  with the contact slots.
+- **Latch tooth (`latch_y/w/l/d`):** with the tooth extended, measure:
+  - its distance from the tongue's end (`latch_y`)
+  - its width across the battery (`latch_w`)
+  - its length along the battery (`latch_l`)
+  - how far it sticks up (`latch_d`)
+- **Contact height (`contact_z`):** the centre of the contact slots, measured down from the
+  tongue top.
+- **Battery top surface:** the height of the surface beside the tongue, measured down from the
+  tongue top. The model assumes it starts right below the grooves (10.2 mm), which leaves only
+  about 0.4 mm clearance under the rail walls, LED bezel and edge bars.
 
 ## Step 1: measure your battery and calibrate the model
 
