@@ -122,7 +122,7 @@ def build(design, layout, outdir: Path, project: str, root_uuid: str):
     comments = "\n".join(f'    (comment {i + 1} "{c}")' for i, c in enumerate(layout.COMMENTS))
     title = f'''  (title_block
     (title "{layout.TITLE}")
-    (rev "A")
+    (rev "{getattr(layout, "REV", "A")}")
     (company "ha-esphome-projects / parkside-charger")
 {comments}
   )'''

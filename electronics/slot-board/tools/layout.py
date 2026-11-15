@@ -3,6 +3,7 @@ schematic sheet placement. Board coordinates in mm, y = 0 is the FRONT edge
 (towards the battery / end stop), y = 47.5 the REAR edge (bay lid)."""
 
 PROJECT = "slot_board"
+REV = "B"
 ROOT_UUID = "5a1c0b0a-7d1e-4c3a-9a47-2f6f3c0b0001"
 BW, BH = 72.0, 47.5     # rides in the card guides of the printed bay with its 72 mm edges
 EDGE_KEEP = 2.0         # keep parts this far from the long (guide) edges

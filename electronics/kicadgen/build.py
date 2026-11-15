@@ -39,6 +39,7 @@ def main(tools_dir, steps=("sch", "pcb", "fab", "img")):
         fab.run_fab(design.PARTS, layout.PROJECT, board_dir)
     if "img" in steps:
         render.render(str(board_dir / f"{layout.PROJECT}.kicad_pcb"), str(board_dir / "img"))
+        render.render_extra(layout.PROJECT, board_dir)
     for f in board_dir.glob("*.kicad_prl"):
         f.unlink()
 

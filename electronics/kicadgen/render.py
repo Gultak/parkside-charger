@@ -92,3 +92,50 @@ def render(pcb, outdir, layers=("top", "bottom")):
 
 if __name__ == "__main__":
     render(sys.argv[1], sys.argv[2])
+
+
+_SHOT_JS = r"""
+const { chromium } = require('playwright');
+(async () => {
+  const [html, png] = process.argv.slice(2);
+  const b = await chromium.launch();
+  const p = await b.newPage({ viewport: { width: 1500, height: 200 }, deviceScaleFactor: 1 });
+  await p.goto('file://' + html);
+  await p.screenshot({ path: png, fullPage: true });
+  await b.close();
+})();
+"""
+
+
+def render_extra(project, board_dir):
+    """Silkscreen view (kicad-cli SVG -> PNG via Playwright Chromium) and a schematic PNG
+    (from the schematic PDF via pdftoppm), so the README pictures always match the board."""
+    import os
+    import subprocess
+    import tempfile
+    from pathlib import Path
+    board_dir = Path(board_dir)
+    out = board_dir / "img"
+    out.mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory() as tmp:
+        svg = Path(tmp) / "silk.svg"
+        subprocess.run(["kicad-cli", "pcb", "export", "svg", "--layers", "F.Cu,F.Mask,F.Silkscreen,Edge.Cuts",
+                        "--page-size-mode", "2", "--exclude-drawing-sheet", "-o", str(svg),
+                        str(board_dir / f"{project}.kicad_pcb")], check=True, capture_output=True)
+        html = Path(str(svg) + ".html")
+        html.write_text(f'<html><body style="margin:0;background:#0d1117"><img src="{svg.name}" '
+                        f'style="width:1500px"></body></html>')
+        js = Path(tmp) / "shot.js"
+        js.write_text(_SHOT_JS)
+        env = dict(os.environ)
+        npm_root = subprocess.run(["npm", "root", "-g"], capture_output=True, text=True).stdout.strip()
+        env["NODE_PATH"] = npm_root
+        subprocess.run(["node", str(js), str(html), str(out / "pcb_top_silkscreen.png")], check=True,
+                       env=env, capture_output=True)
+        print("wrote", out / "pcb_top_silkscreen.png")
+    pdf = board_dir / f"{project}_schematic.pdf"
+    if pdf.exists():
+        for old in out.glob("schematic-*.png"):
+            old.unlink()
+        subprocess.run(["pdftoppm", "-r", "60", "-png", str(pdf), str(out / "schematic")], check=True)
+        print("wrote", ", ".join(str(p) for p in sorted(out.glob("schematic-*.png"))))
