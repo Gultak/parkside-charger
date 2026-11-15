@@ -14,7 +14,7 @@
 
 ## Concept
 
-- **One printed module per battery** (87.6 × 149 mm footprint plus a 9.5 mm nose, 44 mm tall). Modules sit side by
+- **One printed module per battery** (87.6 × 120 mm footprint plus a 9.5 mm nose, 44 mm tall). Modules sit side by
   side at an **88 mm pitch** (86 mm battery + 2 mm; you take the batteries out from below, so no
   finger room is needed): a row of 8 needs **70.4 cm** of shelf. The controller drives up to 16 slots
   through two 24 V outputs, for example **two rows of 8** on two shelves, one chain each.
@@ -140,7 +140,7 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 | `slot_end_right.stl` | 1 per row | same | Rightmost module (no protruding tongue). Optional |
 | `joint_gauge.stl` | 1 | as exported | Tests the dovetail fit |
 | `gauge.stl`, `end_gauge.stl` | 1 each | as exported (rear face down) | Test the front end + latch, and the channel end + contacts |
-| `slot_lid.stl` | 1 per slot | outer face down (as exported) | U-notched rear lid with two fingers that hold the PCB |
+| `slot_lid.stl` | 1 per slot | outer face down (as exported) | U-notched rear lid; it sits 0.5 mm behind the PCB |
 | `controller.stl` | 1 | open side up | All cable notches open to the top, so no support is needed |
 | `controller_lid.stl` | 1 | flat | |
 
@@ -152,12 +152,12 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 | Qty | Part |
 |---|---|
 | 1 | Wood screw **4 × 25 mm countersunk (flat head)**, front, in the centre of the channel ceiling. The head sits 0.4 mm below the surface so the battery slides over it |
-| 1 | Wood screw **4 × 25 mm pan head**, at the rear, centre, inside the bay behind the PCB (drive it through the floor window). The plate is 10 mm thick, leaving 15 mm in an 18 mm shelf. The screw must stay at least 2 mm shorter than plate + shelf |
+| 1 | Wood screw **4 × 25 mm pan head**, at the rear, inside the bay above the PCB: drive it through the floor window and the 10 mm hole in the slot PCB. The plate is 10 mm thick, leaving 15 mm in an 18 mm shelf. The screw must stay at least 2 mm shorter than plate + shelf |
 | 4 | M3 heat-set inserts (4.2 mm hole) for the rear lid + 4 × M3×8 screws |
 | 3–4 | Contact blades: strips of **0.8 mm brass, 6.3 mm wide, about 50 mm long**, tinned, with a rounded tip. They pass through the contact block, the end wall and its bevel (up to 30 mm), and stick out 8 mm from the contact face, so standard Faston tabs are too short. Push them in from the bay side, bend the tail 90° where it leaves the bevel and glue with a drop of epoxy. **Check the blade thickness against your pack's terminals first.** |
 | 1 | Microswitch Omron D2F-01L (or SS-5GL with lever) + 2 × M2 × 8 self-tapping screws |
 | 1 | 5 mm (T-1¾) RGB LED, **common cathode**, diffused, e.g. Kingbright L-154A4SUREQBFZGEW. Any standard 5 mm LED with a 5.8 mm flange fits. 4-wire cable to the slot PCB |
-| 1 | Slot PCB 72 × 60 mm (slides into the card guides from the rear) |
+| 1 | Slot PCB 72 × 47.5 mm (slides into the card guides from the rear) |
 
 ## Mounting
 
@@ -171,8 +171,8 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
    2. Put the next module against the shelf underside about 20 cm further forward. Engage its
       groove (left edge, open at the rear) with the tongue of the module already mounted, and
       push it backwards until it stops. Its front edge is now flush.
-   3. Drive its 2 screws: the countersunk one in the channel, the pan-head one at the rear, through
-      the floor window.
+   3. Drive its 2 screws: the countersunk one in the channel, and the pan-head one inside the bay,
+      through the floor window and the hole in the slot PCB (this works with the PCB fitted).
    4. Repeat for the rest of the row. The 0.4 mm gap between the plates is intended.
 
    This requires about 20 cm of free space in front of the shelf edge, as you slide each module
@@ -188,8 +188,8 @@ No cable has to be threaded through a part before it is connected.
   reach the screws of the **24 V IN (J1) / OUT (J6)** terminals and the **JST-XH I²C plug (J2)**
   with the board installed.
 - **Rear lid:** it has a wide **U-notch open at the bottom** (up to `lid_notch_top`). Plug in all
-  cables first, then put the lid on over them. It closes the bay at the rear edge, and two fingers
-  on its inside hold the board in its card guides.
+  cables first, then put the lid on over them. It closes the bay right behind the board and keeps
+  it in its card guides.
 - **Internal wiring:** the battery contacts, microswitch and LED connect to the front of the
   board (J3/J4/J5). Wire these once, before you slide the board in.
 

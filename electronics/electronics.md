@@ -54,7 +54,7 @@ build ten boards, check on one pack:
    "Performance" packs should be checked.
 4. Measure the blade/slot geometry for the 3D model (see `docs/mechanical.md`).
 
-## 3. Slot board (×16 max), 72 × 60 mm, 4 layers
+## 3. Slot board (×16 max), 72 × 47.5 mm, 4 layers
 
 **The complete KiCad 7 design (schematic, routed PCB, Gerbers, BOM, pick-and-place) is in
 [`slot-board/`](slot-board/README.md).** This section summarises the design decisions.

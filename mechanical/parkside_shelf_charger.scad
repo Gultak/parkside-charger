@@ -80,7 +80,7 @@ pitch    = 88;    // module width = slot spacing (battery body 86 + 2, batteries
 plate_t  = 10;    // mounting plate thickness (carries the dovetail and the LED; as on the reference holder)
 wall_t   = 5;     // rail wall thickness
 stop_t   = 8;     // end wall thickness (behind the prong tips)
-bay_l    = 66;    // electronics bay length (behind the end stop)
+bay_l    = 4 + 47.5 + 0.5;   // electronics bay: 4 mm gap, PCB, 0.5 mm to the lid
 bay_h    = 34;    // electronics bay height below the plate (must clear the battery body)
 bay_wall = 2.4;
 screw_d  = 4.5;   // wood screws 4 x 25 (plate 10 + shelf, stay 2 mm short of the top)
@@ -109,7 +109,8 @@ bar_bot  = keep_z;    // underside of the edge bar (must stay above the battery 
 
 /* [Slot PCB (slides into card guides from the rear)] */
 pcb_w = 72;     // across (X); edges ride 0.8 mm deep in the card guides
-pcb_l = 60;     // along (Y)
+pcb_l = 47.5;   // along (Y)
+pcb_hole = [40.5, 25];   // screwdriver hole in the PCB (board coords: x from the left edge, y from the front edge)
 pcb_t = 1.6;
 pcb_z = 9;      // PCB bottom face below plate face
 
@@ -164,13 +165,15 @@ y_wall   = rail_len + prong_l + prong_cl;   // end wall front face (prong tips)
 y_bay0   = y_wall + stop_t;          // start of bay
 mod_l    = y_bay0 + bay_l;           // total length
 bay_x    = pcb_w / 2 - 0.8;          // bay inner half-width
-rear_tab = 15;                       // plate extension behind the bay for the rear screws
+rear_tab = 0;                        // (no plate extension: the rear screw sits inside the bay)
 total_l  = mod_l + rear_tab;
 cage_l   = total_l - y_bay0;         // bay walls run to the rear edge (module prints standing on it)
 sw_body  = [14, 9];                  // pocket for the microswitch body in the end-wall bevel (X, Z)
 // One screw front, one rear, both on the centre line: the dovetail joint
 // carries the sideways and twisting loads between neighbouring modules.
 front_screw_y = y_lip + 2;           // flat-head screw in the channel ceiling
+rear_screw_x  = pcb_hole[0] - pcb_w / 2;   // under the PCB's hole (PCB components face down: no mirroring)
+rear_screw_y  = y_bay0 + 4 + pcb_hole[1];
 
 module hole_y(d, l) {               // hole along Y: vertical when printed face-down, so plain round
     rotate([-90, 0, 0]) cylinder(d = d, h = l);
@@ -357,8 +360,8 @@ module slot_module() {
         translate([0, front_screw_y, plate_t + eps]) hole_z(screw_d, plate_t + 1);
         translate([0, front_screw_y, -csk_recess - 1]) cylinder(d = csk_d, h = 1 + eps);
         translate([0, front_screw_y, -csk_recess - eps]) cylinder(d1 = csk_d, d2 = 0, h = csk_d / 2);
-        translate([0, mod_l + rear_tab / 2 + 1, plate_t + eps]) hole_z(screw_d, plate_t + 1);
-        translate([0, mod_l + rear_tab / 2 + 1, -40]) cylinder(d = screw_head_d + 1, h = 40);   // head/driver room
+        // rear screw: inside the bay, under the PCB's screwdriver hole
+        translate([rear_screw_x, rear_screw_y, plate_t + eps]) hole_z(screw_d, plate_t + 1);
 
         // status LED in the front bezel: round holes (vertical when printed face-down).
         // Counterbore for body + flange from the front, a lip as flange stop, and a
@@ -387,7 +390,7 @@ function bay_lid_holes() = [
 module slot_lid() {
     // Rear lid: a wide U-notch open at the bottom, so it slides on over the 24 V
     // chain jumpers and the I2C cable when they are already plugged in. It also
-    // keeps the PCB from sliding out of the card guides.
+    // keeps the PCB from sliding out of the card guides (it sits 0.5 mm behind the board).
     lid_t = 2.4;
     col = 7;
     w = 2 * (bay_x + bay_wall);
@@ -398,10 +401,6 @@ module slot_lid() {
             translate([p[0], -eps, p[1] + bay_h]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = lid_t + 1);
         translate([-notch_w / 2, -eps, -eps]) cube([notch_w, lid_t + 2 * eps, bay_h - lid_notch_top + eps]);
     }
-    // two fingers that hold the PCB's rear edge in the card guides
-    finger_l = total_l - (y_bay0 + 4 + pcb_l) - 0.5;
-    for (sx = [-1, 1]) translate([sx * (bay_x - 3) - 2, -finger_l, bay_h - pcb_z - pcb_t - 1.5])
-        cube([4, finger_l + eps, pcb_t + 3]);
 }
 
 // Test print: 20 mm slice of the rail profile incl. lead-in and latch recess

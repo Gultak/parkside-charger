@@ -2,7 +2,8 @@
 
 One per battery slot. It holds the LTC4162-LAD 5S Li-ion charger, the PCA9554 slot I/O
 (presence switch, RGB LED, bleed resistor), and the I²C and 24 V connectors.
-**72 × 60 mm, 4 layers** (In1/In2 = solid GND planes), all parts on the top side.
+**72 × 47.5 mm, 4 layers** (In1/In2 = solid GND planes), all parts on the top side. A **10 mm
+hole** at (40.5, 25) gives screwdriver access to the module's rear mounting screw.
 
 ![Top copper, coloured by net](img/pcb_top.png)
 ![Top side with silkscreen](img/pcb_top_silkscreen.png)
@@ -48,7 +49,12 @@ The layout follows the LTC4162 datasheet's *PCB Layout Considerations*:
 - **Kelvin traces:** CLP/CLN go to the RSNSI pads, and CSP/CSN/BATSENS+ go to the RSNSB pads.
 - The INTVCC, VCC2P5 and VOUTA capacitors sit next to their pins. Every GND pad has its own via
   to the planes, and the exposed pad has 9 thermal vias.
-- The bleed resistors are at the opposite corner from the IC. Mount them 2–3 mm above the board.
+- The input parts (TVS, bulk capacitor, fuse) sit in the left column next to the input FET, so
+  the 24 V terminals and the I²C connector are as far forward as possible.
+- The bleed resistors lie flat in the right half, away from the IC. Mount them 2–3 mm above the
+  board.
+- The **screwdriver hole** (board cutout, copper kept 0.5 mm away on all layers) sits between the
+  charger and the PCA9554. It must stay aligned with `pcb_hole` in the 3D model.
 - The board's long edges ride in the card guides of the printed bay, so parts keep 2 mm away
   from them.
 

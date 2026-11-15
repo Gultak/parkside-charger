@@ -7,7 +7,7 @@
 
 design module: PARTS, NET_WIDTH, DEFAULT_WIDTH
 layout module: PROJECT, BW, BH, EDGE_KEEP, PLACE, POURS, FIXED_TRACKS, FIXED_VIAS,
-               KELVIN, ROUTE_ORDER_FIRST, ROUTE_ORDER_LAST, LABELS, [KEEPOUTS]
+               KELVIN, ROUTE_ORDER_FIRST, ROUTE_ORDER_LAST, LABELS, [KEEPOUTS], [CUTOUTS]
 Run with the system python that has the pcbnew module.
 """
 import heapq
@@ -33,6 +33,7 @@ HW = 1.6                       # weighted A*: heuristic weight (>1 = faster, sli
 PARTS, NET_WIDTH, DEFAULT_WIDTH = {}, {}, 0.2
 PLACE, POURS, FIXED_TRACKS, FIXED_VIAS, KELVIN = {}, [], [], [], []
 ROUTE_ORDER_FIRST, ROUTE_ORDER_LAST, LABELS, KEEPOUTS = [], [], [], []
+CUTOUTS = []                   # round holes in the board: (x, y, diameter); copper keeps 0.5 mm away
 PROJECT, BOARD_DIR = "board", Path(".")
 GND_VIA_SKIP = set()
 
@@ -43,7 +44,7 @@ def configure(design, layout, board_dir):
     g.update(PARTS=design.PARTS, NET_WIDTH=getattr(design, "NET_WIDTH", {}),
              DEFAULT_WIDTH=getattr(design, "DEFAULT_WIDTH", 0.2), BOARD_DIR=Path(board_dir))
     for k in ("PROJECT", "BW", "BH", "EDGE_KEEP", "PLACE", "POURS", "FIXED_TRACKS", "FIXED_VIAS", "KELVIN",
-              "ROUTE_ORDER_FIRST", "ROUTE_ORDER_LAST", "LABELS", "KEEPOUTS", "GND_VIA_SKIP"):
+              "ROUTE_ORDER_FIRST", "ROUTE_ORDER_LAST", "LABELS", "KEEPOUTS", "GND_VIA_SKIP", "CUTOUTS"):
         if hasattr(layout, k):
             g[k] = getattr(layout, k)
 
@@ -423,6 +424,14 @@ def build(outdir: Path, promote=()):
         s.SetLayer(pcbnew.Edge_Cuts)
         s.SetWidth(pcbnew.FromMM(0.1))
         board.Add(s)
+    for cx, cy, d in CUTOUTS:          # round cutout (e.g. screwdriver access)
+        s = pcbnew.PCB_SHAPE(board)
+        s.SetShape(pcbnew.SHAPE_T_CIRCLE)
+        s.SetCenter(P(cx, cy))
+        s.SetEnd(P(cx + d / 2, cy))
+        s.SetLayer(pcbnew.Edge_Cuts)
+        s.SetWidth(pcbnew.FromMM(0.1))
+        board.Add(s)
 
     # ---- footprints
     fps = {}
@@ -482,7 +491,14 @@ def build(outdir: Path, promote=()):
         lay = pour[3] if len(pour) > 3 else "F"
         add_zone(board, netobjs[net], LAYER[lay], poly, prio)
         router.add_zone(net, 0 if lay == "F" else 1, poly)
-    for poly in KEEPOUTS:   # no copper at all (e.g. under an antenna)
+    def octagon16(cx, cy, r):           # 16-gon circumscribing a circle of radius r
+        return [(cx + r / math.cos(math.pi / 16) * math.cos(2 * math.pi * k / 16),
+                 cy + r / math.cos(math.pi / 16) * math.sin(2 * math.pi * k / 16)) for k in range(16)]
+    cut_keepouts = [octagon16(cx, cy, d / 2 + 0.5) for cx, cy, d in CUTOUTS]
+    for cx, cy, d in CUTOUTS:          # the router keeps a track width further away
+        router.add_zone("<keepout>", 0, octagon16(cx, cy, d / 2 + 1.0))
+        router.add_zone("<keepout>", 1, octagon16(cx, cy, d / 2 + 1.0))
+    for poly in list(KEEPOUTS) + cut_keepouts:   # no copper at all (antenna, board cutouts)
         z = pcbnew.ZONE(board)
         z.SetIsRuleArea(True)
         z.SetDoNotAllowCopperPour(True)
