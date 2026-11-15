@@ -290,6 +290,28 @@ module wing_tapers() {
             [inner_x - lip_in, y_wall + eps]]);
 }
 
+// Groove / slot cutter for the upright print (rear face on the bed, so -Y is up):
+// a box [x0..x0+w] x [y0..y1] x [z0..z0+h] that is open on one side ("open" = "-x", "+x",
+// "-z" or "+z"); its upper end (y0) is a 45 deg slope that closes towards the open side, so the
+// roof never overhangs into thin air.
+module groove45(x0, w, y0, y1, z0, h, open) {
+    d = (open == "-z" || open == "+z") ? h : w;   // depth measured from the open side
+    hull() {
+        if (open == "+z") {
+            translate([x0, y0 - d, z0 + h - eps]) cube([w, y1 - y0 + d, eps]);
+            translate([x0, y0, z0]) cube([w, y1 - y0, h]);
+        } else if (open == "-z") {
+            translate([x0, y0, z0]) cube([w, y1 - y0, eps]);            // open side starts at y0 - d
+            translate([x0, y0 - d, z0]) cube([w, y1 - y0 + d, eps]);
+            translate([x0, y0, z0 + h - eps]) cube([w, y1 - y0, eps]);
+        } else {
+            xo = open == "-x" ? x0 : x0 + w - eps;   // face on the open side
+            translate([xo, y0 - d, z0]) cube([eps, y1 - y0 + d, h]);
+            translate([x0, y0, z0]) cube([w, y1 - y0, h]);
+        }
+    }
+}
+
 // ---------------------------- slot module -----------------------------
 module slot_module() {
     col = 7;  // corner columns in the bay that take the lid inserts
@@ -358,16 +380,15 @@ module slot_module() {
                 polygon([[eps, y_bay0 - 3 * eps], [eps, y_bay0 + wall_h], [-wall_h, y_bay0 - 3 * eps]]);
         }
         // slot in the end wall's underside for the cover's front tongue
-        translate([-tongue_w / 2 - 0.4, y_bay0 - 1.7, -wall_h - eps]) cube([tongue_w + 0.8, 1.6, tongue_h + 0.3 + eps]);
+        groove45(-tongue_w / 2 - 0.4, tongue_w + 0.8, y_bay0 - 1.7, y_bay0 - 0.1, -wall_h - eps, tongue_h + 0.3 + eps, "-z");
         // grooves in the side walls for the cover's spring-tab hooks
         for (m = [0, 1]) mirror([m, 0, 0])
-            translate([bay_x - eps, cov_tab_y() - 0.3, tab_z[1] - 3.4]) cube([hook + 0.2, tab_l + 0.6, 3.9]);
+            groove45(bay_x - eps, hook + 0.2, cov_tab_y() - 0.3, cov_tab_y() + tab_l + 0.3, tab_z[1] - 3.4, 3.9, "-x");
         // locating groove in the plate for the cover's back face
-        translate([-bay_x, cov_back_y() - 0.2, -eps]) cube([2 * bay_x, cov_t + 0.4, 1.2]);
+        groove45(-bay_x, 2 * bay_x, cov_back_y() - 0.2, cov_back_y() + cov_t + 0.2, -eps, 1.2, "-z");
         // card guides for the PCB (stop 4 mm short of the end stop)
         for (m = [0, 1]) mirror([m, 0, 0])
-            translate([bay_x - eps, y_bay0 + 4, -pcb_z - pcb_t - 0.2])
-                cube([1.2, cage_l, pcb_t + 0.4]);
+            groove45(bay_x - eps, 1.2, y_bay0 + 4.4, y_bay0 + cage_l + 1, -pcb_z - pcb_t - 0.2, pcb_t + 0.4, "-x");
 
         // mounting screws (vertical). Front: flat-head, countersunk flush into the
         // channel ceiling (fit before the battery goes in). Rear: pan-head in the rear tab.
@@ -390,8 +411,8 @@ module slot_module() {
         translate([led_x - wire_ch / 2, wy, led_z]) cube([wire_ch, wire_ch, plate_t - led_z + eps]);
         translate([gx, wy, plate_t - wire_gd]) cube([led_x + wire_ch / 2 - gx, wire_ch, wire_gd + eps]);
         translate([gx, wy, plate_t - wire_gd]) cube([wire_ch, y_bay0 + 18 - wy, wire_gd + eps]);
-        hull() for (x = [gx, bay_x - col - 8])
-            translate([x, y_bay0 + 12, plate_t - wire_gd]) cube([wire_ch, wire_ch + 1, wire_gd + eps]);
+        groove45(bay_x - col - 8, gx + wire_ch - (bay_x - col - 8), y_bay0 + 12, y_bay0 + 18, plate_t - wire_gd,
+                 wire_gd + eps, "+z");
         translate([bay_x - col - 8, y_bay0 + 12, -bay_wall]) cube([wire_ch, wire_ch + 1, plate_t + bay_wall + eps]);
     }
 }
