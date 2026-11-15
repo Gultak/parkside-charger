@@ -169,8 +169,9 @@ button:
 parkside_charger:
   id: charger
   # Battery-side current budget shared by all slots. Size it to the PSU:
-  #   LRS-200-24 (200 W): 8A    LRS-350-24 / HLG-320H-24 (320-350 W): 14A
-  max_total_current: 8A
+  #   LOP-400-24 built in, no fan (250 W): 10A    LOP-300-24 (180 W): 7A
+  #   external LRS-200-24 (200 W): 8A    LRS-350-24 / HLG-320H-24 (320-350 W): 14A
+  max_total_current: 10A
   enable_output: bus_switch
   ambient_temperature: enclosure_temp
   max_ambient_temperature: 45

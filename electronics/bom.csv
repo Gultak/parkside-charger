@@ -34,8 +34,9 @@ controller,16,"Slot cable: JST-XH 4p both ends 1:1, 4 x 0.14 mm2, up to 1.5 m",,
 controller,1,Active buzzer 12 mm 5 V,,0.5,
 controller,1,SHT40 breakout,Adafruit 4885 or clone,4.0,on a cable near the PSU
 controller,1,"Passives / small parts (2N7002K, BZT52C12, SMBJ26A, PTC 0.5A, caps, resistors)",,2.0,
-power,1,PSU 24 V,Mean Well LRS-200-24 (<=10 slots) / LRS-350-24 or HLG-320H-24 (16 slots),32.0,trim to 24.5 V
-power,1,IEC inlet with switch and fuse 2 A,,6.0,
+power,1,PSU 24 V open frame,Mean Well LOP-400-24 (250 W fanless; LOP-300-24 = 180 W),40.0,in the controller box; trim to 24.5 V; 4x M3 heat-set inserts + screws
+power,1,IEC C14 inlet snap-in with switch and fuse holder + T3.15A fuse,,6.0,cut-out 47.5 x 27.8 mm (check the part)
+power,1,"Mains wiring set: VH 3-pin housing + contacts for the PSU input, ring lug M3 for PE, ferrules",,3.0,
 power,1,Thermal cut-out NC 70 C 250 V AC,KSD301 70C,1.5,in AC line - hardware failsafe
 power,2,m wire 1.5 mm2 red/black,,1.0,PSU -> controller -> chains
 print,2.0,kg PETG or ASA filament,,20.0,16 slots + controller box

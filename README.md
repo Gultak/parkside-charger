@@ -15,7 +15,7 @@ verdict** for every slot to Home Assistant.
 | Slot board | 72 × 47.5 mm, 4 layers. LTC4162-LAD: 5S Li-ion, I²C-programmable 3.81–4.20 V/cell, 0.1–3.2 A, telemetry and battery-resistance measurement. PCA9554 for switch, LED and bleed resistor. **KiCad design + Gerbers in `electronics/slot-board/`** |
 | Controller board | 110 × 100 mm, 4 layers. ESP32-C6 D1 in Dupont sockets, 2 × TCA9548A (16 I²C channels), switched 24 V to two slot chains, 5 V regulator, voltage sensing, buzzer. **KiCad design + Gerbers in `electronics/controller-board/`** |
 | Wiring | 24 V **daisy-chained** slot to slot (IN/OUT screw terminals), plus one 4-wire JST-XH I²C cable per slot to the controller. Every cable can be plugged in with the enclosures closed |
-| Power | Mean Well LRS-200-24 (up to about 10 slots) or LRS-350-24 / HLG-320H-24 (16 slots). The battery-side budget is shared across the slots |
+| Power | Mean Well **LOP-400-24** open-frame PSU (250 W fanless), built into the controller box in its own mains compartment. The battery-side budget (10 A) is shared across the slots |
 | Presence | Microswitch per slot, with the pack's BMS signal (ID contact) and voltage as a fallback |
 | Safety | Per-slot fuses on both sides, the pack's BMS signal gates charging, slot NTC window 5–45 °C plus JEITA, charge timeout, fault latching, ambient limit, default-off soft-start bus switch, **70 °C thermal cut-out in the AC line** |
 | Estimated cost | about €22 per slot plus about €150 fixed: about €370 for 10 slots, about €510 for 16 |

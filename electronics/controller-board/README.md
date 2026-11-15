@@ -46,4 +46,5 @@ The 24 V input, the switched 24 V, and the PSU-to-switch section are pours on bo
    because the generator runs without the global library table.
 2. Standard 2.54 mm female headers fit the 1.0 mm holes; no special parts needed.
 3. **Terminal block orientation:** check the wire-entry direction of J1–J3 in the 3D viewer. It
-   should face the bottom edge, where the box has its cable notch.
+   should face the bottom edge, towards the cable channel in the box (the wires then run to
+   the side-wall notches; J1 gets the PSU leads through the partition notch).

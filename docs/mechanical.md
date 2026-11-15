@@ -10,7 +10,7 @@
 ![Slot module from below/rear: bay walls and lid-insert columns run to the rear edge, floor window with a pointed front edge](img/slot_cable_access.png)
 ![Inside the bay: 45° bevel behind the end wall, with the contact slots and the microswitch pocket](img/bay_bevel.png)
 ![Print orientation: rear face on the bed, nose on top](img/slot_print.png)
-![Controller box: cable notches on all four walls, open towards the lid](img/controller_box.png)
+![Controller box: low-voltage side with cable notches open towards the lid, closed mains compartment for the LOP-400 (green) with IEC inlet cut-out and vent slots](img/controller_box.png)
 
 ## Concept
 
@@ -63,8 +63,9 @@
      of hot glue or CA glue holds it.
 
   ![Section through the LED bore and wire channel](img/led_bore_section.png)
-- A separate **controller box** holds the ESP32-C6 main board. The Mean Well PSU mounts with its
-  own screw holes, at least 5 cm away from the batteries.
+- A separate **controller box** holds the ESP32-C6 main board and, in its own closed mains
+  compartment, the **Mean Well LOP-400-24** (or LOP-300-24) open-frame PSU (`psu` parameter;
+  `psu = "none"` gives the old board-only tray). Mount it at least 5 cm away from the batteries.
 
 ## Measured so far (Parkside X20V)
 
@@ -141,7 +142,7 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 | `joint_gauge.stl` | 1 | as exported | Tests the dovetail fit |
 | `gauge.stl`, `end_gauge.stl` | 1 each | as exported (rear face down) | Test the front end + latch, and the channel end + contacts |
 | `slot_lid.stl` | 1 per slot | outer face down (as exported) | U-notched rear lid; it sits 0.5 mm behind the PCB |
-| `controller.stl` | 1 | open side up | All cable notches open to the top, so no support is needed |
+| `controller.stl` | 1 | open side up | All cable notches open to the top, so no support is needed (the IEC cut-out's top edge is a short bridge). Print the box with the PSU in **ASA, PC or flame-retardant (V-0) PETG**: the PSU's heatsinks get warm |
 | `controller_lid.stl` | 1 | flat | |
 
 **Material: PETG or ASA** (PC-FR if you can). Do **not** use PLA: it creeps under the constant
@@ -200,13 +201,25 @@ No cable has to be threaded through a part before it is connected.
 - One JST-XH 4-pin cable per slot runs to the controller, wired 1:1 (5V, GND, SDA, SCL). Run them
   in a cable duct along the rear.
 
-**Controller box.** The board sits on 4 standoffs with its components facing the lid. Every wall
-has a U-notch that is **open towards the lid**:
-- left and right walls: slot cables 1–8 and 9–16
-- bottom wall: PSU input and OUT A/B
-- top wall: the ESP32's USB-C, plus the SHT40, Qwiic and expansion cables
+**Controller box** (148 × 215 × 44 mm with the LOP-400). Two compartments:
+- **Low-voltage side:** the board sits on 4 standoffs with its components facing the lid. Its
+  walls have U-notches **open towards the lid**:
+  - left and right walls: slot cables 1–8 and 9–16, and OUT A / OUT B. Those leave the board's
+    bottom edge, run along the 12 mm cable channel behind it and out at the side (row 1 left,
+    row 2 right)
+  - top wall: the ESP32's USB-C, plus the SHT40, Qwiic and expansion cables
+- **Mains side**, behind a closed partition: the PSU on four 6 mm M3 standoffs (heat-set inserts),
+  an **IEC C14 inlet with switch and fuse** snapped into the rear wall (cut-out 47.5 × 27.8 mm,
+  check your part), and 2.5 mm vent slots in both side walls and the lid. The PSU's 24 V leads
+  pass the partition through one small notch next to its output terminals, to J1.
+  - **PE:** connect the inlet's earth to the PSU's earth-marked mounting hole (ring lug under that
+    screw, with a star washer). The datasheet requires it for class I.
+  - **Thermal cut-out** (KSD301, 70 °C, NC) in the L line between inlet and PSU, fixed with a cable
+    tie or high-temperature adhesive against the PSU's heatsink.
+  - All mains wiring stays in this compartment; use ferrules or crimped VH contacts, and
+    insulating sleeves on the inlet's spade terminals.
 
-Plug everything in, lay the cables into the notches, then screw the lid on through the four outer
-ears. The ears sit at the four corners, outside the notches, each on a 45° gusset, so the box
+Plug everything in, lay the cables into the notches, then screw the lid on through the six outer
+ears (corners plus a pair at the partition). The ears sit at the four corners, outside the notches, each on a 45° gusset, so the box
 prints base down without support. Mount the box with its base against the shelf, like the slot
 modules.

@@ -29,7 +29,7 @@
 //  plate occupies 0..plate_t and its top face touches the shelf.
 // =====================================================================
 
-part = "assembly"; // [slot, slot_lid, gauge, end_gauge, joint_gauge, controller, controller_lid, assembly, single, joint_section, joint_check]
+part = "assembly"; // [slot, slot_lid, gauge, end_gauge, joint_gauge, controller, controller_preview, controller_lid, assembly, single, joint_section, joint_check]
 
 /* [Battery interface: MEASURE YOUR PACK] */
 chan_w   = 46.9;  // clear width between the rail walls, above the lips (tongue width 46.3 + 0.6)
@@ -141,10 +141,18 @@ lid_notch_top  = 12.0; // the lid's U-notch reaches up to this depth below the p
 /* [Controller box (controller board 110 x 100 mm)] */
 ctl_pcb  = [110, 100];
 ctl_gap  = 4;             // PCB to inner wall
-ctl_in   = [ctl_pcb[0] + 2 * ctl_gap, ctl_pcb[1] + 2 * ctl_gap, 42];   // inner dims (X, Y, Z)
 ctl_wall = 2.4;
 ctl_standoff = 8;         // PCB above the base
 ctl_holes = [[5, 78.5], [105, 78.5], [18, 3.8], [91.8, 3.8]];      // PCB mounting holes (board coords)
+ctl_chan = 12;            // cable channel between the board's bottom edge and the PSU partition
+
+/* [Built-in power supply (Mean Well LOP open frame)] */
+psu = "LOP-400";          // [LOP-400, LOP-300, none]
+psu_gap = 8;              // PSU board edge to the compartment walls (wiring, airflow)
+psu_standoff = 6;         // M3 standoffs (datasheet: max 3 mm of pins below the PSU board)
+part_t = 2.4;             // partition wall between the mains and the low-voltage compartment
+iec_cut = [47.5, 27.8];   // snap-in IEC C14 inlet with fuse holder + switch (check your part!)
+vent_w = 2.5;             // vent slot width (finger-safe)
 
 $fn = 48;
 eps = 0.01;
@@ -421,69 +429,114 @@ module end_gauge() {
 }
 
 // --------------------------- controller box ---------------------------
-// Holds the main board (ESP32-C6 dev board + 2x TCA9548A + relay + DC/DC).
-// Screws to the shelf next to the slots. Cable glands on the rear face.
-// Tray for the controller board: base on the shelf, board on standoffs with its
-// components facing the lid. Every connector group gets a U-notch open towards the
-// lid, so all cables can be plugged in first and the lid put on afterwards:
-//   left/right walls: slot cables 1-8 / 9-16; bottom wall: 24 V PSU in, OUT A/B;
-//   top wall: ESP32 USB-C, SHT40 / Qwiic / expansion headers.
-function ctl_o() = [ctl_in[0] + 2 * ctl_wall, ctl_in[1] + 2 * ctl_wall, ctl_in[2] + ctl_wall];
+// Tray for the controller board, plus (optional) a separate mains compartment for a
+// Mean Well LOP-300/400 open-frame PSU. Base on the shelf, boards on standoffs.
+// Low-voltage compartment: every connector group gets a U-notch open towards the lid,
+// so all cables can be plugged in first and the lid put on afterwards:
+//   left/right walls: slot cables 1-8 / 9-16, and OUT A/B (they run along the cable
+//   channel behind the board); top wall: ESP32 USB-C, SHT40 / Qwiic / expansion.
+// Mains compartment: closed walls, IEC C14 inlet (fuse + switch) in the rear wall,
+// finger-safe vent slots; the PSU's 24 V leads pass the partition in one small notch.
+// PSU data [L, W, H], first hole from the corner [x, y], hole spacing [x, y] (datasheets)
+function psu_spec() = psu == "LOP-300" ? [[101.6, 50.8, 25.4], [3.175, 3.175], [95.25, 44.45]]
+                                       : [[127, 76.2, 27.5], [5.7, 5.7], [115.6, 64.8]];
+function has_psu() = psu != "none";
+function ctl_ix() = max(ctl_pcb[0] + 2 * ctl_gap, has_psu() ? psu_spec()[0][0] + 2 * psu_gap : 0);
+function ctl_iz() = 42;
+function ctl_y1() = ctl_wall + ctl_gap + ctl_pcb[1] + (has_psu() ? ctl_chan : ctl_gap);  // end of LV cavity
+function psu_y0() = ctl_y1() + part_t;                                                   // start of PSU cavity
+function psu_y1() = psu_y0() + psu_spec()[0][1] + 2 * psu_gap;
+function ctl_o() = [ctl_ix() + 2 * ctl_wall, (has_psu() ? psu_y1() : ctl_y1()) + ctl_wall, ctl_iz() + ctl_wall];
 function ctl_pcb_xy(p) = [p[0] - ctl_pcb[0] / 2, ctl_wall + ctl_gap + p[1]];   // board -> box coords
-function ctl_ears() = [[-1, 1], [1, 1], [-1, -1], [1, -1]];
+function psu_xy0() = [-psu_spec()[0][0] / 2, psu_y0() + psu_gap];              // PSU board corner
+function psu_holes() = [for (i = [0, 1], j = [0, 1])
+    psu_xy0() + psu_spec()[1] + [i * psu_spec()[2][0], j * psu_spec()[2][1]]];
+// lid ears: [side, y of the ear's start]; mid pair at the partition for the long box
+function ctl_ears() = let(o = ctl_o())
+    concat([[-1, 3], [1, 3], [-1, o[1] - 22], [1, o[1] - 22]], has_psu() ? [[-1, psu_y0() + 2], [1, psu_y0() + 2]] : []);
 module controller_box() {
     o = ctl_o();
     top = o[2];
+    ix = ctl_ix();
     pz = ctl_wall + ctl_standoff + 1.6;      // PCB top surface
     difference() {
         union() {
             translate([-o[0] / 2, 0, 0]) cube(o);
             // shelf mounting flanges
             for (sx = [-1, 1]) translate([sx * (o[0] / 2 + 6) - 6, 0, 0]) cube([12, o[1], 4]);
-            // lid ears (outside the walls, clear of the PCB), each with a 45 deg gusset
+            // lid ears (outside the walls, on solid wall), each with a 45 deg gusset
             // down to the wall so it prints without support (box printed base down)
             for (e = ctl_ears())
                 hull() {
-                    translate([e[0] * (o[0] / 2 + 4) - 4, (e[1] > 0 ? o[1] - 22 : 3), top - 10]) cube([8, 8, 10]);
-                    translate([e[0] > 0 ? o[0] / 2 - eps : -o[0] / 2, (e[1] > 0 ? o[1] - 22 : 3), top - 10 - 8.5])
-                        cube([eps, 8, eps]);
+                    translate([e[0] * (o[0] / 2 + 4) - 4, e[1], top - 10]) cube([8, 8, 10]);
+                    translate([e[0] > 0 ? o[0] / 2 - eps : -o[0] / 2, e[1], top - 10 - 8.5]) cube([eps, 8, eps]);
                 }
         }
-        translate([-ctl_in[0] / 2, ctl_wall, ctl_wall]) cube(ctl_in + [0, 0, eps]);
-        for (sx = [-1, 1]) for (y = [25, o[1] - 35])   // clear of the lid ears above
+        // low-voltage cavity
+        translate([-ix / 2, ctl_wall, ctl_wall]) cube([ix, ctl_y1() - ctl_wall, ctl_iz() + eps]);
+        // mains cavity
+        if (has_psu()) translate([-ix / 2, psu_y0(), ctl_wall]) cube([ix, psu_y1() - psu_y0(), ctl_iz() + eps]);
+        // shelf screws in the flanges (clear of the lid ears above)
+        for (sx = [-1, 1]) for (y = has_psu() ? [25, ctl_y1() - 30, o[1] - 35] : [25, o[1] - 35])
             translate([sx * (o[0] / 2 + 6), y, -eps]) cylinder(d = screw_d, h = 5);
         for (e = ctl_ears())
-            translate([e[0] * (o[0] / 2 + 4), (e[1] > 0 ? o[1] - 18 : 7), top - 6]) cylinder(d = 4.2, h = 6 + eps);
-        // ---- cable notches, open towards the lid
-        // left / right: slot connectors (board y 6..72)
+            translate([e[0] * (o[0] / 2 + 4), e[1] + 4, top - 6]) cylinder(d = 4.2, h = 6 + eps);
+        // ---- cable notches (low-voltage compartment), open towards the lid
+        // left / right: slot connectors (board y 6..72) and, with a PSU, OUT A/B from the channel
         for (sx = [-1, 1]) translate([sx > 0 ? o[0] / 2 - ctl_wall - eps : -o[0] / 2 - eps,
                                       ctl_pcb_xy([0, 6])[1], pz + 2])
-            cube([ctl_wall + 2 * eps, 66, top]);
-        // bottom: PSU in, OUT A, OUT B, 5 V regulator (board x 2..96)
-        translate([ctl_pcb_xy([2, 0])[0], o[1] - ctl_wall - eps, pz + 1]) cube([94, ctl_wall + 2 * eps, top]);
+            cube([ctl_wall + 2 * eps, (has_psu() ? ctl_y1() - 3 : ctl_pcb_xy([0, 72])[1]) - ctl_pcb_xy([0, 6])[1], top]);
+        // bottom wall (no PSU): PSU in, OUT A, OUT B (board x 2..96)
+        if (!has_psu())
+            translate([ctl_pcb_xy([2, 0])[0], o[1] - ctl_wall - eps, pz + 1]) cube([94, ctl_wall + 2 * eps, top]);
         // top: SHT40 / Qwiic / ESP USB-C / expansion (board x 15..92)
         translate([ctl_pcb_xy([15, 0])[0], -eps, pz + 1]) cube([77, ctl_wall + 2 * eps, top]);
+        if (has_psu()) {
+            // 24 V leads from the PSU output terminals (right end) through the partition
+            translate([ix / 2 - psu_gap - 22, ctl_y1() - eps, ctl_wall + psu_standoff + 6]) cube([14, part_t + 2 * eps, top]);
+            // IEC C14 inlet (fuse + switch) in the rear wall, next to the PSU's AC input (left end)
+            translate([-ix / 2 + psu_gap + 4, o[1] - ctl_wall - eps, ctl_wall + 5]) cube([iec_cut[0], ctl_wall + 2 * eps, iec_cut[1]]);
+            // vent slots in both side walls of the mains compartment (low and high rows)
+            for (sx = [-1, 1]) for (y = [psu_y0() + 14 : 6 : psu_y1() - 8]) for (z = [ctl_wall + 4, ctl_wall + 22])
+                translate([sx > 0 ? o[0] / 2 - ctl_wall - eps : -o[0] / 2 - eps, y, z]) cube([ctl_wall + 2 * eps, vent_w, 14]);
+        }
     }
     // board standoffs (M3 heat-set inserts)
     for (h = ctl_holes) translate([ctl_pcb_xy(h)[0], ctl_pcb_xy(h)[1], ctl_wall - eps])
         difference() { cylinder(d = 7, h = ctl_standoff); translate([0, 0, 1]) cylinder(d = 4.2, h = ctl_standoff); }
+    // PSU standoffs (M3 heat-set inserts). The PSU's earth-marked hole gets PE (ring lug).
+    if (has_psu())
+        for (h = psu_holes()) translate([h[0], h[1], ctl_wall - eps])
+            difference() { cylinder(d = 7.5, h = psu_standoff); translate([0, 0, 1]) cylinder(d = 4.2, h = psu_standoff); }
 }
 module controller_lid() {
     o = ctl_o();
+    ix = ctl_ix();
     difference() {
         union() {
             translate([-o[0] / 2, 0, 0]) cube([o[0], o[1], 2.4]);
             for (e = ctl_ears())
-                translate([e[0] * (o[0] / 2 + 4) - 4, (e[1] > 0 ? o[1] - 22 : 3), 0]) cube([8, 8, 2.4]);
-            // locating lip (inside the corners only, so the notches stay free)
-            for (sx = [-1, 1]) for (y = [ctl_wall + 0.3, o[1] - ctl_wall - 8.3])
-                translate([sx > 0 ? ctl_in[0] / 2 - 8.3 : -ctl_in[0] / 2 + 0.3, y, 2.4 - eps]) cube([8, 8, 3]);
+                translate([e[0] * (o[0] / 2 + 4) - 4, e[1], 0]) cube([8, 8, 2.4]);
+            // locating lips in the corners (not in front of the cable notches)
+            lips_y = has_psu() ? [ctl_wall + 0.3, psu_y0() + 0.3, o[1] - ctl_wall - 8.3]
+                               : [ctl_wall + 0.3, o[1] - ctl_wall - 8.3];
+            for (sx = [-1, 1]) for (y = lips_y)
+                translate([sx > 0 ? ix / 2 - 8.3 : -ix / 2 + 0.3, y, 2.4 - eps]) cube([8, 8, 3]);
         }
         for (e = ctl_ears())
-            translate([e[0] * (o[0] / 2 + 4), (e[1] > 0 ? o[1] - 18 : 7), -eps]) cylinder(d = 3.4, h = 10);
+            translate([e[0] * (o[0] / 2 + 4), e[1] + 4, -eps]) cylinder(d = 3.4, h = 10);
         // vent slots above the regulator / bus switch area
-        for (i = [0:7]) translate([-30 + i * 8, o[1] - 30, -eps]) cube([3, 20, 3]);
+        for (i = [0:7]) translate([-30 + i * 8, ctl_y1() - 26, -eps]) cube([3, 18, 3]);
+        // vent slots above the PSU (finger-safe width)
+        if (has_psu())
+            for (y = [psu_y0() + psu_gap + 6 : 6 : psu_y1() - psu_gap - 6])
+                translate([-psu_spec()[0][0] / 2 + 12, y, -eps]) cube([psu_spec()[0][0] - 24, vent_w, 3]);
     }
+}
+// for previews: the PSU as a block
+module dummy_psu() {
+    if (has_psu()) color("darkgreen", 0.8)
+        translate([psu_xy0()[0], psu_xy0()[1], ctl_wall + psu_standoff]) cube(psu_spec()[0]);
 }
 
 // ------------------------------ output --------------------------------
@@ -515,6 +568,7 @@ else if (part == "slot_lid") translate([0, 0, 2.4]) rotate([-90, 0, 0]) slot_lid
 else if (part == "gauge") rotate([-90, 0, 0]) translate([0, -(y_lip + 6), 0]) gauge();
 else if (part == "end_gauge") rotate([-90, 0, 0]) translate([0, -y_bay0, 0]) end_gauge();
 else if (part == "controller") controller_box();
+else if (part == "controller_preview") { controller_box(); dummy_psu(); }
 else if (part == "controller_lid") controller_lid();
 else if (part == "single") slot_module();
 // cut through the LED bezel with the LED in place

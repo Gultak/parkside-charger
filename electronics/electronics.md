@@ -3,7 +3,7 @@
 ## 1. System overview
 
 ```
- 230 V AC ─[IEC inlet, switch, 2 A fuse]─[KSD301 70 °C cut-out, NC]─► Mean Well PSU 24 V (LRS-200-24 or LRS-350-24)
+ 230 V AC ─[IEC inlet, switch, T3.15 A fuse]─[KSD301 70 °C cut-out, NC]─► Mean Well LOP-400-24 (in the controller box)
                                                                             │ 24 V
    ┌─────────────────────────────────── CONTROLLER BOARD ──────────────────┴──────────────────────────┐
    │ J1 ─ 10 A fuse ─┬─ always on ─► TSR 1-2450 5 V ─┬─► ESP32-C6 D1 (Dupont sockets) ─ 3V3 ─► I2C side │
@@ -195,11 +195,13 @@ first draft) are not available. The bus switch and buzzer therefore use GPIO19/1
 
 | | |
 |---|---|
-| PSU, up to about 10 slots | Mean Well **LRS-200-24** (fanless, 200 W). Trim to 24.5 V. `max_total_current: 8A` |
-| PSU, 16 slots | Mean Well **LRS-350-24** (350 W, has a fan) or **HLG-320H-24** (sealed, fanless). `max_total_current: 14A` |
+| PSU (recommended) | Mean Well **LOP-400-24**, open frame 127 × 76.2 × 27.5 mm, built into the controller box. **250 W by convection** (no fan), 400 W only with 23 CFM forced air. Trim to 24.5 V (adjustable 22.8–25.2 V). Leave the remote-sense / PG connector CN3 open. `max_total_current: 10A` (10 A × 21 V / 0.94 ≈ 225 W, plus ~5 W for the electronics) |
+| PSU, smaller | Mean Well **LOP-300-24**, 101.6 × 50.8 × 25.4 mm: **180 W by convection**. `max_total_current: 7A` |
+| PSU, external | Mean Well LRS-200-24 (8 A) or LRS-350-24 / HLG-320H-24 (14 A), with `psu = "none"` in the 3D model |
+| Why no fan | The 400 W rating needs 23 CFM, which only a 60 mm fan delivers, and that doesn't fit the 44 mm box. A 250 W budget still keeps 6 packs charging at 1.5 A at once; the others wait their turn |
 | Battery-side current budget | The firmware shares `max_total_current` between the slots. 8 A × 21 V = 168 W, plus about 6 % charger loss |
 | Per slot | 0.3–3.0 A, set in Home Assistant. Default 1.5 A (0.37C on 4 Ah, 0.75C on 2 Ah) |
-| Typical | 5 packs (8 A) or 9 packs (14 A) charging at 1.5 A at once. The rest wait: "charge to 100 %" requests first, then the emptiest pack |
+| Typical | 6 packs (10 A, LOP-400) charging at 1.5 A at once (5 with 8 A, 9 with 14 A). The rest wait: "charge to 100 %" requests first, then the emptiest pack |
 | Chain wiring | Two chains (OUT A/B) of up to 8 slots each. Use 1.5 mm² jumpers: worst case each chain carries the whole budget (≤ 14 A, terminals rated 13.5 A, so set ≤ 13 A when running a single chain of 16) |
 | Idle consumption | About 2 W (ESP + 16 × LTC4162 quiescent) |
 
@@ -218,4 +220,6 @@ first draft) are not available. The bus switch and buzzer therefore use GPIO19/1
   Keep nothing flammable directly below the rack, and put a smoke detector in the room.
 - Never charge packs that are swollen, dropped hard, or have been below 0 °C.
 - The AC side (inlet, fuse, thermal cut-out, PSU) must be built by a qualified person, with PE
-  connected to the PSU case.
+  connected to the PSU's earth-marked mounting hole. The LOP is an **open-frame** supply: it must
+  sit in the closed mains compartment of the controller box (lid screwed on, only finger-safe
+  2.5 mm vents), never open on the shelf. Print that box in ASA, PC or V-0 rated PETG.
