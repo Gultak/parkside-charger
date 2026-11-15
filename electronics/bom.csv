@@ -3,7 +3,8 @@ per slot: board,1,Li-ion step-down charger 1-8 cells I2C,Analog Devices LTC4162E
 per slot: board,1,Power inductor 6.8 uH Isat>=4.5A shielded,Coilcraft XAL6060-682 or similar,1.00,L >= 0.3*Vin(max)/1.5MHz = 5 uH
 per slot: board,2,Current sense resistor 10 mOhm 1% >=0.5W,e.g. Vishay WSL1206R0100,0.30,RSNSB + RSNSI
 per slot: board,2,N-channel MOSFETs (INFET >=40 V / BATFET >=30 V),per LTC4162 datasheet MOSFET selection,0.50,
-per slot: board,1,Passives set (caps 50 V X7R + polymer; resistors; NTC bias 10k 0.1%),,1.50,
+per slot: board,1,Passives set (caps 50 V X7R + polymer; resistors; NTC bias 10k 0.1%; 10k NTC 0603 B3380),,1.50,
+per slot: board,1,Comparator TLV7031DBVR (pack BMS/ID input),TI,0.60,
 per slot: board,1,I/O expander 8-bit I2C,NXP PCA9554PW / TI TCA9554,0.80,address 0x20
 per slot: board,2,Fuse 5 A fast SMD,Littelfuse 0466005.NR (1206),0.50,input + battery side
 per slot: board,1,TVS 26 V,SMBJ26A,0.20,

@@ -60,7 +60,11 @@ Plus:
 - **Bleed-down:** if a pack is more than 50 mV/cell above the target (a full pack in Storage mode,
   or the Auto timer expiring), the slot switches in its 200 Ω bleed resistor (about 0.1 A) until
   it reaches the target.
-- **Temperature:** charging only runs between 5 and 45 °C on the pack's NTC, with 2 K hysteresis.
+- **Pack BMS:** the slot board watches the pack's ID contact (the BMS status line). While the
+  BMS reports a fault or deep discharge (line released for more than ~3 s), the slot does not
+  charge: status *Pack BMS blocks charging*, entity `Slot n pack BMS fault`.
+- **Temperature:** charging only runs between 5 and 45 °C on the slot's NTC (next to the battery
+  contacts), with 2 K hysteresis.
   The LTC4162's own JEITA control is on as well. If the enclosure is above 45 °C (SHT40), all
   charging stops and the 24 V bus switch opens.
 - **Power budget:** `max_total_current: 8A` is shared out every 2 s. "100 %" requests go first,
@@ -74,7 +78,9 @@ Plus:
 
 | Entity | Meaning |
 |---|---|
-| `Slot n battery present` | Microswitch. Without one, falls back to NTC/voltage detection |
+| `Slot n battery present` | Microswitch. Without one, falls back to the pack's BMS signal / voltage |
+| `Slot n pack BMS fault` | On while the pack's BMS releases its ID contact (fault, deep discharge, or no pack) |
+| `Slot n contact temperature` | NTC on the slot board next to the battery contacts |
 | `Slot n status` | Empty / Battery detected / Waiting for power budget / Charging (target 92 %) / Ready / Full / Holding storage level / Discharging to storage level / Paused: temperature / No thermistor reading / No 24 V input / Fault: … / No charger board |
 | `Slot n voltage`, `charge current`, `battery temperature` | Live telemetry |
 | `Slot n state of charge` | From the rested voltage (compensated for I·R while charging) |
@@ -125,7 +131,7 @@ contains the right table.
 | yellow, blinking | waiting for power budget |
 | green | ready (≥ 80 %) |
 | magenta | discharging to storage level |
-| magenta, blinking | paused: temperature / no NTC / no 24 V |
+| magenta, blinking | paused: temperature / no NTC / no 24 V / pack BMS blocks charging |
 | red, blinking | fault, or slot board not responding |
 
 ## Example Home Assistant automation
@@ -151,8 +157,8 @@ action:
 2. One slot board **without a battery**: the log shows the slot's LTC4162 and PCA9554, with no
    "strap" or "wrong charger IC" error. `cell_count` only reads 5 while the charger is running
    and 0 otherwise, so the strapping check takes effect during the first charge.
-3. Put a **lab supply in place of the battery** (20 V, 0.5 A limit, with a 10 kΩ resistor from T to
-   B− standing in for the NTC). Check the voltage reading against a multimeter, and adjust
+3. Put a **lab supply in place of the battery** (20 V, 0.5 A limit, with a 10 kΩ resistor from ID to
+   B− standing in for the pack's BMS line). Check the voltage reading against a multimeter, and adjust
    `sense_resistor` if the current reading is off.
 4. Use a real pack in **Storage** mode first: it charges only briefly, at low risk. Then try Ready.
 5. Watch the first full charges from start to finish, including temperatures.

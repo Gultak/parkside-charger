@@ -31,7 +31,14 @@ hole** at (40.5, 25) gives screwdriver access to the module's rear mounting scre
   (`GND +24V | +24V GND`), so a chain jumper never crosses over. The pass-through copper is a
   pour on both outer layers (for the chain current), and GND passes through the two inner planes.
   Behind the terminals come a 5 A fuse, an SMBJ26A TVS and 47 µF of bulk capacitance.
-- **Battery:** J3 (B+, B−, NTC) goes through a mandatory 5 A fuse F2. NTCBIAS is 10 kΩ 0.1 %.
+- **Battery:** J3 (B+, B−, ID) goes through a mandatory 5 A fuse F2. The pack charges directly on
+  B+/B−.
+- **Pack BMS signal (ID contact):** 10 kΩ pull-up to 5 V (R15, like the Parkside charger), RC
+  filter 100 kΩ / 4.7 µF (R16/C15) against the pack's short releases, TLV7031 comparator U4 at
+  4.55 V (R17/R18) → PCA9554 IO6. High = released = BMS fault / deep discharge / no pack.
+- **Thermistor:** the LTC4162 reads RT1, a 10 kΩ NTC (B 3380) at the front edge next to the
+  battery contacts, with NTCBIAS 10 kΩ 0.1 %. The pack's own NTC is in series with its BMS
+  transistor and pulsed, so it is not used.
 - **I²C:** J2 (JST-XH 4: 5V, GND, SDA, SCL) has 100 Ω series resistors and a PESD5V0S2UT.
   LTC4162 @0x68 and PCA9554 @0x20 share the bus. The slot bus runs at 5 V; the TCA9548A on the
   controller shifts the level.
@@ -84,6 +91,6 @@ is shared with the controller board in `../kicadgen/`. It needs KiCad 7 (`kicad-
    3D viewer, and that it suits how the board slides into the bay.
 3. **Review the routing in KiCad:** a custom grid router routed this board automatically.
    Electrically it is DRC-clean, but a human pass is recommended, especially:
-   - the long NTC trace from J3 to U1
+   - the long ID trace from J3 to the comparator (R15/R16)
    - the I²C pair along the middle of the board
 4. **First bring-up:** use a current-limited lab supply. See `docs/firmware.md`, *Bring-up checklist*.

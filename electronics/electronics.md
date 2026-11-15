@@ -15,7 +15,7 @@
           │ OUT A: 24 V daisy chain        │ OUT B: 24 V daisy chain         │ 16 × 4-wire cable (5V GND SDA SCL)
           ▼                                ▼                                 │ one per slot, star topology
    SLOT 1 J1 IN ─ J6 OUT ─► SLOT 2 … ─► SLOT 8      SLOT 9 … ─► SLOT 16 ◄─────┘
-   (each slot board: LTC4162-L charger @0x68 + PCA9554 @0x20; battery B+, B−, NTC)
+   (each slot board: LTC4162-L charger @0x68 + PCA9554 @0x20; battery B+, B−, ID/BMS signal)
 ```
 
 **Why one charger IC per slot, and why the LTC4162-L?**
@@ -37,21 +37,32 @@
 X20V packs are 5S Li-ion: 18 V nominal, **21.0 V charge voltage**, about 15 V empty. Before you
 build ten boards, check on one pack:
 
-1. **Identify the contacts.** Measured: seen from the front (tongue pointing away), the four
-   contacts are **+, ID, nc, −**. The slot board expects the pack's temperature sensor on J3 pin 3
-   ("NTC"), and it is wired to the **ID** contact. **Still to check:** measure ID → − at room
-   temperature and again after warming the pack in your hands.
-   - If the value changes (about 10 kΩ at 25 °C), it is the NTC and the design works as is.
-   - If it stays fixed, it is an identification resistor and the pack has no NTC on its
-     terminals. The charger then has no battery temperature, which needs a design decision before
-     building (for example `require_ntc: false` plus a 10 kΩ resistor on the NTC input, so the
-     LTC4162 sees 25 °C).
-2. **Measure the NTC beta.** Read R at room temperature and again after 30 min in the fridge, then
-   compute B = ln(R1/R2) / (1/T1 − 1/T2), with T in kelvin. Enter the result as `ntc_beta`
-   (default 3435).
-3. **Check that the pack accepts charge on B+/B−.** Use a lab supply set to 21.0 V / 0.5 A for a
-   few minutes. Packs with "smart" charge enables are rare in the X20V line, but newer
-   "Performance" packs should be checked.
+1. **Contacts.** Seen from the front (tongue pointing away): **+, ID, T, −**. The pack's PCB
+   calls them P+, CS, DS, P− ([Hackaday.io: LIDL PARKSIDE Battery hacks](https://hackaday.io/project/188089-lidl-parkside-battery-hacks)).
+   - **+ / −** go straight to the cells (through a fuse). **Checked: the pack charges directly on
+     + / −**; there are no MOSFETs in the pack.
+   - **ID (CS)** is the BMS status line. Inside the pack it goes to − through a **~10 kΩ NTC in
+     series with a transistor** (measured 12 kΩ). While the pack is OK the transistor is on. On
+     under-voltage (about 2.6 V/cell) and other faults it switches off and the line floats.
+     Parkside's charger (pin labelled "ID") and soldering iron pull it up to 5 V through 7–10 kΩ;
+     the pack then sends a short open-drain data frame on it (1 kbit/s, about 4 times a second),
+     and it also releases the line briefly a few times a second. Without a pull-up the pack's
+     MCU goes to sleep and releases the line
+     ([positron96: PARKSIDE battery protection board](https://positron96.gitlab.io/projects/parkside-battery-protection/),
+     [mmame/parkside-x20](https://github.com/mmame/parkside-x20)).
+   - **T (DS)** measures about 512 kΩ to − and shows no activity. **Not used.**
+   - **Still to check on your pack:** the contact that reads **about 10–12 kΩ to −** (changing when
+     you warm the pack) is the one that goes to J3 pin 3. Per the pinout above that is the ID
+     contact (second from +).
+2. **What the slot board does with it** (§3.1): it pulls ID up to 5 V through 10 kΩ, like the
+   Parkside charger, filters out the short releases (RC about 0.5 s) and compares the result with
+   4.55 V. Above that = line released = **BMS fault, deep discharge or no pack**: the firmware does
+   not charge (status *Pack BMS blocks charging*). Because the pack's NTC is pulsed and in series
+   with the BMS transistor, it is **not** used as the charger's thermistor. The LTC4162 reads a
+   10 kΩ NTC on the slot board next to the battery contacts instead; the pack protects its own
+   cells through the BMS signal.
+3. **Deeply discharged packs** (BMS released) are not charged. Wake them in the original
+   charger first.
 4. Measure the blade/slot geometry for the 3D model (see `docs/mechanical.md`).
 
 ## 3. Slot board (×16 max), 72 × 47.5 mm, 4 layers
@@ -83,14 +94,16 @@ with a good layout, so reuse the proven one. Make these choices:
 | BOOST capacitor | 22 nF, ≥ 6.3 V, X7R | |
 | Input FET (INFET) | **N-channel** MOSFET, ≥ 40 V, per datasheet "INFET and BATFET MOSFET Selection" | Blocks back-feed from the battery into the 24 V bus |
 | Battery FET (BATFET) | **N-channel** MOSFET, ≥ 30 V, low R_DS(on) | Same section of the datasheet |
-| NTCBIAS → NTC | **10 kΩ 0.1 %** bias to the pack's T contact | Firmware converts using `ntc_bias_resistor`, `ntc_r25`, `ntc_beta` |
+| NTCBIAS → NTC | **10 kΩ 0.1 %** bias to **RT1, a 10 kΩ NTC on the board** (Murata NCP18XH103F03RB, B 3380) at the front edge next to the battery contacts | Firmware converts using `ntc_bias_resistor`, `ntc_r25`, `ntc_beta: 3380` |
+| Pack ID contact | R15 10 kΩ pull-up to 5V_SLOT → R16 100 kΩ / C15 4.7 µF (τ ≈ 0.5 s) → U4 TLV7031 comparator against 4.55 V (R17/R18) → PCA9554 IO6 | High = ID released = BMS fault / no pack. The pull-up also keeps the pack's BMS awake |
 | DVCC (I²C supply) | **5V_SLOT** | Datasheet: DVCC 1.8–5.5 V operating, 5.5 V absolute maximum, and SDA/SCL must stay ≤ DVCC. A 5 V rail (±5 %) with the slot bus pulled up to the same rail is within spec. Don't use a buck that overshoots above 5.5 V |
 | SDA/SCL | 100 Ω series + ESD diode (e.g. PESD5V0S2UT) | The cable comes from outside the board |
 | SMBALERT | to PCA9554 IO5 (optional) | Not used by the firmware yet |
 | VOUT (PowerPath system output) | only the datasheet's minimum capacitance, no load | |
 
 Leave **JEITA** enabled. The firmware also enforces its own 5–45 °C charge window, using the
-same NTC.
+same (board) NTC. Battery cell temperature is the pack's own job: its BMS releases the ID line on
+faults, and the firmware stops charging when it does.
 
 ### 3.2 Protection
 
@@ -111,7 +124,8 @@ same NTC.
 | IO3 | LED blue (anode) | |
 | IO4 | Bleed-resistor MOSFET gate | 2N7002K or AO3422 (≥ 55 V), 100 k gate pull-down |
 | IO5 | LTC4162 SMBALERT (optional) | |
-| IO6/7 | spare, to a test header | |
+| IO6 | Pack BMS fault (U4 comparator on the ID contact) | High = ID line released for more than ~0.5 s |
+| IO7 | spare | |
 
 **Bleed resistor (optional but recommended):** 2 × 100 Ω / 2 W in series from B+ (after F_BAT) to
 the MOSFET drain. That draws about 0.1 A and about 2 W at 21 V. The firmware uses it to bring a
@@ -124,7 +138,7 @@ off the PCB and away from plastic. If you don't fit them, delete `bleed_output:`
 |---|---|---|
 | J1 24 V IN / J6 24 V OUT | 2 × 5.08 mm screw terminal, 2-pin (Phoenix MKDS 1,5/2) | Connected straight through, so the slots **daisy-chain**: `GND +24V | +24V GND`. Use 1.5 mm² wire for the chain jumpers. Each terminal is rated 13.5 A |
 | J2 I²C | JST-XH 4-pin | 5V_SLOT, GND, SDA, SCL |
-| J3 battery | 3.5 mm screw terminal, 3-pin (+1 spare) | B+, B−, T. Use 1.0 mm² silicone wire for B+/B− and keep it short |
+| J3 battery | 3.5 mm screw terminal, 3-pin | B+, B−, ID (the pack's BMS contact; the T contact is not used). Use 1.0 mm² silicone wire for B+/B− and keep it short |
 | J4 switch | JST-PH 2-pin | IO0, GND |
 | J5 LED | JST-PH 4-pin | GND (common cathode), R, G, B |
 
@@ -174,8 +188,9 @@ first draft) are not available. The bus switch and buzzer therefore use GPIO19/1
 - The **hardware thermal cut-out** (KSD301, 70 °C, normally closed) is in the AC line of the PSU.
   Mount it touching the PSU case or the bus wiring. It works without software.
 - **Per-slot fuses** on both the input and the battery side.
-- **Default-off** 24 V bus switch, a software ambient limit (45 °C), the battery NTC window
-  (5–45 °C), and the LTC4162's JEITA control and timers.
+- **Default-off** 24 V bus switch, a software ambient limit (45 °C), the pack's BMS signal (no
+  charging while it reports a fault), the slot NTC window (5–45 °C), and the LTC4162's JEITA
+  control and timers.
 - **Fault latching:** a pack that shorts, fails detection or hits the 10 h charge timeout is not
   charged again until you take it out.
 - Print the holders in **PETG or ASA**, not PLA, which softens near 55 °C. If the shelf is wood

@@ -88,6 +88,14 @@ SYMBOLS["ESD_2CH"] = ic_symbol(
     left=[("1", "IO1", "passive"), ("2", "IO2", "passive")], right=[], bottom=[("3", "GND", "passive")],
     width=7.62, desc="Double ESD protection diode array, common anode")
 
+# TI TLV7031DBV: comparator, push-pull output, rail-to-rail input (SOT-23-5: 1 OUT, 2 V-, 3 IN+, 4 IN-, 5 V+)
+SYMBOLS["COMP_SOT23_5"] = ic_symbol(
+    "COMP_SOT23_5", "U", "TLV7031DBV", "Package_TO_SOT_SMD:SOT-23-5",
+    "https://www.ti.com/lit/ds/symlink/tlv7031.pdf",
+    left=[("3", "IN+", "input"), ("4", "IN-", "input")], right=[("1", "OUT", "output")],
+    bottom=[("5", "V+", "power_in"), ("2", "V-", "power_in")],
+    width=12.7, desc="Nanopower comparator, push-pull output, rail-to-rail input")
+
 # ESP32-C6 D1 (xyzroe/ESP32_C6_D1, Wemos D1 form factor) plugged into 2x 1x8 female Dupont headers.
 # Pin numbers = footprint pads: left row 1..8 top->bottom, right row 9..16 top->bottom
 # (seen from the top, antenna up, USB down).

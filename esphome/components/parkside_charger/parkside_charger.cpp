@@ -348,7 +348,9 @@ void ParksideSlot::update() {
   if (this->presence_switch_ != nullptr && this->presence_switch_->has_state()) {
     present = this->presence_switch_->state;
   } else {
-    present = !std::isnan(this->batt_temp_) || this->vbat_ > 8.0f;
+    // no switch: the pack's BMS pulling the ID line low, or a pack voltage
+    bool bms_seen = this->bms_fault_ != nullptr && this->bms_fault_->has_state() && !this->bms_fault_->state;
+    present = bms_seen || this->vbat_ > 8.0f;
   }
   if (present && !this->present_)
     this->on_inserted_();
@@ -425,6 +427,10 @@ void ParksideSlot::update() {
     this->stop_charging_(Phase::DISABLED);
   } else if (this->require_ntc_ && std::isnan(this->batt_temp_)) {
     this->stop_charging_(Phase::NO_NTC);
+  } else if (this->bms_fault_ != nullptr && (!this->bms_fault_->has_state() || this->bms_fault_->state)) {
+    // The Parkside charger only charges while the pack's BMS signals "OK" on its ID
+    // contact; it releases the line on under-voltage (~2.6 V/cell) and other faults.
+    this->stop_charging_(Phase::BMS_BLOCKED);
   } else if (temp_bad) {
     this->stop_charging_(Phase::TEMP_PAUSE);
   } else if (this->phase_ == Phase::CHARGING) {
@@ -543,6 +549,7 @@ void ParksideSlot::update() {
     case Phase::TEMP_PAUSE:
     case Phase::NO_INPUT:
     case Phase::NO_NTC:
+    case Phase::BMS_BLOCKED:
       this->set_led_(this->led_blink_, false, this->led_blink_);  // magenta blinking
       break;
     default:
@@ -633,6 +640,8 @@ const char *ParksideSlot::phase_str_(Phase p) {
       return "No 24 V input";
     case Phase::NO_NTC:
       return "No thermistor reading";
+    case Phase::BMS_BLOCKED:
+      return "Pack BMS blocks charging";
     case Phase::FAULT:
       return "Fault";
     case Phase::DISABLED:
@@ -691,8 +700,9 @@ void ParksideSlot::dump_config() {
   ESP_LOGCONFIG(TAG, "  Cells: %u, RSNSB: %.4f ohm, RSNSI: %.4f ohm", this->cells_, this->rsnsb_, this->rsnsi_);
   ESP_LOGCONFIG(TAG, "  Charge window: %.0f..%.0f degC, NTC required: %s", this->t_min_, this->t_max_,
                 YESNO(this->require_ntc_));
-  ESP_LOGCONFIG(TAG, "  Presence switch: %s, bleed resistor: %s", YESNO(this->presence_switch_ != nullptr),
-                YESNO(this->bleed_out_ != nullptr));
+  ESP_LOGCONFIG(TAG, "  Presence switch: %s, bleed resistor: %s, BMS input: %s",
+                YESNO(this->presence_switch_ != nullptr), YESNO(this->bleed_out_ != nullptr),
+                YESNO(this->bms_fault_ != nullptr));
   if (!this->chip_ok_)
     ESP_LOGCONFIG(TAG, "  LTC4162 not responding");
   LOG_UPDATE_INTERVAL(this);

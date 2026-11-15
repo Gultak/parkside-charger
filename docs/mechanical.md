@@ -79,7 +79,7 @@
 | Front end | From the reference holder: lips start 28.6 mm in front of the contact face; walls slope away at 45° and reach the plate face 43 mm in front of it; frame front 45.5 mm, nose tip 55 mm in front of it | `lip_l`, `lead_in`, `slope_l`, `front_l`, `nose_l`, `nose_w` |
 | Tongue end | Prongs beside the contact pocket reach 14 mm past the contact face; pocket 30 mm wide with 4 mm 45° chamfers; wide part tapers 4 mm over the last 7 mm (from the reference holder model) | `prong_l` = 14, `cblock_w` = 29.6, `cblock_ch` = 4, `wing_l` = 7 |
 | Battery top surface | 4–5 mm below the tongue top, about as high as the latch tooth. Beside the tongue there is a trough down to below the grooves, at least ±34.9 mm wide (the reference holder fills it) | `body_top` = 4, `trough_x` = 34.9. Inside the trough: rail walls and ribs. Outside it, nothing reaches more than 3.5 mm below the tongue top: the edge bars, dovetail and LED sit in the 10 mm plate (`plate_t` = 10) |
-| Contacts | 4 slots at an 8 mm pitch, 9.8 mm deep, 0.8 mm blades fit. Seen from the front (tongue pointing away): **+, ID, nc, −** | `contact_x` = −12, −4, 4, 12; `contact_len` = 8 |
+| Contacts | 4 slots at an 8 mm pitch, 9.8 mm deep, 0.8 mm blades fit. Seen from the front (tongue pointing away): **+, ID, T, −**. Fit blades for **+, ID and −** only; T is not used | `contact_x` = −12, −4, 4, 12; `contact_len` = 8 |
 
 ![Section through two slots with the measured battery profile](img/battery_fit_section.png)
 

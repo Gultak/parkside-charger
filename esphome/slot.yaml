@@ -6,7 +6,8 @@
 #   0x68  LTC4162-L charger
 #   0x20  PCA9554 I/O expander (on 5 V): IO0 microswitch, IO1..3 RGB LED anodes
 #         (common-cathode LED, active high),
-#         IO4 bleed-resistor MOSFET, IO5..7 spare
+#         IO4 bleed-resistor MOSFET, IO5 LTC4162 SMBALERT,
+#         IO6 pack BMS fault (comparator on the pack's ID contact: high = released), IO7 spare
 
 pca9554:
   - id: slot${n}_io
@@ -25,6 +26,22 @@ binary_sensor:
       inverted: true # switch closes to GND when a battery is seated
     filters:
       - delayed_on_off: 500ms
+  # The pack's BMS pulls its ID contact low through its NTC (~10 kOhm) while all is
+  # well and releases it on under-voltage / faults. It also releases it briefly a few
+  # times a second: the board filters that (RC ~0.5 s), and this filter waits for 3 s.
+  - platform: gpio
+    id: slot${n}_bms_fault
+    name: "Slot ${n} pack BMS fault"
+    device_class: problem
+    entity_category: diagnostic
+    pin:
+      pca9554: slot${n}_io
+      number: 6
+      mode:
+        input: true
+    filters:
+      - delayed_on: 3s
+      - delayed_off: 1s
 
 output:
   - platform: gpio
@@ -117,6 +134,8 @@ parkside_slot:
     input_current_limit: 3A
     max_charge_current: 1.5A
     presence_switch: slot${n}_switch
+    bms_fault_input: slot${n}_bms_fault
+    ntc_beta: 3380 # Murata NCP18XH103F03RB on the slot board
     led_red: slot${n}_led_r
     led_green: slot${n}_led_g
     led_blue: slot${n}_led_b
@@ -137,8 +156,8 @@ parkside_slot:
       name: "Slot ${n} charge current"
     state_of_charge:
       name: "Slot ${n} state of charge"
-    battery_temperature:
-      name: "Slot ${n} battery temperature"
+    battery_temperature: # 10k NTC on the slot board, next to the battery contacts
+      name: "Slot ${n} contact temperature"
     internal_resistance:
       name: "Slot ${n} internal resistance"
     capacity_estimate:

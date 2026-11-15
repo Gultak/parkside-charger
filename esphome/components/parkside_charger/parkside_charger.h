@@ -71,6 +71,7 @@ enum class Phase : uint8_t {
   TEMP_PAUSE,   // battery too cold/hot
   NO_INPUT,     // 24 V bus missing
   NO_NTC,       // no thermistor reading but one is required
+  BMS_BLOCKED,  // the pack's BMS signal (ID contact) reports a fault or is missing
   FAULT,
   DISABLED,     // mode Off or charger disabled globally
 };
@@ -99,6 +100,8 @@ class ParksideSlot : public PollingComponent, public i2c::I2CDevice {
   void set_bleed_resistance(float r) { this->bleed_r_ = r; }
 
   void set_presence_switch(binary_sensor::BinarySensor *b) { this->presence_switch_ = b; }
+  // true = the pack's ID line is released (BMS fault / pack asleep / no pack)
+  void set_bms_fault_input(binary_sensor::BinarySensor *b) { this->bms_fault_ = b; }
   void set_bleed_output(output::BinaryOutput *o) { this->bleed_out_ = o; }
   void set_led_outputs(output::BinaryOutput *r, output::BinaryOutput *g, output::BinaryOutput *b) {
     this->led_r_ = r; this->led_g_ = g; this->led_b_ = b;
@@ -179,6 +182,7 @@ class ParksideSlot : public PollingComponent, public i2c::I2CDevice {
   float bleed_r_{200.0f};
 
   binary_sensor::BinarySensor *presence_switch_{nullptr};
+  binary_sensor::BinarySensor *bms_fault_{nullptr};
   output::BinaryOutput *bleed_out_{nullptr};
   output::BinaryOutput *led_r_{nullptr}, *led_g_{nullptr}, *led_b_{nullptr};
   select::Select *mode_select_{nullptr};

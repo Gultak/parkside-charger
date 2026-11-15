@@ -78,7 +78,26 @@ PARTS = {
            {"1": "BAT", "2": "BAT_F"}, "Littelfuse 0466005.NR - mandatory, battery side"),
     "J3": ("BATTERY", "Connector:Screw_Terminal_01x03",
            "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-3-3.5-H_1x03_P3.50mm_Horizontal",
-           {"1": "BAT_F", "2": "GND", "3": "NTC"}, "B+, B-, T (pack thermistor)"),
+           {"1": "BAT_F", "2": "GND", "3": "BMS"},
+           "B+, B-, pack ID contact (BMS status: ~10k NTC + transistor to B-, released on faults)"),
+    # ---------------------------------------------- temperature / pack BMS --
+    # The LTC4162 thermistor input reads a 10k NTC on this board, at the front edge
+    # next to the battery contacts. The pack's own NTC sits in series with its BMS
+    # transistor on the ID contact and is pulsed, so it is not usable for the LTC4162.
+    "RT1": ("10k NTC B3380", "Device:Thermistor", "Resistor_SMD:R_0603_1608Metric",
+            {"1": "NTC", "2": "GND"}, "Murata NCP18XH103F03RB (10k, B25/50 3380, 1%)"),
+    # Pack ID contact: 5 V through 10k like the Parkside charger / soldering iron (keeps
+    # the pack's BMS awake), RC filter ~0.5 s against its short releases, comparator at
+    # 4.55 V: BMS_FAULT high = line released (fault, deep discharge, no pack).
+    "R15": ("10k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "+5V", "2": "BMS"}, "ID pull-up"),
+    "R16": ("100k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "BMS", "2": "BMS_F"}, ""),
+    "C15": ("4u7 10V", "Device:C", "Capacitor_SMD:C_0603_1608Metric", {"1": "BMS_F", "2": "GND"}, "X5R"),
+    "R17": ("10k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "+5V", "2": "BMS_REF"}, ""),
+    "R18": ("100k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "BMS_REF", "2": "GND"}, "-> 4.55 V"),
+    "U4": ("TLV7031DBV", "pcl:COMP_SOT23_5", "Package_TO_SOT_SMD:SOT-23-5",
+           {"1": "BMS_FAULT", "2": "GND", "3": "BMS_F", "4": "BMS_REF", "5": "+5V"},
+           "TI TLV7031DBVR (push-pull, rail-to-rail input)"),
+    "C16": ("100n", "Device:C", "Capacitor_SMD:C_0603_1608Metric", {"1": "+5V", "2": "GND"}, "U4 bypass"),
     # ---------------------------------------------------------- I2C / logic --
     "J2": ("I2C", "Connector_Generic:Conn_01x04", "Connector_JST:JST_XH_B4B-XH-A_1x04_P2.50mm_Vertical",
            {"1": "+5V", "2": "GND", "3": "SDA_IN", "4": "SCL_IN"}, "JST B4B-XH-A: 5V, GND, SDA, SCL"),
@@ -90,7 +109,7 @@ PARTS = {
             {"1": "+5V", "2": "GND"}, "5 V bulk"),
     "U2": ("PCA9554PW", "pcl:PCA9554", "Package_SO:TSSOP-16_4.4x5mm_P0.65mm",
            {"1": "GND", "2": "GND", "3": "GND", "4": "SW_IN", "5": "IO1", "6": "IO2", "7": "IO3",
-            "8": "GND", "9": "IO4", "10": "ALERT", "16": "+5V", "14": "SCL", "15": "SDA"},
+            "8": "GND", "9": "IO4", "10": "ALERT", "11": "BMS_FAULT", "16": "+5V", "14": "SCL", "15": "SDA"},
            "NXP PCA9554PW (or TCA9554PWR), address 0x20"),
     "C13": ("100n", "Device:C", "Capacitor_SMD:C_0603_1608Metric", {"1": "+5V", "2": "GND"}, ""),
     "J4": ("SWITCH", "Connector_Generic:Conn_01x02", "Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical",
@@ -113,7 +132,7 @@ PARTS = {
 }
 
 # pins that are intentionally unconnected (get a no-connect flag)
-NO_CONNECT = {"U2": ["11", "12", "13"]}
+NO_CONNECT = {"U2": ["12", "13"]}
 
 # copper widths (mm) for routed nets; nets not listed use DEFAULT_WIDTH
 DEFAULT_WIDTH = 0.2

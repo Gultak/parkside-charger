@@ -67,8 +67,8 @@ latch_prof = [[nose_l + 0.2, 1.7], [52.9, 1.8], [50.5, 5], [49.5, 5], [front_l, 
 
 /* [Battery contacts (male 6.3 x 0.8 mm tabs or 0.8 mm brass)] */
 // X positions of the contact tabs, measured from the channel centre line.
-// Typical Parkside X20V: B+, (NTC/T), (data), B-  -> verify with a meter!
-contact_x   = [-12, -4, 4, 12];   // measured: 8 mm pitch; seen from the front: +, ID, nc, -
+// Parkside X20V: B+, ID (BMS status, ~10k to B-), T (unused, ~512k), B-
+contact_x   = [-12, -4, 4, 12];   // measured: 8 mm pitch; seen from the front: +, ID, T, - (T not used)
 contact_z   = 5.5;  // tab centre below the plate face
 contact_len = 8;    // how far the tab sticks out of the contact face (battery slots are 9.8 deep)
 tab_w       = 6.3;

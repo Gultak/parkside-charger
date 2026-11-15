@@ -241,6 +241,22 @@ int main(int argc, char **argv) {
     CHECK(r.health[1]->state.rfind("Worn", 0) == 0 || r.health[1]->state.rfind("Replace", 0) == 0,
           "worn pack health: %s (IR %.0f mOhm)", r.health[1]->state.c_str(), r.ir[1]->state);
   }
+  printf("Scenario 6: pack BMS signal (ID contact)\n");
+  {
+    Rig r(1, 8);
+    binary_sensor::BinarySensor bms;
+    r.slots[0]->set_bms_fault_input(&bms);
+    bms.publish_state(true);          // ID released: under-voltage / fault
+    r.insert(0, 20);
+    r.run(0.1);
+    CHECK(r.slots[0]->phase() == Phase::BMS_BLOCKED, "BMS fault blocks charging: %s", r.status[0]->state.c_str());
+    bms.publish_state(false);         // BMS pulls ID low again
+    r.run(0.1);
+    CHECK(r.slots[0]->is_charging(), "BMS OK -> charging");
+    bms.publish_state(true);
+    r.run(0.01);
+    CHECK(!r.slots[0]->is_charging(), "BMS fault during charge stops it: %s", r.status[0]->state.c_str());
+  }
   printf(fails ? "\n%d FAILED\n" : "\nALL PASSED\n", fails);
   return fails != 0;
 }

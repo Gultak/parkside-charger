@@ -23,6 +23,11 @@ PLACE = {
     "R3": (26.5, 37.2, 0), "R4": (29.6, 37.2, 0), "R5": (32.7, 37.2, 0), "C11": (30.4, 32.6, 0),
     # battery output, front edge
     "F2": (40.0, 11.5, 0), "J3": (44.0, 5.5, 180),
+    # board NTC at the front edge, next to the battery contacts
+    "RT1": (31.0, 3.5, 0),
+    # pack ID / BMS input: pull-up, RC filter, reference, comparator
+    "U4": (60.5, 34.0, 0), "C16": (60.5, 37.0, 0), "R15": (64.0, 36.8, 0),
+    "R16": (64.0, 33.0, 90), "C15": (65.6, 33.0, 90), "R17": (67.2, 33.0, 90), "R18": (68.8, 33.0, 90),
     # logic, right half
     "U2": (52.0, 34.0, 0), "C13": (56.8, 29.6, 0), "J2": (60.0, 42.5, 180), "U3": (66.0, 41.5, 0),
     "R6": (46.6, 41.0, 90), "R7": (48.2, 41.0, 90), "C12": (69.0, 41.5, 90),
@@ -85,7 +90,7 @@ ROUTE_ORDER_LAST = ["VCC2P5"]
 LABELS = [
     ("PARKSIDE X20V SLOT rev B", 35.0, 44.5, 1.0), ("FRONT (battery side)", 20.0, 1.3, 0.9),
     ("IN: GND +24V", 6.0, 34.0, 0.8), ("OUT: +24V GND", 20.6, 46.2, 0.8),
-    ("NTC GND B+", 40.5, 9.6, 0.8), ("SCL SDA GND 5V", 56.2, 37.6, 0.8),
+    ("ID GND B+", 40.5, 9.6, 0.8), ("SCL SDA GND 5V", 56.2, 37.6, 0.8),
     ("GND SW", 53.0, 7.6, 0.8), ("B G R GND", 63.5, 7.6, 0.8),
 ]
 
@@ -114,6 +119,10 @@ SCH_PLACE = {
     "R8": (225, 175), "R9": (235, 175), "R10": (245, 175), "J5": (275, 180),
     # bleed
     "R11": (225, 215), "R12": (237, 222), "Q3": (265, 215), "R13": (290, 205), "R14": (300, 205),
+    # board NTC, pack ID / BMS input
+    "RT1": (212, 118),
+    "R15": (320, 105), "R16": (335, 115), "C15": (347, 125), "R17": (362, 100), "R18": (362, 122),
+    "U4": (385, 112), "C16": (400, 125),
 }
 
 SCH_TEXTS = [
@@ -123,4 +132,5 @@ SCH_TEXTS = [
         ("I2C (5 V slot bus via TCA9548A channel), PCA9554 @0x20, LTC4162 @0x68", 20, 150),
         ("PRESENCE SWITCH / RGB LED (common cathode)", 220, 150),
         ("BLEED-DOWN TO STORAGE VOLTAGE (~0.1 A)", 220, 200),
+        ("PACK ID CONTACT = BMS STATUS (low = OK, released = fault)", 312, 90),
 ]

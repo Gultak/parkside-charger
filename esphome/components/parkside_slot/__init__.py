@@ -49,6 +49,7 @@ CONF_REQUIRE_NTC = "require_ntc"
 CONF_MIN_CHARGE_TEMPERATURE = "min_charge_temperature"
 CONF_MAX_CHARGE_TEMPERATURE = "max_charge_temperature"
 CONF_PRESENCE_SWITCH = "presence_switch"
+CONF_BMS_FAULT_INPUT = "bms_fault_input"
 CONF_BLEED_OUTPUT = "bleed_output"
 CONF_BLEED_RESISTANCE = "bleed_resistance"
 CONF_LED_RED = "led_red"
@@ -174,6 +175,7 @@ CONFIG_SCHEMA = (
                 min=30, max=50
             ),
             cv.Optional(CONF_PRESENCE_SWITCH): cv.use_id(binary_sensor.BinarySensor),
+            cv.Optional(CONF_BMS_FAULT_INPUT): cv.use_id(binary_sensor.BinarySensor),
             cv.Optional(CONF_BLEED_OUTPUT): cv.use_id(output.BinaryOutput),
             cv.Optional(CONF_BLEED_RESISTANCE, default=200): cv.resistance,
             cv.Optional(CONF_LED_RED): cv.use_id(output.BinaryOutput),
@@ -228,6 +230,8 @@ async def to_code(config):
 
     if CONF_PRESENCE_SWITCH in config:
         cg.add(var.set_presence_switch(await cg.get_variable(config[CONF_PRESENCE_SWITCH])))
+    if CONF_BMS_FAULT_INPUT in config:
+        cg.add(var.set_bms_fault_input(await cg.get_variable(config[CONF_BMS_FAULT_INPUT])))
     if CONF_BLEED_OUTPUT in config:
         cg.add(var.set_bleed_output(await cg.get_variable(config[CONF_BLEED_OUTPUT])))
     leds = []
