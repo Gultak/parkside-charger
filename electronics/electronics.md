@@ -162,7 +162,7 @@ off the PCB and away from plastic. If you don't fit them, delete `bleed_output:`
 | J4 switch | JST-PH 2-pin | IO0, GND |
 | J5 LED | JST-PH 4-pin | GND (common cathode), R, G, B |
 
-## 4. Controller board, 110 × 100 mm, 4 layers
+## 4. Controller board, 112 × 64 mm, 4 layers
 
 **The complete KiCad 7 design is in [`controller-board/`](controller-board/README.md).** It covers
 up to **16 slots**.

@@ -201,7 +201,7 @@ No cable has to be threaded through a part before it is connected.
 - One JST-XH 4-pin cable per slot runs to the controller, wired 1:1 (5V, GND, SDA, SCL). Run them
   in a cable duct along the rear.
 
-**Controller box** (148 × 215 × 44 mm with the LOP-400). Two compartments:
+**Controller box** (148 × 179 × 44 mm with the LOP-400). Two compartments:
 - **Low-voltage side:** the board sits on 4 standoffs with its components facing the lid. Its
   walls have U-notches **open towards the lid**:
   - left and right walls: slot cables 1–8 and 9–16, and OUT A / OUT B. Those leave the board's

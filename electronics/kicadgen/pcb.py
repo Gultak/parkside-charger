@@ -498,6 +498,26 @@ def build(outdir: Path, promote=()):
     for cx, cy, d in CUTOUTS:          # the router keeps a track width further away
         router.add_zone("<keepout>", 0, octagon16(cx, cy, d / 2 + 1.0))
         router.add_zone("<keepout>", 1, octagon16(cx, cy, d / 2 + 1.0))
+
+    def grow(poly, m):                 # miter offset of a simple polygon by m (either winding)
+        n = len(poly)
+        area = sum(poly[i][0] * poly[(i + 1) % n][1] - poly[(i + 1) % n][0] * poly[i][1] for i in range(n))
+        sgn = 1.0 if area > 0 else -1.0
+        out = []
+        for i in range(n):
+            (x0, y0), (x1, y1), (x2, y2) = poly[i - 1], poly[i], poly[(i + 1) % n]
+            def nrm(ax, ay, bx, by):
+                dx, dy = bx - ax, by - ay
+                ln = math.hypot(dx, dy) or 1.0
+                return sgn * dy / ln, -sgn * dx / ln
+            n1, n2 = nrm(x0, y0, x1, y1), nrm(x1, y1, x2, y2)
+            bx, by = n1[0] + n2[0], n1[1] + n2[1]
+            k = m / max(0.2, (1 + n1[0] * n2[0] + n1[1] * n2[1]))
+            out.append((x1 + bx * k, y1 + by * k))
+        return out
+    for poly in KEEPOUTS:              # same margin for the layout's own keepouts
+        router.add_zone("<keepout>", 0, grow(poly, 0.5))
+        router.add_zone("<keepout>", 1, grow(poly, 0.5))
     for poly in list(KEEPOUTS) + cut_keepouts:   # no copper at all (antenna, board cutouts)
         z = pcbnew.ZONE(board)
         z.SetIsRuleArea(True)

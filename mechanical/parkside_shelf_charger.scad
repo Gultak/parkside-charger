@@ -138,12 +138,12 @@ wire_gd    = 3;     // depth of the wire groove on the shelf side of the plate
 floor_window_y = 36;   // window starts this far behind the PCB's front edge
 lid_notch_top  = 12.0; // the lid's U-notch reaches up to this depth below the plate (PCB at 9..10.6)
 
-/* [Controller box (controller board 110 x 100 mm)] */
-ctl_pcb  = [110, 100];
+/* [Controller box (controller board 112 x 64 mm, rev B)] */
+ctl_pcb  = [112, 64];
 ctl_gap  = 4;             // PCB to inner wall
 ctl_wall = 2.4;
 ctl_standoff = 8;         // PCB above the base
-ctl_holes = [[5, 78.5], [105, 78.5], [18, 3.8], [91.8, 3.8]];      // PCB mounting holes (board coords)
+ctl_holes = [[5.5, 60], [106.5, 60], [36.5, 4], [79.5, 4]];        // PCB mounting holes (board coords)
 ctl_chan = 12;            // cable channel between the board's bottom edge and the PSU partition
 
 /* [Built-in power supply (Mean Well LOP open frame)] */
@@ -482,15 +482,15 @@ module controller_box() {
         for (e = ctl_ears())
             translate([e[0] * (o[0] / 2 + 4), e[1] + 4, top - 6]) cylinder(d = 4.2, h = 6 + eps);
         // ---- cable notches (low-voltage compartment), open towards the lid
-        // left / right: slot connectors (board y 6..72) and, with a PSU, OUT A/B from the channel
+        // left / right: slot connectors (board y 0.5..57) and, with a PSU, OUT A/B from the channel
         for (sx = [-1, 1]) translate([sx > 0 ? o[0] / 2 - ctl_wall - eps : -o[0] / 2 - eps,
-                                      ctl_pcb_xy([0, 6])[1], pz + 2])
-            cube([ctl_wall + 2 * eps, (has_psu() ? ctl_y1() - 3 : ctl_pcb_xy([0, 72])[1]) - ctl_pcb_xy([0, 6])[1], top]);
-        // bottom wall (no PSU): PSU in, OUT A, OUT B (board x 2..96)
+                                      ctl_pcb_xy([0, 0.5])[1], pz + 2])
+            cube([ctl_wall + 2 * eps, (has_psu() ? ctl_y1() - 3 : ctl_pcb_xy([0, 57])[1]) - ctl_pcb_xy([0, 0.5])[1], top]);
+        // bottom wall (no PSU): PSU in, OUT A, OUT B (board x 14..92)
         if (!has_psu())
-            translate([ctl_pcb_xy([2, 0])[0], o[1] - ctl_wall - eps, pz + 1]) cube([94, ctl_wall + 2 * eps, top]);
-        // top: SHT40 / Qwiic / ESP USB-C / expansion (board x 15..92)
-        translate([ctl_pcb_xy([15, 0])[0], -eps, pz + 1]) cube([77, ctl_wall + 2 * eps, top]);
+            translate([ctl_pcb_xy([14, 0])[0], o[1] - ctl_wall - eps, pz + 1]) cube([78, ctl_wall + 2 * eps, top]);
+        // top: SHT40 / Qwiic / ESP USB-C / expansion (board x 28..77)
+        translate([ctl_pcb_xy([28, 0])[0], -eps, pz + 1]) cube([49, ctl_wall + 2 * eps, top]);
         if (has_psu()) {
             // 24 V leads from the PSU output terminals (right end) through the partition
             translate([ix / 2 - psu_gap - 22, ctl_y1() - eps, ctl_wall + psu_standoff + 6]) cube([14, part_t + 2 * eps, top]);

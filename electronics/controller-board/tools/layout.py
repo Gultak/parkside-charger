@@ -1,4 +1,4 @@
-"""Controller board layout. Board coordinates in mm (x right, y down), 110 x 100.
+"""Controller board layout. Board coordinates in mm (x right, y down), 112 x 64.
 
 Top edge: ESP32-C6 D1 with its USB-C at the edge (antenna points into the board,
 with a copper-free keepout below it), headers left/right of it.
@@ -6,59 +6,63 @@ Left / right edges: slot connectors 1-8 / 9-16.  Bottom edge: 24 V power.
 """
 
 PROJECT = "controller_board"
+REV = "B"
 ROOT_UUID = "6b2d1c1b-8e2f-4d4b-8b58-3a7a4d1c0002"
-BW, BH = 110.0, 100.0
+BW, BH = 112.0, 64.0
 EDGE_KEEP = 0.5
-GND_VIA_SKIP = {("U3", "12"), ("U4", "12")}   # these get the fixed vias below
+GND_VIA_SKIP = {("U3", "12"), ("U4", "12"), ("U4", "2")}   # these get the fixed vias below
 
-ESP_X, ESP_Y = 55.0, 19.5          # module centre; rotated 180 deg: USB at the top edge
+ESP_X, ESP_Y = 56.0, 19.5          # module centre; rotated 180 deg: USB at the top edge
 
+# Compact layout (rev B): slot connectors at a 7 mm pitch down both sides, the ESP32 at the
+# top centre with the headers beside it, the 24 V power band along the bottom edge.
 PLACE = {
     "U2": (ESP_X, ESP_Y, 180),
-    # headers along the top edge
-    "J4": (23.5, 3.6, 90), "J5": (28.0, 12.0, 180), "J6": (71.0, 3.6, 90),
-    # I2C pull-ups / mux reset next to the module pins
-    "R9": (37.4, 20.8, 0), "R10": (37.4, 23.3, 0), "R11": (71.0, 26.0, 0),
-    # voltage dividers next to IO0/IO1
-    "R7": (72.6, 15.4, 0), "R8": (72.6, 17.2, 0), "C4": (72.6, 19.0, 0),
-    "R5": (77.4, 15.4, 0), "R6": (77.4, 17.2, 0), "C3": (77.4, 19.0, 0),
+    # left of the module: mounting hole, Qwiic, SHT40 header, I2C pull-ups, buzzer
+    "H3": (36.5, 4.0, 0), "J5": (36.5, 12.0, 90), "J4": (31.5, 19.5, 90),
+    "R9": (36.5, 23.4, 0), "R10": (36.5, 25.2, 0),
+    "BZ1": (32.0, 34.5, 0), "Q3": (24.0, 38.0, 0), "R12": (20.5, 40.5, 0), "R13": (20.5, 42.3, 0),
+    "D3": (20.5, 44.6, 0),
+    # right of the module: mounting hole, expansion header, voltage dividers, mux reset pull-up
+    "H4": (79.5, 4.0, 0), "J6": (72.6, 3.0, 0),
+    "R7": (77.5, 10.0, 0), "R8": (77.5, 11.8, 0), "C4": (77.5, 13.6, 0),
+    "R5": (77.5, 15.6, 0), "R6": (77.5, 17.4, 0), "C3": (77.5, 19.2, 0),
+    "R11": (77.5, 21.6, 0),
     # muxes + pull-up packs
-    "U3": (26.0, 38.0, 270), "C8": (31.0, 44.0, 0),
-    "U4": (84.0, 38.0, 90), "C9": (79.0, 32.4, 0),
-    # buzzer
-    "BZ1": (46.0, 62.0, 0), "Q3": (60.0, 58.0, 0), "R12": (60.0, 54.6, 0), "R13": (60.0, 61.4, 0),
-    "D3": (60.0, 65.0, 0),
-    # power, bottom edge (left -> right): PSU in, fuse, bus switch, OUT A, OUT B, 5 V regulator
-    "J1": (6.0, 93.0, 0), "F1": (21.0, 88.0, 0), "D1": (25.5, 80.0, 0), "C1": (16.0, 79.5, 0),
-    "Q1": (44.0, 92.0, 0),
-    "R1": (36.0, 78.0, 0), "D2": (36.0, 80.4, 0), "C2": (36.0, 83.2, 0),
-    "R2": (42.0, 78.0, 0), "Q2": (46.6, 79.4, 0), "R3": (52.0, 78.0, 0), "R4": (52.0, 80.0, 0),
-    "J2": (56.0, 93.0, 0), "J3": (70.0, 93.0, 0),
-    "U1": (86.0, 92.0, 0), "C5": (83.0, 81.0, 0), "C6": (90.5, 81.0, 0), "F2": (96.5, 81.0, 0),
-    "C7": (99.6, 87.0, 90),
-    # mounting holes
-    "H1": (5.0, 78.5, 0), "H2": (105.0, 78.5, 0), "H3": (18.0, 3.8, 0), "H4": (91.8, 3.8, 0),
+    "U3": (25.2, 28.0, 270), "C8": (25.2, 34.0, 0),
+    "U4": (86.0, 28.0, 90), "C9": (81.0, 22.4, 0),
+    # 24 V power band along the bottom edge (left -> right): PSU in, fuse, bus switch, OUT A, OUT B
+    "J1": (18.0, 58.4, 0), "F1": (33.0, 53.4, 0), "D1": (37.5, 45.4, 0), "C1": (28.0, 44.9, 0),
+    "Q1": (56.0, 57.4, 0),
+    "R1": (48.0, 43.4, 0), "D2": (48.0, 45.8, 0), "C2": (48.0, 48.6, 0),
+    "R2": (54.0, 43.4, 0), "Q2": (58.6, 44.8, 0), "R3": (64.0, 43.4, 0), "R4": (64.0, 45.4, 0),
+    "J2": (68.0, 58.4, 0), "J3": (82.0, 58.4, 0),
+    # 5 V regulator above OUT B
+    "U1": (80.5, 46.0, 0), "C5": (78.5, 49.6, 0), "C6": (84.5, 49.6, 0), "F2": (91.5, 44.0, 0),
+    "C7": (89.5, 49.6, 0),
+    # mounting holes in the bottom corners
+    "H1": (5.5, 60.0, 0), "H2": (106.5, 60.0, 0),
 }
 for i in range(8):
-    y = 10.0 + 8.0 * i
-    PLACE[f"J{101 + i}"] = (4.0, y, 0)                 # slots 1-8, left edge
-    PLACE[f"J{109 + i}"] = (106.0, y, 180)             # slots 9-16, right edge
-for n in range(1, 5):                                  # packs for slots 1-8 / 9-16
-    PLACE[f"RN{n}"] = (18.5, 14.0 + 16.0 * (n - 1), 0)
-    PLACE[f"RN{n + 4}"] = (91.5, 14.0 + 16.0 * (n - 1), 0)
+    PLACE[f"J{101 + i}"] = (4.0, 3.5 + 7.0 * i, 0)       # slots 1-8, left edge
+    PLACE[f"J{109 + i}"] = (108.0, 4.5 + 7.0 * i, 180)   # slots 9-16, right edge
+for n in range(1, 5):                                     # packs for slots 1-8 / 9-16
+    PLACE[f"RN{n}"] = (18.5, 7.0 + 14.0 * (n - 1), 0)
+    PLACE[f"RN{n + 4}"] = (93.5, 7.0 + 14.0 * (n - 1), 0)
 
 # copper pours: (net, priority, polygon[, layer])
-_IN = [(3.5, 86.0), (24.5, 86.0), (24.5, 93.0), (8.5, 93.0), (8.5, 95.6), (3.5, 95.6)]
-_V24 = [(29.5, 86.0), (36.0, 86.0), (36.0, 93.0), (40.6, 93.0), (40.6, 97.6), (29.5, 97.6)]
-_SW = [(40.6, 86.0), (73.0, 86.0), (73.0, 95.6), (67.4, 95.6), (67.4, 90.4), (58.7, 90.4), (58.7, 95.6),
-       (53.3, 95.6), (53.3, 90.4), (49.2, 90.4), (49.2, 96.2), (40.6, 96.2)]
+_IN = [(15.5, 51.4), (36.5, 51.4), (36.5, 58.4), (20.5, 58.4), (20.5, 61.0), (15.5, 61.0)]
+_V24 = [(41.5, 51.4), (48.0, 51.4), (48.0, 58.4), (52.6, 58.4), (52.6, 63.0), (41.5, 63.0)]
+_SW = [(52.6, 51.4), (85.0, 51.4), (85.0, 61.0), (79.4, 61.0), (79.4, 55.8), (70.7, 55.8), (70.7, 61.0),
+       (65.3, 61.0), (65.3, 55.8), (61.2, 55.8), (61.2, 61.6), (52.6, 61.6)]
 POURS = [("+24V_IN", 2, _IN), ("+24V_IN", 2, _IN, "B"),
          ("+24V", 2, _V24), ("+24V", 2, _V24, "B"),
          ("+24V_SW", 2, _SW), ("+24V_SW", 2, _SW, "B")]
 # mux GND pins (pin 12) sit at the end of a busy pin row: reserve their GND via before routing
-FIXED_TRACKS = [("GND", "F", 0.3, [(22.425, 35.14), (22.425, 33.4)]),    # U3 (rot 270) pin 12
-                ("GND", "F", 0.3, [(87.575, 40.86), (87.575, 42.6)])]    # U4 (rot 90) pin 12
-FIXED_VIAS = [("GND", (22.425, 33.4)), ("GND", (87.575, 42.6))]
+FIXED_TRACKS = [("GND", "F", 0.3, [(21.625, 25.14), (21.625, 23.4)]),    # U3 (rot 270) pin 12
+                ("GND", "F", 0.3, [(89.575, 30.86), (89.575, 32.6)]),    # U4 (rot 90) pin 12
+                ("GND", "F", 0.2, [(83.075, 30.86), (83.075, 33.4)])]    # U4 pin 2 (A1), between two signals
+FIXED_VIAS = [("GND", (21.625, 23.4)), ("GND", (89.575, 32.6)), ("GND", (83.075, 33.4))]
 # no copper under the ESP antenna (module rotated: antenna at y = ESP_Y + 12 .. + 18)
 KEEPOUTS = [[(ESP_X - 15.0, ESP_Y + 11.0), (ESP_X + 15.0, ESP_Y + 11.0),
              (ESP_X + 15.0, ESP_Y + 21.0), (ESP_X - 15.0, ESP_Y + 21.0)]]
@@ -69,18 +73,17 @@ ROUTE_ORDER_FIRST = [f"S{s}_{l}" for s in (1, 8, 2, 7, 3, 6, 4, 5, 9, 16, 10, 15
 ROUTE_ORDER_LAST = []
 
 LABELS = [
-    ("PARKSIDE CHARGER CONTROLLER rev A", 55.0, 72.5, 1.2),
-    ("PSU IN: +24V GND", 9.0, 98.6, 0.8), ("OUT A: +24V GND", 59.0, 98.6, 0.8),
-    ("OUT B: +24V GND", 73.0, 98.6, 0.8), ("10 A", 26.0, 84.6, 0.8),
-    ("SHT40: 3V3 GND SCL SDA", 27.4, 7.8, 0.8), ("QWIIC", 28.0, 16.6, 0.8),
-    ("EXP: 3V3 GND IO5 IO6 IO7 TX RX", 78.6, 7.8, 0.8),
+    ("PARKSIDE CHARGER CONTROLLER rev B", ESP_X, 38.0, 1.0),
+    ("PSU IN: +24V GND", 21.0, 63.2, 0.8), ("OUT A: +24V GND", 71.0, 63.2, 0.8),
+    ("OUT B: +24V GND", 85.0, 63.2, 0.8), ("10 A", 38.0, 50.2, 0.8),
+    ("SHT40", 31.5, 16.9, 0.8), ("QWIIC", 36.5, 16.0, 0.8),
+    ("EXP: 3V3 GND IO5 IO6 IO7 TX RX", 88.0, 1.0, 0.8),
 ]
 for i in range(8):
-    y = 10.0 + 8.0 * i
-    LABELS.append((f"S{1 + i}", 15.6, y + 1.0, 1.0))
-    LABELS.append((f"S{9 + i}", 94.2, y + 1.0, 1.0))
-LABELS.append(("5V GND SDA SCL", 8.0, 73.6, 0.8))
-LABELS.append(("SCL SDA GND 5V", 102.0, 73.6, 0.8))
+    LABELS.append((f"S{1 + i}", 15.2, 3.5 + 7.0 * i + 0.5, 0.9))
+    LABELS.append((f"S{9 + i}", 96.6, 4.5 + 7.0 * i + 0.5, 0.9))
+LABELS.append(("5V GND SDA SCL", 8.0, 57.2, 0.8))
+LABELS.append(("SCL SDA GND 5V", 104.0, 57.2, 0.8))
 
 # ------------------------------------------------------------------ schematic --
 TITLE = "Parkside charger - controller board"
