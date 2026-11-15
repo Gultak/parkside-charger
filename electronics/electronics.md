@@ -50,7 +50,17 @@ build ten boards, check on one pack:
      MCU goes to sleep and releases the line
      ([positron96: PARKSIDE battery protection board](https://positron96.gitlab.io/projects/parkside-battery-protection/),
      [mmame/parkside-x20](https://github.com/mmame/parkside-x20)).
-   - **T (DS)** measures about 512 kΩ to − and shows no activity. **Not used.**
+   - **T (DS)** measures about 512 kΩ to − on an idle pack and shows no activity. **Not used.**
+   - **Likely meaning of the names:** CS = *charge status* (the charger's pin is labelled "ID"),
+     DS = *discharge status* for the tools. Julian Ilett's teardown notes call the two middle pins
+     "(C)harge" and "(T)ool". positron96's "10 kΩ NTC + transistor, released on under-voltage"
+     was measured with a tool-style 10 kΩ pull-up and may describe the tool pin (T/DS). Either way
+     the slot board reads ID (CS), the pin the Parkside charger uses, with the same pull-up and
+     threshold. That works whether ID is an NTC or a fixed resistor: OK ≈ 2.5–3 V, data frames pull
+     it to 0 V, a released line reads 5 V.
+   - **Bring-up check:** with 10 kΩ from 5 V to ID, ID should sit at about 2.5–3 V (or pulse) on a
+     healthy pack and go to 5 V on an empty one. If ID instead stays at 5 V on a healthy pack, wire
+     J3 pin 3 to the T contact instead (no board change needed).
    - **Still to check on your pack:** the contact that reads **about 10–12 kΩ to −** (changing when
      you warm the pack) is the one that goes to J3 pin 3. Per the pinout above that is the ID
      contact (second from +).
