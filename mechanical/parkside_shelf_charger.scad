@@ -361,7 +361,7 @@ module slot_module() {
         translate([-tongue_w / 2 - 0.4, y_bay0 - 1.7, -wall_h - eps]) cube([tongue_w + 0.8, 1.6, tongue_h + 0.3 + eps]);
         // grooves in the side walls for the cover's spring-tab hooks
         for (m = [0, 1]) mirror([m, 0, 0])
-            translate([bay_x - eps, cov_tab_y() - 0.3, tab_z[1] - 2.3]) cube([hook + 0.2, tab_l + 0.6, 2.8]);
+            translate([bay_x - eps, cov_tab_y() - 0.3, tab_z[1] - 3.4]) cube([hook + 0.2, tab_l + 0.6, 3.9]);
         // locating groove in the plate for the cover's back face
         translate([-bay_x, cov_back_y() - 0.2, -eps]) cube([2 * bay_x, cov_t + 0.4, 1.2]);
         // card guides for the PCB (stop 4 mm short of the end stop)
@@ -410,17 +410,22 @@ module slot_cover() {
         union() {
             // front face, a web forward under the end wall, and the tongue up into its slot
             translate([-w2, yf, -bay_h]) cube([2 * w2, cov_t, bay_h - wall_h - 0.2]);
-            translate([-tongue_w / 2, y_bay0 - 1.5, -wall_h - 1.4]) cube([tongue_w, yf - y_bay0 + 1.5 + cov_t, 1.2]);
+            // web: its underside slopes at 45 deg from the front face (prints without overhang)
+            translate([tongue_w / 2, 0, 0]) rotate([0, -90, 0]) linear_extrude(tongue_w)    // (z, y) polygon
+                polygon([[-wall_h - 0.2, y_bay0 - 1.5], [-wall_h - 0.2, yf + cov_t],
+                         [-wall_h - 0.6 - (yf + cov_t - y_bay0 + 1.5), yf + cov_t],
+                         [-wall_h - 0.6 - (yf - y_bay0 + 1.5), yf], [-wall_h - 0.6, y_bay0 - 1.5]]);
             translate([-tongue_w / 2, y_bay0 - 1.5, -wall_h - 0.4]) cube([tongue_w, 1.2, tongue_h + 0.4]);
             // floor
             translate([-w2, yf, -bay_h]) cube([2 * w2, cov_back_y() + cov_t - yf, cov_t]);
             // back face, up into the plate groove
             translate([-w2, cov_back_y(), -bay_h]) cube([2 * w2, cov_t, bay_h + 1.0]);
-            // spring tabs with hooks (lead-in on top, flat latch face below)
+            // spring tabs with hooks (lead-in on top, 45 deg latch face below: prints without
+            // overhang, and lets go with a firm pull)
             for (m = [0, 1]) mirror([m, 0, 0]) {
                 translate([w2 - cov_t, cov_tab_y(), -bay_h]) cube([cov_t, tab_l, tab_z[1] + bay_h]);
                 translate([w2 - eps, cov_tab_y(), 0]) rotate([90, 0, 0]) mirror([0, 0, 1])
-                    linear_extrude(tab_l) polygon([[0, tab_z[1] - 2], [cov_cl + hook, tab_z[1] - 2],
+                    linear_extrude(tab_l) polygon([[0, tab_z[1] - 2 - cov_cl - hook], [cov_cl + hook, tab_z[1] - 2],
                                                    [cov_cl + hook, tab_z[1] - 1.4], [0, tab_z[1]]]);
             }
         }
