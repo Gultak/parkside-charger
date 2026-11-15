@@ -11,7 +11,7 @@
 
 ## Concept
 
-- **One printed module per battery** (87.6 × 168 mm footprint, 34 mm tall). Modules sit side by
+- **One printed module per battery** (87.6 × 168 mm footprint, 42 mm tall). Modules sit side by
   side at an **88 mm pitch** (86 mm battery + 2 mm; you take the batteries out from below, so no
   finger room is needed): a row of 8 needs **70.4 cm** of shelf. The controller drives up to 16 slots
   through two 24 V outputs, for example **two rows of 8** on two shelves, one chain each.
@@ -64,6 +64,7 @@
 | Rail length | 64 mm, tongue end (release button) to the contact face | `rail_len` = 64 |
 | Latch tooth | 4 mm from the tongue end, 29 mm wide, 4 mm long | `latch_y` = 3.5, `latch_w` = 30, `latch_l` = 6, `latch_d` = 5 (height not measured; 5 mm matches the reference holder) |
 | Tongue end | Prongs beside the contact pocket reach 14 mm past the contact face; pocket 30 mm wide with 4 mm 45° chamfers; wide part tapers 4 mm over the last 7 mm (from the reference holder model) | `prong_l` = 14, `cblock_w` = 29.6, `cblock_ch` = 4, `wing_l` = 7 |
+| Battery top surface | 4–5 mm below the tongue top, about as high as the latch tooth. Beside the tongue there is a trough down to below the grooves, at least ±34.9 mm wide (the reference holder fills it) | `body_top` = 4, `trough_x` = 34.9. Inside the trough: rail walls, ribs and LED bezel. Outside it, nothing reaches more than 3.5 mm below the tongue top: the edge bars and dovetail sit in the 8 mm plate (`plate_t` = 8) |
 | Contacts | 4 slots at an 8 mm pitch, 9.8 mm deep, 0.8 mm blades fit. Seen from the front (tongue pointing away): **+, ID, nc, −** | `contact_x` = −12, −4, 4, 12; `contact_len` = 8 |
 
 ![Section through two slots with the measured battery profile](img/battery_fit_section.png)
@@ -71,9 +72,6 @@
 **Still to measure** (placeholders in the model):
 - **Contact height (`contact_z`):** the centre of the contact slots, measured down from the
   tongue top.
-- **Battery top surface:** the height of the surface beside the tongue, measured down from the
-  tongue top. The model assumes it starts right below the grooves (10.2 mm), which leaves only
-  about 0.4 mm clearance under the rail walls, LED bezel and edge bars.
 
 ## Step 1: measure your battery and calibrate the model
 
@@ -137,8 +135,8 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 
 | Qty | Part |
 |---|---|
-| 1 | Wood screw **4 × 16 mm countersunk (flat head)**, front, in the centre of the channel ceiling. The head sits 0.4 mm below the surface so the battery slides over it |
-| 1 | Wood screw **4 × 16 mm pan head**, rear tab, centre. The plate is 6 mm thick, leaving 10 mm in the shelf. On an 18 mm shelf never go above 18 mm |
+| 1 | Wood screw **4 × 20 mm countersunk (flat head)**, front, in the centre of the channel ceiling. The head sits 0.4 mm below the surface so the battery slides over it |
+| 1 | Wood screw **4 × 20 mm pan head**, rear tab, centre. The plate is 8 mm thick, leaving 12 mm in an 18 mm shelf. The screw must stay at least 2 mm shorter than plate + shelf |
 | 4 | M3 heat-set inserts (4.2 mm hole) for the rear lid + 4 × M3×8 screws |
 | 3–4 | Contact blades: strips of **0.8 mm brass, 6.3 mm wide, about 40 mm long**, tinned, with a rounded tip. They pass through the contact block and end wall (22.5 mm) and stick out 8 mm from the contact face, so standard Faston tabs are too short. Push them in from the bay side, bend the tail 90° behind the end wall and glue with a drop of epoxy. **Check the blade thickness against your pack's terminals first.** |
 | 1 | Microswitch Omron D2F-01L (or SS-5GL with lever) + 2 × M2 × 8 self-tapping screws |

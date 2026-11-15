@@ -45,6 +45,12 @@ prong_cl = 0.5;   // extra room in front of the prong tips
 cblock_w = 29.6;  // contact block width (fills the pocket between the prongs, 30 on the reference)
 cblock_ch = 4;    // 45 deg chamfer on the contact block's front corners
 wing_l   = 7;     // the wide part tapers to the groove width over the last 7 mm
+// Battery top surface: beside the tongue there is a trough (at least as wide as
+// the reference holder, +-34.9 mm) down to below the grooves; further out the
+// pack's top surface is only 4-5 mm below the tongue top (measured).
+trough_x = 34.9;  // half-width of the free trough beside the tongue
+body_top = 4;     // pack top surface outside the trough, below the tongue top (measured 4-5)
+keep_z   = -(body_top - 0.5);   // nothing outside the trough may reach below this
 lead_in  = 3;     // chamfer on the lip entry
 // latch recess the battery's spring latch snaps into (in the channel ceiling)
 // measured tooth: 4 mm from the tongue end, 29 wide, 4 long; height assumed 4
@@ -65,13 +71,13 @@ tab_vertical = true; // blade plane vertical (true) or horizontal (false)
 
 /* [Module frame] */
 pitch    = 88;    // module width = slot spacing (battery body 86 + 2, batteries are grabbed from below)
-plate_t  = 6;     // mounting plate thickness
+plate_t  = 8;     // mounting plate thickness (carries the dovetail: edge bars stop at keep_z)
 wall_t   = 5;     // rail wall thickness
 stop_t   = 8;     // end wall thickness (behind the prong tips)
 bay_l    = 66;    // electronics bay length (behind the end stop)
 bay_h    = 34;    // electronics bay height below the plate (must clear the battery body)
 bay_wall = 2.4;
-screw_d  = 4.5;   // wood screws 4 x 16 (max ~3/4 of plate + shelf thickness!)
+screw_d  = 4.5;   // wood screws 4 x 20 (plate 8 + shelf, stay 2 mm short of the top)
 screw_head_d = 9;
 csk_d    = 8.6;   // countersink for the flat-head screws inside the channel
 csk_recess = 0.4; // heads sit this far below the channel ceiling (battery slides over)
@@ -84,16 +90,16 @@ joint_left  = true;   // groove on the left edge  (false for the leftmost module
 joint_right = true;   // tongue on the right edge (false for the rightmost module)
 jt_gap   = 0.4;       // gap between neighbouring plates
 jt_d     = 5;         // dovetail depth
-jt_root  = 6;         // dovetail height at the root (narrow end)
-jt_tip   = 9;         // dovetail height at the tip (wide end)
-jt_zc    = -2;        // dovetail centre height (0 = channel ceiling)
+jt_root  = 5;         // dovetail height at the root (narrow end)
+jt_tip   = 7;         // dovetail height at the tip (wide end)
+jt_zc    = (keep_z + plate_t) / 2;   // dovetail centre height (0 = channel ceiling)
 jt_clear = 0.2;       // clearance per side (raise to 0.25-0.3 if it binds)
 jt_front = 3;         // closed front end of the groove (front-edge alignment stop)
 jt_r     = 1.0;       // radius on the tongue's edges (groove follows with r + clearance)
 // The tongue's front end and the groove's closed end are both bevelled at 45 deg
 // (rising towards the back), so neither has a flat overhang when printed face-down.
 bar_w    = 9;         // width of the edge bar carrying the joint
-bar_bot  = -9.6;      // underside of the edge bar (must stay above the battery body)
+bar_bot  = keep_z;    // underside of the edge bar (must stay above the battery body)
 
 /* [Slot PCB (slides into card guides from the rear)] */
 pcb_w = 72;     // across (X); edges ride 0.8 mm deep in the card guides
@@ -116,7 +122,7 @@ led_lip_d  = 5.0;   // lip the flange stops against (wires + heat-shrink pass th
 led_lip_l  = 1;
 led_bore_d = 7.0;   // bore behind the lip for the solder joints
 bezel_l    = 14;    // bezel length along Y
-led_x_off  = 5.5;   // LED axis from the rail wall's outer face
+led_x_off  = 1.5;   // LED axis from the rail wall's outer face (bezel stays inside the trough)
 led_z      = -4.6;  // LED axis height (bezel must stay above the battery body)
 wire_ch    = 5;     // wire channel / groove width
 wire_gd    = 3;     // depth of the wire groove on the shelf side of the plate
@@ -260,14 +266,14 @@ module slot_module() {
             translate([-bay_x - bay_wall, y_bay0 - eps, -bay_h])
                 cube([2 * (bay_x + bay_wall), bay_l + eps, bay_h + eps]);
             // LED bezel at the front, beside the right rail
-            translate([outer_x, 0, -9.4]) cube([11, bezel_l, 9.4 + eps]);
+            translate([outer_x, 0, -9.4]) cube([trough_x - 0.4 - outer_x, bezel_l, 9.4 + eps]);
             // stiffening ribs from rail walls to the plate flange
             for (m = [0, 1]) mirror([m, 0, 0])
                 for (y = [rail_len * 0.45, rail_len * 0.8])
                     translate([outer_x - eps, y - 1.5, -wall_h])
                         hull() {
                             cube([eps, 3, wall_h]);
-                            translate([7, 0, wall_h - eps]) cube([eps, 3, eps]);
+                            translate([trough_x - 0.9 - outer_x, 0, wall_h - eps]) cube([eps, 3, eps]);
                         }
         }
 
@@ -461,6 +467,8 @@ module dummy_led() {
 }
 module dummy_battery() {
     color("forestgreen", 0.85) translate([-43, 3, -wall_h - 75]) cube([86, rail_len - 3, 75]);
+    color("forestgreen", 0.85) for (m = [0, 1]) mirror([m, 0, 0])
+        translate([trough_x + 0.5, 3, -wall_h - eps]) cube([43 - trough_x - 0.5, rail_len - 3, wall_h - body_top + eps]);
     color("darkgreen", 0.85) translate([-chan_w / 2 + 0.3, 3, -wall_h + 0.2])
         cube([chan_w - 0.6, rail_len - 3, wall_h - 0.5]);
 }
