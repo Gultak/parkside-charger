@@ -14,7 +14,7 @@
 //
 //  Export:
 //    openscad -D 'part="slot"'           -o slot.stl            parkside_shelf_charger.scad
-//    openscad -D 'part="slot_lid"'       -o slot_lid.stl        parkside_shelf_charger.scad
+//    openscad -D 'part="slot_cover"'     -o slot_cover.stl      parkside_shelf_charger.scad
 //    openscad -D 'part="gauge"'          -o gauge.stl           parkside_shelf_charger.scad
 //    openscad -D 'part="end_gauge"'      -o end_gauge.stl       parkside_shelf_charger.scad
 //    openscad -D 'part="joint_gauge"'    -o joint_gauge.stl     parkside_shelf_charger.scad
@@ -29,7 +29,7 @@
 //  plate occupies 0..plate_t and its top face touches the shelf.
 // =====================================================================
 
-part = "assembly"; // [slot, slot_lid, gauge, end_gauge, joint_gauge, controller, controller_preview, controller_lid, assembly, single, joint_section, joint_check]
+part = "assembly"; // [slot, slot_cover, gauge, end_gauge, joint_gauge, controller, controller_preview, controller_lid, assembly, single, joint_section, joint_check]
 
 /* [Battery interface: MEASURE YOUR PACK] */
 chan_w   = 46.9;  // clear width between the rail walls, above the lips (tongue width 46.3 + 0.6)
@@ -80,7 +80,7 @@ pitch    = 88;    // module width = slot spacing (battery body 86 + 2, batteries
 plate_t  = 10;    // mounting plate thickness (carries the dovetail and the LED; as on the reference holder)
 wall_t   = 5;     // rail wall thickness
 stop_t   = 8;     // end wall thickness (behind the prong tips)
-bay_l    = 4 + 47.5 + 0.5;   // electronics bay: 4 mm gap, PCB, 0.5 mm to the lid
+bay_l    = 4 + 47.5 + 0.5 + 1.8 + 0.8;   // electronics bay: 4 mm gap, PCB, 0.5 mm, cover back face, 0.8 mm rim
 bay_h    = 34;    // electronics bay height below the plate (must clear the battery body)
 bay_wall = 2.4;
 screw_d  = 4.5;   // wood screws 4 x 25 (plate 10 + shelf, stay 2 mm short of the top)
@@ -135,8 +135,18 @@ wire_gd    = 3;     // depth of the wire groove on the shelf side of the plate
 /* [Cable access, slot bay] */
 // Rear part of the bay floor is open: 24 V IN/OUT screws and the I2C plug of the
 // slot board (all facing down) are reachable from below with the bay closed.
-floor_window_y = 36;   // window starts this far behind the PCB's front edge
-lid_notch_top  = 12.0; // the lid's U-notch reaches up to this depth below the plate (PCB at 9..10.6)
+
+/* [Clip-on bay cover (front + bottom + back in one U-shaped part)] */
+cov_t      = 1.8;    // wall thickness
+cov_cl     = 0.3;    // clearance to the side walls (per side)
+tongue_h   = 2.5;    // the cover's front tongue goes this far up into a slot under the end wall
+tongue_w   = 54;     // its width (the end wall is 2 * outer_x wide)
+cov_notch_bot = 24;  // cable cut-outs in the back face reach down to this depth below the plate
+cov_notch_l = [-34.9, -9];   // X range: 24 V IN/OUT terminals (left)
+cov_notch_r = [14, 29];      // X range: I2C plug (right)
+tab_z      = [-32, -24];     // spring tabs rising from the floor near the rear corners
+tab_l      = 8;      // their length along Y
+hook       = 0.8;    // hook height (into the side-wall grooves)
 
 /* [Controller box (controller board 112 x 64 mm, rev B)] */
 ctl_pcb  = [112, 64];
@@ -339,29 +349,25 @@ module slot_module() {
         translate([sw_x - sw_body[0] / 2, y_bay0 - eps, -wall_h - eps])
             cube([sw_body[0], wall_h + 1, wall_h + eps]);
 
-        // bay cavity, open to the rear; the end stop is its front wall
+        // bay cavity, open to the rear and the bottom (the clip-on cover closes both)
         difference() {
-            translate([-bay_x, y_bay0 - 2 * eps, -bay_h + bay_wall]) cube([2 * bay_x, cage_l + 3 * eps, bay_h - bay_wall]);
-            // corner columns for the lid inserts (full length -> no overhangs)
-            for (sx = [-1, 1]) for (z = [-col, -bay_h + bay_wall])
-                translate([sx > 0 ? bay_x - col : -bay_x, y_bay0, z]) cube([col, cage_l + eps, col]);
+            translate([-bay_x, y_bay0 - 2 * eps, -bay_h - eps]) cube([2 * bay_x, cage_l + 3 * eps, bay_h + eps]);
             // 45 deg bevel behind the end wall: printed standing on the rear face, the
             // end wall's rear face would otherwise be a 10 mm overhang
             translate([bay_x + eps, 0, 0]) rotate([0, -90, 0]) linear_extrude(2 * bay_x + 2 * eps)   // (z, y)
                 polygon([[eps, y_bay0 - 3 * eps], [eps, y_bay0 + wall_h], [-wall_h, y_bay0 - 3 * eps]]);
         }
-        // cable-access window in the bay floor (rear part, between the corner columns).
-        // Its front edge is a 45 deg point, so the floor needs no bridge when printed upright.
-        let (hw = bay_x - col, yw = y_bay0 + 4 + floor_window_y)
-            translate([0, 0, -bay_h - eps]) linear_extrude(bay_wall + 2 * eps)
-                polygon([[-hw, yw], [0, yw - hw], [hw, yw], [hw, total_l + 1], [-hw, total_l + 1]]);
+        // slot in the end wall's underside for the cover's front tongue
+        translate([-tongue_w / 2 - 0.4, y_bay0 - 1.7, -wall_h - eps]) cube([tongue_w + 0.8, 1.6, tongue_h + 0.3 + eps]);
+        // grooves in the side walls for the cover's spring-tab hooks
+        for (m = [0, 1]) mirror([m, 0, 0])
+            translate([bay_x - eps, cov_tab_y() - 0.3, tab_z[1] - 2.3]) cube([hook + 0.2, tab_l + 0.6, 2.8]);
+        // locating groove in the plate for the cover's back face
+        translate([-bay_x, cov_back_y() - 0.2, -eps]) cube([2 * bay_x, cov_t + 0.4, 1.2]);
         // card guides for the PCB (stop 4 mm short of the end stop)
         for (m = [0, 1]) mirror([m, 0, 0])
             translate([bay_x - eps, y_bay0 + 4, -pcb_z - pcb_t - 0.2])
                 cube([1.2, cage_l, pcb_t + 0.4]);
-
-        // rear lid screw holes (M3 heat-set inserts, along Y)
-        for (p = bay_lid_holes()) translate([p[0], total_l - 8 + eps, p[1]]) hole_y(4.2, 8.1);
 
         // mounting screws (vertical). Front: flat-head, countersunk flush into the
         // channel ceiling (fit before the battery goes in). Rear: pan-head in the rear tab.
@@ -389,25 +395,40 @@ module slot_module() {
         translate([bay_x - col - 8, y_bay0 + 12, -bay_wall]) cube([wire_ch, wire_ch + 1, plate_t + bay_wall + eps]);
     }
 }
-function bay_lid_holes() = [
-    [-bay_x + 3.5, -bay_h + bay_wall + 3.5], [bay_x - 3.5, -bay_h + bay_wall + 3.5],
-    [-bay_x + 3.5, -3.5], [bay_x - 3.5, -3.5]
-];
+function cov_back_y() = total_l - 0.8 - cov_t;          // inner face of the cover's back face
+function cov_tab_y() = cov_back_y() - tab_l - 2;        // start of the spring tabs along Y
 
-// Rear lid of the bay: power + I2C cable entries, vents
-module slot_lid() {
-    // Rear lid: a wide U-notch open at the bottom, so it slides on over the 24 V
-    // chain jumpers and the I2C cable when they are already plugged in. It also
-    // keeps the PCB from sliding out of the card guides (it sits 0.5 mm behind the board).
-    lid_t = 2.4;
-    col = 7;
-    w = 2 * (bay_x + bay_wall);
-    notch_w = 2 * (bay_x - col - 0.5);
+// Clip-on U-shaped bay cover: front face + floor + back face. Fit it after the module is
+// screwed on and all cables are plugged in: put the front tongue up into the slot under the
+// end wall, swing the rear up - the cables drop into the cut-outs, which are open at the top -
+// until the two spring tabs click into the side walls. To remove it, push the tabs
+// inwards through the cable cut-outs. Print with the floor on the bed.
+module slot_cover() {
+    w2 = bay_x - cov_cl;            // half width (fits between the side walls)
+    yf = y_bay0 + 0.2;              // front face, just behind the end wall
     difference() {
-        translate([-w / 2, 0, 0]) cube([w, lid_t, bay_h]);
-        for (p = bay_lid_holes())
-            translate([p[0], -eps, p[1] + bay_h]) rotate([-90, 0, 0]) cylinder(d = 3.4, h = lid_t + 1);
-        translate([-notch_w / 2, -eps, -eps]) cube([notch_w, lid_t + 2 * eps, bay_h - lid_notch_top + eps]);
+        union() {
+            // front face, a web forward under the end wall, and the tongue up into its slot
+            translate([-w2, yf, -bay_h]) cube([2 * w2, cov_t, bay_h - wall_h - 0.2]);
+            translate([-tongue_w / 2, y_bay0 - 1.5, -wall_h - 1.4]) cube([tongue_w, yf - y_bay0 + 1.5 + cov_t, 1.2]);
+            translate([-tongue_w / 2, y_bay0 - 1.5, -wall_h - 0.4]) cube([tongue_w, 1.2, tongue_h + 0.4]);
+            // floor
+            translate([-w2, yf, -bay_h]) cube([2 * w2, cov_back_y() + cov_t - yf, cov_t]);
+            // back face, up into the plate groove
+            translate([-w2, cov_back_y(), -bay_h]) cube([2 * w2, cov_t, bay_h + 1.0]);
+            // spring tabs with hooks (lead-in on top, flat latch face below)
+            for (m = [0, 1]) mirror([m, 0, 0]) {
+                translate([w2 - cov_t, cov_tab_y(), -bay_h]) cube([cov_t, tab_l, tab_z[1] + bay_h]);
+                translate([w2 - eps, cov_tab_y(), 0]) rotate([90, 0, 0]) mirror([0, 0, 1])
+                    linear_extrude(tab_l) polygon([[0, tab_z[1] - 2], [cov_cl + hook, tab_z[1] - 2],
+                                                   [cov_cl + hook, tab_z[1] - 1.4], [0, tab_z[1]]]);
+            }
+        }
+        // gaps in the tongue where the contact blades pass through the end wall
+        for (x = contact_x) translate([x - 1, y_bay0 - 2, -wall_h - 0.5]) cube([2, 2, tongue_h + 1]);
+        // cable cut-outs, open at the top
+        for (n = [cov_notch_l, cov_notch_r])
+            translate([n[0], cov_back_y() - eps, -cov_notch_bot]) cube([n[1] - n[0], cov_t + 2 * eps, cov_notch_bot + 2]);
     }
 }
 
@@ -564,7 +585,7 @@ module dummy_battery() {
 }
 
 if (part == "slot") rotate([-90, 0, 0]) translate([0, -total_l, 0]) slot_module();   // rear face on the bed
-else if (part == "slot_lid") translate([0, 0, 2.4]) rotate([-90, 0, 0]) slot_lid();   // outer face on the bed
+else if (part == "slot_cover") translate([0, 0, bay_h]) slot_cover();   // floor on the bed
 else if (part == "gauge") rotate([-90, 0, 0]) translate([0, -(y_lip + 6), 0]) gauge();
 else if (part == "end_gauge") rotate([-90, 0, 0]) translate([0, -y_bay0, 0]) end_gauge();
 else if (part == "controller") controller_box();
@@ -592,7 +613,7 @@ else if (part == "assembly") {
     // the right-hand module is shown half slid on, to show the dovetail joint
     for (i = [0:2]) translate([(i - 1) * pitch, i == 2 ? -80 : 0, 0]) {
         color("lightgray") slot_module();
-        color("dimgray") translate([0, total_l, -bay_h]) slot_lid();
+        color("dimgray") slot_cover();
         if (i != 1) dummy_battery();
     }
     translate([2.4 * pitch, 0, plate_t]) mirror([0, 0, 1]) color("silver") controller_box();

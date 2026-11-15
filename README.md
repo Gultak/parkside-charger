@@ -24,7 +24,7 @@ verdict** for every slot to Home Assistant.
 
 | Path | What |
 |---|---|
-| `mechanical/parkside_shelf_charger.scad` | Parametric OpenSCAD model: slot module (interlocking), end modules, bay lid, rail and joint test gauges, controller box |
+| `mechanical/parkside_shelf_charger.scad` | Parametric OpenSCAD model: slot module (interlocking), end modules, clip-on bay cover, rail and joint test gauges, controller box |
 | `mechanical/stl/` | STLs exported with the measured rail dimensions. Test-fit the gauges first |
 | `docs/mechanical.md` | How to measure the pack, test prints, printing, mounting, cabling |
 | `electronics/electronics.md` | Architecture, design decisions, pin maps, power budget, safety |

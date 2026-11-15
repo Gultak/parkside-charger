@@ -23,7 +23,6 @@ per slot: board,1,PCB 72x47.5 4-layer 1oz (electronics/slot-board/fab),JLCPCB/PC
 per slot: module,1,Microswitch with lever,Omron D2F-01L,1.5,clones ~0.30,https://www.digikey.com/en/products/result?keywords=D2F-01L
 per slot: module,1,LED 5 mm RGB common cathode diffused,Kingbright L-154A4SUREQBFZGEW,0.6,standard T-1 3/4: 5.8 mm flange; driven from PCA9554 at 5 V,https://www.digikey.com/en/products/result?keywords=L-154A4SUREQBFZGEW
 per slot: module,4,Brass strip 0.8 x 6.3 x 50 mm (contact blade),,0.05,Faston tabs are too short for the contact block + end wall + bevel,
-per slot: module,4,M3 heat-set insert + M3x8 screw,,0.1,,
 per slot: module,1,Wood screw 4x25 countersunk (flat head),,0.03,front - centre of the channel ceiling,
 per slot: module,1,Wood screw 4x25 pan head,,0.03,"rear - inside the bay, through the hole in the slot PCB",
 per slot: module,1,2-wire jumper 1.5 mm2 with ferrules (24 V daisy chain),,0.5,slot J6 OUT -> next slot J1 IN,
@@ -50,5 +49,5 @@ power,1,VH 3p housing + 2 crimp contacts (PSU AC input),JST VHR-3N + SVH-21T-P1.
 power,1,Ring lug M3 (PE to the PSU) + ferrules,,0.5,,
 power,1,Thermal cut-out NC 70 C 250 V AC,KSD301 70C,1.5,in AC line - hardware failsafe; not sold by DigiKey,
 power,2,m wire 1.5 mm2 red/black,,1.0,PSU -> controller -> chains,
-print,2.0,kg PETG or ASA filament (controller box: ASA/PC/V-0 PETG),,20.0,16 slots + controller box,
+print,2.0,kg PETG (V-0) or ASA filament; bay covers in PETG (flexible tabs); controller box ASA/PC/V-0 PETG,,20.0,16 slots + controller box,
 safety,1,Steel/alu sheet 0.5-1 mm for shelf underside,,15.0,recommended on wooden shelves,
