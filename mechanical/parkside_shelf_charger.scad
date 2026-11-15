@@ -151,7 +151,7 @@ psu = "LOP-400";          // [LOP-400, LOP-300, none]
 psu_gap = 8;              // PSU board edge to the compartment walls (wiring, airflow)
 psu_standoff = 6;         // M3 standoffs (datasheet: max 3 mm of pins below the PSU board)
 part_t = 2.4;             // partition wall between the mains and the low-voltage compartment
-iec_cut = [47.5, 27.8];   // snap-in IEC C14 inlet with fuse holder + switch (check your part!)
+iec_cut = [47.3, 28.3];   // IEC C14 inlet with fuse + switch, Schurter DD11.0121.1111: cut-out 47.1 x 28.1 (+0.2)
 vent_w = 2.5;             // vent slot width (finger-safe)
 
 $fn = 48;

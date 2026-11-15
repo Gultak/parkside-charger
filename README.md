@@ -31,7 +31,7 @@ verdict** for every slot to Home Assistant.
 | `electronics/slot-board/` | KiCad 7 project, Gerbers, BOM and pick-and-place for the slot board |
 | `electronics/controller-board/` | KiCad 7 project, Gerbers, BOM and pick-and-place for the controller board |
 | `electronics/kicadgen/` | The generator that builds both boards from `tools/design.py` + `tools/layout.py` |
-| `electronics/bom.csv` | System bill of materials with rough prices |
+| `electronics/bom.csv` | System bill of materials with rough prices and DigiKey links (part-number searches; they open the product page when DigiKey stocks it) |
 | `esphome/` | ESPHome config + external component (`parkside_charger`, `parkside_slot`) |
 | `esphome/tests/sim/` | Host simulation of the charging logic (fake LTC4162 + battery model) |
 | `docs/firmware.md` | Charging strategy, entities, LED legend, health heuristics, bring-up |

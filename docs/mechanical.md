@@ -209,7 +209,7 @@ No cable has to be threaded through a part before it is connected.
     row 2 right)
   - top wall: the ESP32's USB-C, plus the SHT40, Qwiic and expansion cables
 - **Mains side**, behind a closed partition: the PSU on four 6 mm M3 standoffs (heat-set inserts),
-  an **IEC C14 inlet with switch and fuse** snapped into the rear wall (cut-out 47.5 × 27.8 mm,
+  an **IEC C14 inlet with switch and fuse** (Schurter DD11.0121.1111) in the rear wall (cut-out 47.3 × 28.3 mm;
   check your part), and 2.5 mm vent slots in both side walls and the lid. The PSU's 24 V leads
   pass the partition through one small notch next to its output terminals, to J1.
   - **PE:** connect the inlet's earth to the PSU's earth-marked mounting hole (ring lug under that
