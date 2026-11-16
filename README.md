@@ -18,7 +18,7 @@ verdict** for every slot to Home Assistant.
 | Power | Mean Well **LOP-400-24** open-frame PSU (250 W fanless), built into the controller box in its own mains compartment. The battery-side budget (10 A) is shared across the slots |
 | Presence | Microswitch per slot, with the pack's BMS signal (ID contact) and voltage as a fallback |
 | Safety | Per-slot fuses on both sides, the pack's BMS signal gates charging, slot NTC window 5–45 °C plus JEITA, charge timeout, fault latching, ambient limit, default-off soft-start bus switch, **70 °C thermal cut-out in the AC line** |
-| Estimated cost | about €22 per slot plus about €150 fixed: about €370 for 10 slots, about €510 for 16 |
+| Estimated cost | about €24 per slot plus about €156 fixed: about €390 for 10 slots, about €535 for 16 ([BOM.md](BOM.md)) |
 
 ## Contents
 
@@ -31,7 +31,7 @@ verdict** for every slot to Home Assistant.
 | `electronics/slot-board/` | KiCad 7 project, Gerbers, BOM and pick-and-place for the slot board |
 | `electronics/controller-board/` | KiCad 7 project, Gerbers, BOM and pick-and-place for the controller board |
 | `electronics/kicadgen/` | The generator that builds both boards from `tools/design.py` + `tools/layout.py` |
-| `electronics/bom.csv` | System bill of materials with rough prices and DigiKey links (part-number searches; they open the product page when DigiKey stocks it) |
+| `BOM.md` | Bill of materials with rough prices and vendor links (DigiKey Ireland, Amazon.ie) |
 | `esphome/` | ESPHome config + external component (`parkside_charger`, `parkside_slot`) |
 | `esphome/tests/sim/` | Host simulation of the charging logic (fake LTC4162 + battery model) |
 | `docs/firmware.md` | Charging strategy, entities, LED legend, health heuristics, bring-up |
