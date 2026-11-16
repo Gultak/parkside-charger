@@ -36,6 +36,22 @@ verdict** for every slot to Home Assistant.
 | `esphome/tests/sim/` | Host simulation of the charging logic (fake LTC4162 + battery model) |
 | `docs/firmware.md` | Charging strategy, entities, LED legend, health heuristics, bring-up |
 
+## Using the ESPHome components
+
+`esphome/parkside-charger.yaml` loads the custom components from the local `esphome/components`
+folder. To use them from GitHub instead (for example from your Home Assistant ESPHome add-on),
+replace the `external_components` block with:
+
+```yaml
+external_components:
+  - source:
+      type: git
+      url: https://github.com/Gultak/parkside-charger
+      ref: main
+      path: esphome/components
+    components: [parkside_charger, parkside_slot]
+```
+
 ## Build order
 
 1. **Check a pack** (electronics.md §2): confirm which contact reads about 10–12 kΩ to B− (the

@@ -123,7 +123,7 @@ def build(design, layout, outdir: Path, project: str, root_uuid: str):
     title = f'''  (title_block
     (title "{layout.TITLE}")
     (rev "{getattr(layout, "REV", "A")}")
-    (company "ha-esphome-projects / parkside-charger")
+    (company "github.com/Gultak/parkside-charger")
 {comments}
   )'''
     ttxt = "\n".join(f'  (text "{t}" (at {F(x)} {F(y)} 0) {eff(justify="left bottom", size=2)} (uuid {uid()}))'
