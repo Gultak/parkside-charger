@@ -1,0 +1,176 @@
+# One battery slot. Included 10x from parkside-charger.yaml with vars:
+#   n   = slot number (1..10)
+# The I2C bus "slot${n}_bus" (a TCA9548A channel) is defined in the main file.
+#
+# Slot board I2C devices (identical on every board, each slot has its own bus):
+#   0x68  LTC4162-L charger
+#   0x20  PCA9554 I/O expander (on 5 V): IO0 microswitch, IO1..3 RGB LED anodes
+#         (common-cathode LED, active high),
+#         IO4 bleed-resistor MOSFET, IO5 LTC4162 SMBALERT,
+#         IO6 pack BMS fault (comparator on the pack's ID contact: high = released), IO7 spare
+
+pca9554:
+  - id: slot${n}_io
+    i2c_id: slot${n}_bus
+    address: 0x20
+
+binary_sensor:
+  - platform: gpio
+    id: slot${n}_switch
+    internal: true
+    pin:
+      pca9554: slot${n}_io
+      number: 0
+      mode:
+        input: true
+      inverted: true # switch closes to GND when a battery is seated
+    filters:
+      - delayed_on_off: 500ms
+  # The pack's BMS pulls its ID contact low through its NTC (~10 kOhm) while all is
+  # well and releases it on under-voltage / faults. It also releases it briefly a few
+  # times a second: the board filters that (RC ~0.5 s), and this filter waits for 3 s.
+  - platform: gpio
+    id: slot${n}_bms_fault
+    name: "Slot ${n} pack BMS fault"
+    device_class: problem
+    entity_category: diagnostic
+    pin:
+      pca9554: slot${n}_io
+      number: 6
+      mode:
+        input: true
+    filters:
+      - delayed_on: 3s
+      - delayed_off: 1s
+
+output:
+  - platform: gpio
+    id: slot${n}_led_r
+    pin:
+      pca9554: slot${n}_io
+      number: 1
+      mode:
+        output: true
+  - platform: gpio
+    id: slot${n}_led_g
+    pin:
+      pca9554: slot${n}_io
+      number: 2
+      mode:
+        output: true
+  - platform: gpio
+    id: slot${n}_led_b
+    pin:
+      pca9554: slot${n}_io
+      number: 3
+      mode:
+        output: true
+  - platform: gpio
+    id: slot${n}_bleed
+    pin:
+      pca9554: slot${n}_io
+      number: 4
+      mode:
+        output: true
+
+select:
+  - platform: template
+    id: slot${n}_mode
+    name: "Slot ${n} charge mode"
+    icon: mdi:battery-sync
+    # order matters (firmware uses the index): Auto, Storage, Ready, Full, Off
+    options: [Auto, Storage, Ready, Full, "Off"]
+    initial_option: Auto
+    optimistic: true
+    restore_value: true
+    entity_category: config
+
+number:
+  - platform: template
+    id: slot${n}_max_current
+    name: "Slot ${n} max charge current"
+    unit_of_measurement: A
+    min_value: 0.3
+    max_value: 3.0
+    step: 0.1
+    initial_value: 1.5
+    optimistic: true
+    restore_value: true
+    entity_category: config
+  - platform: template
+    id: slot${n}_nominal_capacity
+    name: "Slot ${n} nominal capacity"
+    icon: mdi:battery-high
+    unit_of_measurement: Ah
+    min_value: 0 # 0 = unknown -> no capacity-based health %
+    max_value: 12
+    step: 0.5
+    initial_value: 0
+    optimistic: true
+    restore_value: true
+    entity_category: config
+
+button:
+  - platform: template
+    name: "Slot ${n} charge to 100%"
+    icon: mdi:battery-arrow-up
+    on_press:
+      - lambda: id(slot${n}).request_full_charge();
+  - platform: template
+    name: "Slot ${n} measure internal resistance"
+    icon: mdi:omega
+    entity_category: diagnostic
+    on_press:
+      - lambda: id(slot${n}).request_resistance_measurement();
+
+parkside_slot:
+  - id: slot${n}
+    slot_number: ${n}
+    i2c_id: slot${n}_bus
+    address: 0x68
+    cells: 5
+    sense_resistor: 0.010 # RSNSB on the slot board
+    input_sense_resistor: 0.010 # RSNSI
+    input_current_limit: 3A
+    max_charge_current: 1.5A
+    presence_switch: slot${n}_switch
+    bms_fault_input: slot${n}_bms_fault
+    ntc_beta: 3380 # Murata NCP18XH103F03RB on the slot board
+    led_red: slot${n}_led_r
+    led_green: slot${n}_led_g
+    led_blue: slot${n}_led_b
+    bleed_output: slot${n}_bleed # remove if R_bleed is not fitted
+    bleed_resistance: 200 ohm
+    mode_select: slot${n}_mode
+    max_current_number: slot${n}_max_current
+    nominal_capacity_number: slot${n}_nominal_capacity
+    present:
+      name: "Slot ${n} battery present"
+    status:
+      name: "Slot ${n} status"
+    health_status:
+      name: "Slot ${n} health"
+    battery_voltage:
+      name: "Slot ${n} voltage"
+    charge_current:
+      name: "Slot ${n} charge current"
+    state_of_charge:
+      name: "Slot ${n} state of charge"
+    battery_temperature: # 10k NTC on the slot board, next to the battery contacts
+      name: "Slot ${n} contact temperature"
+    internal_resistance:
+      name: "Slot ${n} internal resistance"
+    capacity_estimate:
+      name: "Slot ${n} capacity (estimated)"
+    health:
+      name: "Slot ${n} health (capacity)"
+    self_discharge:
+      name: "Slot ${n} self-discharge"
+    charged_capacity:
+      name: "Slot ${n} charged since insertion"
+      entity_category: diagnostic
+    input_power:
+      name: "Slot ${n} input power"
+      entity_category: diagnostic
+    charger_temperature:
+      name: "Slot ${n} charger temperature"
