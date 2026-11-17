@@ -3,8 +3,9 @@
 Prices are rough unit prices in EUR (small quantities, without VAT and shipping); use them for
 budgeting only. Links go to **DigiKey Ireland** where DigiKey stocks the part (most of them are
 searches for the exact manufacturer part number, which open the product page directly), and to
-**Amazon.ie** for generic hardware. Only two parts need another vendor: the ESP32-C6 D1 module
-(Tindie) and the PCBs (JLCPCB, Gerbers in `electronics/*/fab`).
+**Amazon.ie** for generic hardware. A few parts need another vendor: the ESP32-C6 D1 module
+(Tindie), the PCBs (JLCPCB, Gerbers in `electronics/*/fab`) and the brass strip for the contact
+blades (Farnell Ireland).
 
 The per-board BOMs with every passive and the pick-and-place files are generated with the boards:
 [`electronics/slot-board/fab/slot_board_bom.csv`](electronics/slot-board/fab/slot_board_bom.csv) and
@@ -45,12 +46,12 @@ Subtotal: **≈ €21** per slot
 |---:|---|---|---:|---|---|
 | 1 | Microswitch with lever | Omron D2F-01L | 1.50 | clones ~0.30 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=D2F-01L) |
 | 1 | LED 5 mm RGB common cathode diffused | Kingbright L-154A4SUREQBFZGEW | 0.60 | standard T-1 3/4: 5.8 mm flange; driven from PCA9554 at 5 V | [DigiKey](https://www.digikey.ie/en/products/result?keywords=L-154A4SUREQBFZGEW) |
-| 3 | Brass strip 0.8 x 6 x 50 mm (contact blade: +, ID, −) | Albion Alloys 6 x 0.8 mm brass strip, 305 mm (pack of 4) | 0.10 | one pack = 24 blades = 8 slots; Faston tabs are too short for the contact block + end wall + bevel | [Amazon.ie](https://www.amazon.ie/Albion-Alloys-0-8mm-Brass-Strip/dp/B00CEHFF20) |
+| 3 | Brass strip 0.81 x 6.35 x 50 mm (contact blade: +, ID, −) | K&S 8240, 0.032" x 1/4" x 12" (300 mm); Farnell order code 3377132 | 0.43 | one 300 mm strip = 6 blades: 16 slots need 8 strips (about €2.59 each); Faston tabs are too short for the contact block + end wall + bevel | [Farnell Ireland](https://ie.farnell.com/k-s/ks8240/brass-strip-0-032-x-1-4-x-12/dp/3377132) |
 | 1 | Wood screw 4x25 countersunk (flat head) |  | 0.03 | front - centre of the channel ceiling | [Amazon.ie](https://www.amazon.ie/s?k=wood%20screws%204x25%20countersunk) |
 | 1 | Wood screw 4x25 pan head |  | 0.03 | rear - inside the bay, through the hole in the slot PCB | [Amazon.ie](https://www.amazon.ie/s?k=wood%20screws%204x25%20pan%20head) |
 | 1 | 2-wire jumper 1.5 mm2 with ferrules (24 V daisy chain) |  | 0.50 | slot J6 OUT -> next slot J1 IN | [Amazon.ie (wire)](https://www.amazon.ie/s?k=1.5mm2%20silicone%20wire%20red%20black)<br>[Amazon.ie (ferrules)](https://www.amazon.ie/s?k=ferrule%20crimp%20kit%201.5mm2) |
 
-Subtotal: **≈ €3** per slot
+Subtotal: **≈ €4** per slot
 
 ## Controller (once)
 
@@ -110,7 +111,7 @@ Subtotal: **≈ €15**
 
 | | ≈ € |
 |---|---:|
-| Per slot (board + module) | 24 |
+| Per slot (board + module) | 25 |
 | Fixed (controller, power supply, filament, safety) | 156 |
-| 8 slots | 345 |
-| 16 slots | 534 |
+| 8 slots | 354 |
+| 16 slots | 551 |

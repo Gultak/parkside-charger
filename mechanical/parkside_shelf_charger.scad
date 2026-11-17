@@ -71,7 +71,7 @@ latch_prof = [[nose_l + 0.2, 1.7], [52.9, 1.8], [50.5, 5], [49.5, 5], [front_l, 
 contact_x   = [-12, -4, 4, 12];   // measured: 8 mm pitch; seen from the front: +, ID, T, - (T not used)
 contact_z   = 5.5;  // tab centre below the plate face
 contact_len = 8;    // how far the tab sticks out of the contact face (battery slots are 9.8 deep)
-tab_w       = 6.0;   // Albion Alloys 6 x 0.8 mm brass strip
+tab_w       = 6.35;  // K&S 8240 brass strip 0.032 x 1/4" (0.81 x 6.35 mm)
 tab_t       = 0.8;
 tab_vertical = true; // blade plane vertical (true) or horizontal (false)
 
