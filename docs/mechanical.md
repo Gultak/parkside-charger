@@ -205,7 +205,7 @@ No cable has to be threaded through a part before it is connected.
 
 **Daisy chain:**
 - Each slot's 24 V OUT (J6, XT30 female) goes to the next slot's IN (J1, XT30 male) with a short
-  cable: a pre-made XT30 male-female extension, 10-15 cm (about 8 cm of free wire is needed). XT30s
+  cable: a pre-made XT30 male-female extension, 16 AWG, 20 cm (about 8 cm of free wire is needed; tuck the slack behind the module). XT30s
   are polarised and gendered, so a cable can't be plugged in reversed or OUT to OUT. The XT30s
   stick out of the board's rear edge into the cover's left cable cut-out.
 - The controller's OUT A feeds the first slot of row 1, and OUT B the first slot of row 2.

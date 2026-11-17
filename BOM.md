@@ -57,7 +57,7 @@ Subtotal: **≈ €20** per slot, of which to buy **≈ €20**
 | 3 | 6.3 mm male crimp tab with locking lance (+, ID, −) | the spade connectors | 0.10 | clicks into the contact block | ✅ at hand |  |
 | 0.5 | m wire 0.75 mm², three colours |  | 0.80 | contact tabs to J3 | ✅ at hand |  |
 | 2 | Wood screws 4x25 (1 countersunk, 1 pan head) |  | 0.03 |  | ✅ at hand |  |
-| 1 | XT30 extension cable male-female, 10-15 cm, 16 AWG (18 AWG is enough) | pre-made | 1.50 | chain cable OUT -> next slot's IN (about 8 cm of free wire needed) | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=XT30%20extension%20cable%20male%20female%2010cm) |
+| 1 | XT30 extension cable male-female, 16 AWG, 20 cm (10 cm only if that is the free wire length) | pre-made | 1.50 | chain cable OUT -> next slot's IN (about 8 cm of free wire needed) | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=XT30%20extension%20cable%20male%20female%2010cm) |
 
 Subtotal: **≈ €5** per slot, of which to buy **≈ €4**
 
