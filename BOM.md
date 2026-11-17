@@ -45,13 +45,13 @@ Subtotal: **≈ €21** per slot
 |---:|---|---|---:|---|---|
 | 1 | Microswitch with lever | Omron D2F-01L | 1.50 | clones ~0.30 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=D2F-01L) |
 | 1 | LED 5 mm RGB common cathode diffused | Kingbright L-154A4SUREQBFZGEW | 0.60 | standard T-1 3/4: 5.8 mm flange; driven from PCA9554 at 5 V | [DigiKey](https://www.digikey.ie/en/products/result?keywords=L-154A4SUREQBFZGEW) |
-| 3 | FASTON 250 male crimp tab, 6.35 x 0.81 mm, uninsulated, 22-18 AWG (+, ID, −) | TE Connectivity 42475-4 | 0.30 | sits in the contact block, wire straight to J3 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=42475-4) |
+| 3 | 6.3 mm (FASTON 250) male crimp tab with **locking lance** (housing-lock type), 6.2-6.35 x 0.7-0.8 mm, uninsulated, for 0.5-1.5 mm² (+, ID, −) | generic; the pocket is sized for 14 mm tip to side ears, lance end 13 mm from the tip | 0.10 | clicks into the contact block, wire straight to J3 | [Amazon.ie](https://www.amazon.ie/s?k=6.3mm%20male%20crimp%20terminal%20locking%20tongue)<br>[DigiKey](https://www.digikey.ie/en/products/result?keywords=250%20tab%20housing%20lock) |
 | 0.5 | m silicone wire 0.75 mm² (18 AWG), red / black / one more colour | | 0.80 | 3 x about 15 cm per slot (contact tabs to J3) | [Amazon.ie](https://www.amazon.ie/s?k=18AWG%20silicone%20wire%20set) |
 | 1 | Wood screw 4x25 countersunk (flat head) |  | 0.03 | front - centre of the channel ceiling | [Amazon.ie](https://www.amazon.ie/s?k=wood%20screws%204x25%20countersunk) |
 | 1 | Wood screw 4x25 pan head |  | 0.03 | rear - inside the bay, through the hole in the slot PCB | [Amazon.ie](https://www.amazon.ie/s?k=wood%20screws%204x25%20pan%20head) |
 | 1 | 2-wire jumper 1.5 mm2 with ferrules (24 V daisy chain) |  | 0.50 | slot J6 OUT -> next slot J1 IN | [Amazon.ie (wire)](https://www.amazon.ie/s?k=1.5mm2%20silicone%20wire%20red%20black)<br>[Amazon.ie (ferrules)](https://www.amazon.ie/s?k=ferrule%20crimp%20kit%201.5mm2) |
 
-Subtotal: **≈ €4** per slot
+Subtotal: **≈ €3.5** per slot
 
 ## Controller (once)
 
@@ -112,7 +112,7 @@ Subtotal: **≈ €15**
 
 | | ≈ € |
 |---|---:|
-| Per slot (board + module) | 25 |
+| Per slot (board + module) | 24 |
 | Fixed (controller, power supply, filament, safety) | 181 |
-| 8 slots | 379 |
-| 16 slots | 577 |
+| 8 slots | 374 |
+| 16 slots | 567 |

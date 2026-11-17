@@ -81,7 +81,7 @@
 | Front end | From the reference holder: lips start 28.6 mm in front of the contact face; walls slope away at 45° and reach the plate face 43 mm in front of it; frame front 45.5 mm, nose tip 55 mm in front of it | `lip_l`, `lead_in`, `slope_l`, `front_l`, `nose_l`, `nose_w` |
 | Tongue end | Prongs beside the contact pocket reach 14 mm past the contact face; pocket 30 mm wide with 4 mm 45° chamfers; wide part tapers 4 mm over the last 7 mm (from the reference holder model) | `prong_l` = 14, `cblock_w` = 29.6, `cblock_ch` = 4, `wing_l` = 7 |
 | Battery top surface | 4–5 mm below the tongue top, about as high as the latch tooth. Beside the tongue there is a trough down to below the grooves, at least ±34.9 mm wide (the reference holder fills it) | `body_top` = 4, `trough_x` = 34.9. Inside the trough: rail walls and ribs. Outside it, nothing reaches more than 3.5 mm below the tongue top: the edge bars, dovetail and LED sit in the 10 mm plate (`plate_t` = 10) |
-| Contacts | 4 slots at an 8 mm pitch, 9.8 mm deep, 0.8 mm blades fit. Seen from the front (tongue pointing away): **+, ID, T, −**. Tabs for **+, ID and −** only; T is not used | `contact_x` = −12, −4, 4, 12; `contact_used`; `contact_len` = 6.5 (FASTON 250 tab: `tab_w`, `tab_t`, `tab_flat`, `barrel_w`) |
+| Contacts | 4 slots at an 8 mm pitch, 9.8 mm deep, 0.8 mm blades fit. Seen from the front (tongue pointing away): **+, ID, T, −**. Tabs for **+, ID and −** only; T is not used | `contact_x` = −12, −4, 4, 12; `contact_used`; `contact_len` = 6.5 (tab: `tab_w`, `tab_t`, `tab_flat`, `ear_w`, `lance_*`, `barrel_w`) |
 
 ![Section through two slots with the measured battery profile](img/battery_fit_section.png)
 
@@ -118,7 +118,7 @@ Then:
 3. Print `stl/end_gauge.stl`: the last 28 mm of the channel with the contact block, prong
    pockets, end wall and contact slots, printed standing on its rear face. Slide the pack in: the
    prongs must reach the end wall freely, and the contact face must sit against the block. Fit
-   two crimped tabs (no epoxy yet) to check that they meet the pack's slots (`contact_z`) and
+   two crimped tabs to check that they click in, that they meet the pack's slots (`contact_z`) and
    reach deep enough into them (`contact_len`).
 4. Print **one** full slot module and test it with the contacts in place before printing ten.
 
@@ -156,7 +156,7 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 |---|---|
 | 1 | Wood screw **4 × 25 mm countersunk (flat head)**, front, in the centre of the channel ceiling. The head sits 0.4 mm below the surface so the battery slides over it |
 | 1 | Wood screw **4 × 25 mm pan head**, at the rear, inside the bay above the PCB: drive it from below (cover off) through the 10 mm hole in the slot PCB. The plate is 10 mm thick, leaving 15 mm in an 18 mm shelf. The screw must stay at least 2 mm shorter than plate + shelf |
-| 3 | **Contact tabs:** FASTON 250 male crimp tabs, 6.35 × 0.81 mm, uninsulated, for 22–18 AWG (**TE 42475-4**), one each for +, ID and − (the T contact stays empty). Crimp each onto about 15 cm of **0.75 mm² (18 AWG) silicone wire** (red for +, black for −, any colour for ID) with an open-barrel crimper. Before the slot board goes in, push each crimped tab **tip first from the bay side** into its pocket, with the barrel facing the **middle** of the block, until its widening seats on the taper: the tab then sticks out of the contact face by about 6.5 mm (`contact_len`). Fill the pocket behind it with a drop of epoxy. The wires go straight to the slot board's J3. Check `tab_flat` (tip to where the tab widens) against your terminals before printing. |
+| 3 | **Contact tabs:** 6.3 mm (FASTON 250) male crimp tabs with a **locking lance** (the housing-lock type: a springy tongue punched out of the blade near its root), uninsulated, one each for +, ID and − (the T contact stays empty). Crimp each onto about 15 cm of **0.75 mm² (18 AWG) silicone wire** (red for +, black for −, any colour for ID) with an open-barrel crimper. Before the slot board goes in, push each tab **tip first from the bay side** into its pocket, with the barrel and the lance facing the **middle** of the block, until it clicks: the side ears then sit on the taper and the lance has sprung out behind a ledge, so the tab can move neither way. It sticks out of the contact face by about 6.5 mm (`contact_len`). A drop of epoxy is optional. Once clicked in, a tab only comes out by force, so try the fit on the end gauge first. The pockets are sized for tabs 6.2 × 0.7 mm, 14 mm from the tip to the ears (`tab_flat`), lance from 9 to 13 mm (`lance_root`, `lance_end`), standing 2 mm off the blade (`lance_h`), ears 8 mm across (`ear_w`): measure yours and adjust. |
 | 1 | Microswitch Omron D2F-01L (or SS-5GL with lever) + 2 × M2 × 8 self-tapping screws |
 | 1 | 5 mm (T-1¾) RGB LED, **common cathode**, diffused, e.g. Kingbright L-154A4SUREQBFZGEW. Any standard 5 mm LED with a 5.8 mm flange fits. 4-wire cable to the slot PCB |
 | 1 | Slot PCB 72 × 47.5 mm (slides into the card guides from the rear) |

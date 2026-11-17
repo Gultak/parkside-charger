@@ -72,11 +72,15 @@ contact_x   = [-12, -4, 4, 12];   // measured: 8 mm pitch; seen from the front: 
 contact_z   = 5.5;  // tab centre below the plate face
 contact_used = [true, true, false, true];   // + ID T -: T needs no tab
 contact_len = 6.5;  // how far the tab tip sticks out of the contact face (battery slots are 9.8 deep)
-tab_w       = 6.35; // tab width
-tab_t       = 0.81; // tab thickness
-tab_flat    = 8.2;  // flat tab length, tip to where it starts to widen into the crimp barrel  CHECK on your part
+tab_w       = 6.2;  // tab width            (measured on the user's 6.3 mm housing-lock tabs)
+tab_t       = 0.7;  // tab thickness
+tab_flat    = 14;   // flat tab length, tip to where the side ears widen it
+ear_w       = 8.0;  // width across the side ears (the forward stop)  CHECK on your part
+lance_root  = 9;    // locking lance: root, measured from the tip
+lance_end   = 13;   // free end of the lance from the tip (measured 12.5-13: use the far value)
+lance_h     = 2;    // how far the lance end stands off the blade
 barrel_w    = 5.0;  // pocket for the crimped barrel + wire, across the tab plane (the tab is vertical);
-                    // the barrel sits on one side of the tab plane: fit the tabs barrel-side inwards
+                    // barrel and lance sit on the same side of the tab plane: fit them facing inwards
 tab_vertical = true; // blade plane vertical (the pockets assume this)
 
 /* [Module frame] */
@@ -119,9 +123,9 @@ pcb_t = 1.6;
 pcb_z = 9;      // PCB bottom face below plate face
 
 /* [Microswitch: Omron D2F-01L / similar, M2 holes 6.5 mm apart] */
-sw_x    = -18;  // switch window centre from channel centre (behind the left prong)
+sw_x    = -18.5;// switch window centre from channel centre (behind the left prong)
 sw_z    = 3.5;
-sw_win  = [9, 4];   // window through the end stop for the lever (X, Z)
+sw_win  = [8, 4];   // window through the end stop for the lever (X, Z)
 
 /* [Status LED: 5 mm RGB (T-1 3/4) in the front face of the right edge bar, inserted FROM THE FRONT] */
 // Standard 5 mm LED: 5.0 mm body, 5.8 mm flange, ~8.6 mm flange-to-dome-tip.
@@ -357,20 +361,35 @@ module slot_module() {
                            [for (q = latch_prof) [q[1], rail_len - q[0]]],
                            [[-eps, rail_len - front_l + eps]]));
 
-        // crimp-tab pockets: a slot for the flat tab at the front, a 45 deg taper where the
-        // terminal widens, then the pocket for the crimp barrel and wire straight back into
-        // the bay. The taper is the stop; a drop of epoxy in the pocket holds the tab.
+        // crimp-tab pockets: a slot for the flat tab at the front, a wedge-shaped window
+        // the locking lance springs into, then a 45 deg taper where the side ears sit
+        // (forward stop) and the pocket for the barrel and wire straight back into the bay;
+        // a slit in the tab plane lets the ears through.
+        // Pushed in from the bay, the lance clicks in behind the ledge and holds the tab
+        // against the battery pushing it back.
         for (i = [0 : len(contact_x) - 1]) if (contact_used[i]) let (x = contact_x[i], zc = -contact_z,
                 ya = y_stop - contact_len + tab_flat, h = tab_w + 0.3, ts = tab_t + 0.15,
-                sd = x < 0 ? 1 : -1,                                     // barrel side: towards the centre
+                he = ear_w + 0.4,
+                sd = x < 0 ? 1 : -1,                                     // barrel/lance side: towards the centre
+                xf = x + sd * ts / 2,                                    // blade face on that side
                 x0 = sd > 0 ? x - ts / 2 - 0.15 : x + ts / 2 + 0.15 - barrel_w, // pocket [x0, x0 + barrel_w]
-                yb = ya + barrel_w - ts - 0.15) {                         // end of the 45 deg taper
+                yb = ya + barrel_w - ts - 0.15,                          // end of the 45 deg taper
+                yl0 = y_stop - contact_len + lance_root - 0.3,           // lance window: root ...
+                yl1 = y_stop - contact_len + lance_end + 0.15,           // ... to the ledge it catches on
+                lw = lance_h + 0.4) {
             translate([x - ts / 2, y_stop - cblock_ch - eps, zc - h / 2]) cube([ts, ya - y_stop + cblock_ch + eps, h]);
+            hull() {                                                       // lance window (wedge: no overhang)
+                translate([xf - (sd > 0 ? eps : 0), yl0, zc - h / 2]) cube([eps, eps, h]);
+                translate([sd > 0 ? xf - eps : xf - lw, yl1 - eps, zc - h / 2]) cube([lw + eps, eps, h]);
+            }
             hull() {
                 translate([x - ts / 2, ya - eps, zc - h / 2]) cube([ts, eps, h]);
                 translate([x0, yb, zc - h / 2]) cube([barrel_w, eps, h]);
             }
             translate([x0, yb, zc - h / 2]) cube([barrel_w, y_bay0 + wall_h + 1 - yb, h]);
+            // slit for the side ears in the tab plane, behind the stop; open at the bottom
+            // (the ears reach to 0.4 mm above the block's underside: no skin worth keeping)
+            translate([x - ts / 2 - 0.15, ya, -wall_h - 1]) cube([ts + 0.3, y_bay0 + wall_h + 1 - ya, wall_h + 1 - contact_z + he / 2]);
         }
 
         // microswitch lever window + 2x M2 pilot holes (switch screwed to the
