@@ -9,7 +9,7 @@ import pcbnew
 
 
 
-def run_fab(PARTS, project, board_dir):
+def run_fab(PARTS, project, board_dir, exclude=None):
   root = Path(board_dir).resolve()
   pcb = root / f"{project}.kicad_pcb"
   fab = root / "fab"
@@ -46,17 +46,35 @@ def run_fab(PARTS, project, board_dir):
           z.write(f, f.name)
   print("gerbers:", len(list(gdir.iterdir())), "files ->", fab / f"{project}_gerbers.zip")
 
-  # --- BOM (grouped)
-  groups = {}
-  for ref, (value, _s, fp, _p, mpn) in PARTS.items():
-      groups.setdefault((value, fp.split(":")[1], mpn), []).append(ref)
-  with open(fab / f"{project}_bom.csv", "w", newline="") as f:
-      w = csv.writer(f)
-      w.writerow(["Qty", "References", "Value", "Footprint", "MPN / notes"])
-      for (value, fp, mpn), refs in sorted(groups.items(), key=lambda kv: kv[1][0]):
-          refs.sort(key=lambda r: (r.rstrip("0123456789"), int(r[len(r.rstrip("0123456789")):])))
-          w.writerow([len(refs), " ".join(refs), value, fp, mpn])
-  print("BOM:", len(groups), "lines")
+  write_bom(PARTS, project, fab, exclude or {})
 
   # --- schematic PDF
   run("kicad-cli", "sch", "export", "pdf", "-o", str(root / f"{project}_schematic.pdf"), str(root / f"{project}.kicad_sch"))
+
+
+def write_bom(PARTS, project, fab, exclude):
+  """Two grouped BOMs: <project>_bom.csv is the order list for DigiKey's BOM Manager (parts
+  in `exclude` - at hand, or bought elsewhere - left out); <project>_bom_all.csv lists every
+  part with a Source column."""
+  def key(r):
+      return (r.rstrip("0123456789"), int(r[len(r.rstrip("0123456789")):]))
+  def groups(refs):
+      g = {}
+      for ref in refs:
+          value, _s, fp, _p, mpn = PARTS[ref]
+          g.setdefault((value, fp.split(":")[1], mpn, exclude.get(ref, "DigiKey (this CSV)")), []).append(ref)
+      return sorted(g.items(), key=lambda kv: key(min(kv[1], key=key)))
+  order = [r for r in PARTS if r not in exclude]
+  with open(fab / f"{project}_bom.csv", "w", newline="") as f:
+      w = csv.writer(f)
+      w.writerow(["Qty", "References", "Value", "Footprint", "MPN / notes"])
+      for (value, fp, mpn, _src), refs in groups(order):
+          refs.sort(key=key)
+          w.writerow([len(refs), " ".join(refs), value, fp, mpn])
+  with open(fab / f"{project}_bom_all.csv", "w", newline="") as f:
+      w = csv.writer(f)
+      w.writerow(["Qty", "References", "Value", "Footprint", "MPN / notes", "Source"])
+      for (value, fp, mpn, src), refs in groups(PARTS):
+          refs.sort(key=key)
+          w.writerow([len(refs), " ".join(refs), value, fp, mpn, src])
+  print("BOM:", len(groups(order)), "lines to order,", len(PARTS) - len(order), "parts excluded")

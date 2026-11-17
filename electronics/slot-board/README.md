@@ -5,8 +5,17 @@ One per battery slot. It holds the LTC4162-LAD 5S Li-ion charger, the PCA9554 sl
 **72 × 47.5 mm, 4 layers** (In1/In2 = solid GND planes), all parts on the top side. A **10 mm
 hole** at (40.5, 25) gives screwdriver access to the module's rear mounting screw.
 
-![Top copper, coloured by net](img/pcb_top.png)
-![Top side with silkscreen](img/pcb_top_silkscreen.png)
+| Top (parts side) with silkscreen | Bottom copper |
+|---|---|
+| ![Top side with silkscreen](img/pcb_top_silkscreen.png) | ![Bottom copper, coloured by net](img/pcb_bottom.png) |
+| **Inner layer 1** (In1) | **Inner layer 2** (In2) |
+| ![Inner layer 1](img/pcb_inner1.png) | ![Inner layer 2](img/pcb_inner2.png) |
+
+**Why 4 layers?** Two would work electrically, but the LTC4162 is a 1.5 MHz buck converter
+switching several amps: a solid GND plane directly under the top layer keeps the hot loop small,
+the current-sense lines quiet and the EMI low, and spreads the heat of the QFN, inductor and
+MOSFETs. For small boards like this one, 4 layers cost only a little more than 2 at JLCPCB,
+so it isn't worth the risk.
 
 | File | |
 |---|---|
@@ -26,11 +35,11 @@ hole** at (40.5, 25) gives screwdriver access to the module's rear mounting scre
   - L1 = 6.8 µH XAL6060
   - R_SNSB = R_SNSI = 10 mΩ (max 3.2 A charge / input)
   - INFET and BATFET are N-channel FDMC8327L
-- **Input:** J1 (24 V IN) and J6 (24 V OUT) are 2-pole 5.08 mm screw terminals, connected
-  straight through so the slots **daisy-chain**. The +24 V pins sit next to each other
-  (`GND +24V | +24V GND`), so a chain jumper never crosses over. The pass-through copper is a
+- **Input:** J1 (24 V IN, XT30PW-M male) and J6 (24 V OUT, XT30PW-F female) are right-angle XT30s
+  sticking out of the rear edge, connected straight through so the slots **daisy-chain**. XT30s
+  are polarised and gendered, so a chain cable only fits OUT → IN, the right way round. The pass-through copper is a
   pour on both outer layers (for the chain current), and GND passes through the two inner planes.
-  Behind the terminals come a 5 A fuse, an SMBJ26A TVS and 47 µF of bulk capacitance.
+  Behind the connectors come a 5 A fuse, an SMBJ26A TVS and 47 µF of bulk capacitance.
 - **Battery:** J3 (B+, B−, ID) goes through a mandatory 5 A fuse F2. The pack charges directly on
   B+/B−.
 - **Pack BMS signal (ID contact):** 10 kΩ pull-up to 5 V (R15, like the Parkside charger), RC

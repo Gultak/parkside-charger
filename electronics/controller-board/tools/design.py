@@ -3,15 +3,18 @@
 ESP32-C6 D1 (xyzroe) in female Dupont headers, 2x TCA9548A = 16 slot I2C channels (each with
 4.7 k pull-ups to the 5 V slot rail - the TCA9548A at 3.3 V level-shifts), switched
 24 V output to two slot daisy chains, 24 V -> 5 V SIP regulator, supply voltage
-sensing, buzzer, SHT40 + Qwiic + expansion headers.
+sensing, buzzer, SHT21 + Qwiic + expansion headers.
 """
 
 # fmt: off
 PARTS = {
     # ------------------------------------------------------------- 24 V in --
-    "J1": ("24V PSU IN", "Connector:Screw_Terminal_01x02",
-           "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
-           {"1": "+24V_IN", "2": "GND"}, "Phoenix 1715721 (MKDS 1,5/2-5,08), 13.5 A"),
+    # same pinout as the LOP-300 output (CN2, B6P-VH): a 1:1 cable with VHR-6N housings at
+    # both ends; pins 1-3 +V, 4-6 -V, 10 A per contact with 18 AWG
+    "J1": ("24V PSU IN", "Connector_Generic:Conn_01x06",
+           "Connector_JST:JST_VH_B6P-VH_1x06_P3.96mm_Vertical",
+           {"1": "+24V_IN", "2": "+24V_IN", "3": "+24V_IN", "4": "GND", "5": "GND", "6": "GND"},
+           "JST B6P-VH (pins 1-3 +V, 4-6 -V, as on the LOP-300 CN2)"),
     "F1": ("10A mini blade", "Device:Fuse", "Fuse:Fuseholder_Blade_Mini_Keystone_3568",
            {"1": "+24V_IN", "2": "+24V"}, "Keystone 3568 holder + 10 A mini blade fuse"),
     "D1": ("SMBJ26A", "Device:D_Zener", "Diode_SMD:D_SMB", {"1": "+24V", "2": "GND"}, "TVS 26 V"),
@@ -29,12 +32,14 @@ PARTS = {
     "R3": ("100", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "BUS_EN_IO", "2": "BUS_EN"}, ""),
     "R4": ("100k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "BUS_EN", "2": "GND"},
            "default off while the ESP boots / resets"),
-    "J2": ("24V OUT A", "Connector:Screw_Terminal_01x02",
-           "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
-           {"1": "+24V_SW", "2": "GND"}, "to the first slot of chain A (slot J1 IN)"),
-    "J3": ("24V OUT B", "Connector:Screw_Terminal_01x02",
-           "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
-           {"1": "+24V_SW", "2": "GND"}, "to the first slot of chain B"),
+    # XT30 female, vertical: the chain cable plugs in from above. Same pin assignment on every
+    # XT30 in the system: 1 = GND, 2 = +24V
+    "J2": ("24V OUT A", "Connector_Generic:Conn_01x02",
+           "Connector_AMASS:AMASS_XT30UPB-F_1x02_P5.0mm_Vertical",
+           {"1": "GND", "2": "+24V_SW"}, "Amass XT30UPB-F: to the first slot of chain A (slot J1 IN)"),
+    "J3": ("24V OUT B", "Connector_Generic:Conn_01x02",
+           "Connector_AMASS:AMASS_XT30UPB-F_1x02_P5.0mm_Vertical",
+           {"1": "GND", "2": "+24V_SW"}, "Amass XT30UPB-F: to the first slot of chain B"),
     # voltage sensing (24.5 V -> 2.2 V at the ADC)
     "R5": ("100k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "+24V_SW", "2": "VS_OUT"}, ""),
     "R6": ("10k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "VS_OUT", "2": "GND"}, ""),
@@ -68,8 +73,8 @@ PARTS = {
     "R13": ("100k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "BUZ", "2": "GND"}, ""),
     "D3": ("1N4148W", "Device:D", "Diode_SMD:D_SOD-123", {"1": "+5V", "2": "BUZ_N"}, ""),
     # ------------------------------------------------------ headers --------
-    "J4": ("SHT40", "Connector_Generic:Conn_01x04", "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
-           {"1": "+3V3", "2": "GND", "3": "SCL", "4": "SDA"}, "SHT40 breakout (VIN GND SCL SDA), on a cable"),
+    "J4": ("SHT21", "Connector_Generic:Conn_01x04", "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+           {"1": "+3V3", "2": "GND", "3": "SCL", "4": "SDA"}, "SHT21 breakout (VIN GND SCL SDA), on a Dupont cable; check the order on your board"),
     "J5": ("QWIIC", "Connector_Generic:Conn_01x04",
            "Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
            {"1": "GND", "2": "+3V3", "3": "SDA", "4": "SCL"}, "Qwiic / STEMMA QT spare I2C"),
@@ -116,3 +121,12 @@ NO_CONNECT = {"U2": ["1"]}
 DEFAULT_WIDTH = 0.2
 NET_WIDTH = {"+5V": 0.6, "+5V_SLOT": 0.5, "+3V3": 0.4, "+24V": 0.6, "MUX_RST": 0.25}
 # fmt: on
+
+
+# left out of fab/controller_board_bom.csv (the DigiKey order list); listed in fab/controller_board_bom_all.csv
+NOT_IN_ORDER_BOM = {
+    "J1": "at hand (JST B6P-VH)", "U2": "at hand (ESP32-C6 D1 + headers)",
+    "J4": "at hand (2.54 mm pin header)", "J6": "at hand (2.54 mm pin header)",
+    "J2": "Amazon.ie (XT30UPB-F, not at DigiKey)", "J3": "Amazon.ie (XT30UPB-F, not at DigiKey)",
+    "H1": "mounting hole", "H2": "mounting hole", "H3": "mounting hole", "H4": "mounting hole",
+}

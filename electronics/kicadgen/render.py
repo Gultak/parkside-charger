@@ -21,7 +21,7 @@ def color(net):
     return int(r * 255), int(g * 255), int(b * 255)
 
 
-def render(pcb, outdir, layers=("top", "bottom")):
+def render(pcb, outdir, layers=("top", "inner1", "inner2", "bottom")):
     board = pcbnew.LoadBoard(pcb)
     bb = board.GetBoardEdgesBoundingBox()
     x0, y0 = pcbnew.ToMM(bb.GetX()), pcbnew.ToMM(bb.GetY())
@@ -36,7 +36,8 @@ def render(pcb, outdir, layers=("top", "bottom")):
         font = ImageFont.load_default()
     out = Path(outdir)
     out.mkdir(parents=True, exist_ok=True)
-    for lname, layer in (("top", pcbnew.F_Cu), ("bottom", pcbnew.B_Cu), ("inner1", pcbnew.In1_Cu)):
+    for lname, layer in (("top", pcbnew.F_Cu), ("bottom", pcbnew.B_Cu), ("inner1", pcbnew.In1_Cu),
+                          ("inner2", pcbnew.In2_Cu)):
         if lname not in layers:
             continue
         img = Image.new("RGB", (int(W * SCALE) + 1, int(H * SCALE) + 1), (15, 15, 20))

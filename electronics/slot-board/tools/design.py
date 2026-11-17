@@ -14,12 +14,14 @@ PARTS = {
     # ---------------------------------------------------------------- input --
     # 24 V daisy chain: J1 = IN, J6 = OUT, connected straight through (the
     # +24 V pins sit next to each other: GND +24V | +24V GND). Rated 13.5 A.
-    "J1": ("24V IN", "Connector:Screw_Terminal_01x02",
-           "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
-           {"1": "GND", "2": "+24V"}, "Phoenix 1715721 (MKDS 1,5/2-5,08)"),
-    "J6": ("24V OUT", "Connector:Screw_Terminal_01x02",
-           "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
-           {"1": "+24V", "2": "GND"}, "Phoenix 1715721 (MKDS 1,5/2-5,08)"),
+    # XT30: polarised and gendered, so a chain cable can only go OUT (female) -> IN (male),
+    # the right way round. Same pin assignment on every XT30 in the system: 1 = GND, 2 = +24V.
+    "J1": ("24V IN", "Connector_Generic:Conn_01x02",
+           "Connector_AMASS:AMASS_XT30PW-M_1x02_P2.50mm_Horizontal",
+           {"1": "GND", "2": "+24V"}, "Amass XT30PW-M (male, right angle): 24 V from the previous slot / controller"),
+    "J6": ("24V OUT", "Connector_Generic:Conn_01x02",
+           "Connector_AMASS:AMASS_XT30PW-F_1x02_P2.50mm_Horizontal",
+           {"1": "GND", "2": "+24V"}, "Amass XT30PW-F (female, right angle): 24 V on to the next slot"),
     "F1": ("5A fast", "Device:Fuse", "Fuse:Fuse_1206_3216Metric",
            {"1": "+24V", "2": "VIN"}, "Littelfuse 0466005.NR (1206, 5 A, very fast)"),
     "D1": ("SMBJ26A", "Device:D_Zener", "Diode_SMD:D_SMB",
@@ -112,14 +114,14 @@ PARTS = {
             "8": "GND", "9": "IO4", "10": "ALERT", "11": "BMS_FAULT", "16": "+5V", "14": "SCL", "15": "SDA"},
            "NXP PCA9554PW (or TCA9554PWR), address 0x20"),
     "C13": ("100n", "Device:C", "Capacitor_SMD:C_0603_1608Metric", {"1": "+5V", "2": "GND"}, ""),
-    "J4": ("SWITCH", "Connector_Generic:Conn_01x02", "Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical",
-           {"1": "SW_IN", "2": "GND"}, "presence microswitch, closes to GND"),
+    "J4": ("SWITCH", "Connector_Generic:Conn_01x02", "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
+           {"1": "SW_IN", "2": "GND"}, "2.54 mm pin header (Dupont cable): presence microswitch, closes to GND"),
     "C14": ("100n", "Device:C", "Capacitor_SMD:C_0603_1608Metric", {"1": "SW_IN", "2": "GND"}, "debounce"),
     "R8": ("560", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "IO1", "2": "LED_R"}, "red"),
     "R9": ("270", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "IO2", "2": "LED_G"}, "green"),
     "R10": ("270", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "IO3", "2": "LED_B"}, "blue"),
-    "J5": ("LED", "Connector_Generic:Conn_01x04", "Connector_JST:JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical",
-           {"1": "GND", "2": "LED_R", "3": "LED_G", "4": "LED_B"}, "RGB LED, common cathode on pin 1"),
+    "J5": ("LED", "Connector_Generic:Conn_01x04", "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+           {"1": "GND", "2": "LED_R", "3": "LED_G", "4": "LED_B"}, "2.54 mm pin header (Dupont cable): RGB LED, common cathode on pin 1"),
     # ---------------------------------------------------------------- bleed --
     "R11": ("100", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "IO4", "2": "BLEED_G"}, ""),
     "R12": ("100k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "BLEED_G", "2": "GND"}, ""),
@@ -152,3 +154,10 @@ def nets():
 if __name__ == "__main__":
     for n, conns in sorted(nets().items()):
         print(f"{n:10s} {len(conns):2d}  " + " ".join(f"{r}.{p}" for r, p in conns))
+
+
+# left out of fab/slot_board_bom.csv (the DigiKey order list); listed in fab/slot_board_bom_all.csv
+NOT_IN_ORDER_BOM = {
+    "J1": "Amazon.ie (XT30PW-M, not at DigiKey)", "J6": "Amazon.ie (XT30PW-F, not at DigiKey)",
+    "J4": "at hand (2.54 mm pin header)", "J5": "at hand (2.54 mm pin header)",
+}

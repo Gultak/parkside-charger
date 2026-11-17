@@ -36,7 +36,7 @@ def main(tools_dir, steps=("sch", "pcb", "fab", "img")):
             sys.exit("routing failed")
         project.write_project(layout.PROJECT, board_dir, layout.ROOT_UUID)  # pcbnew rewrites it on save
     if "fab" in steps:
-        fab.run_fab(design.PARTS, layout.PROJECT, board_dir)
+        fab.run_fab(design.PARTS, layout.PROJECT, board_dir, getattr(design, "NOT_IN_ORDER_BOM", {}))
     if "img" in steps:
         render.render(str(board_dir / f"{layout.PROJECT}.kicad_pcb"), str(board_dir / "img"))
         render.render_extra(layout.PROJECT, board_dir)

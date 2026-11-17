@@ -14,11 +14,11 @@ verdict** for every slot to Home Assistant.
 | Slots | 1–16 printed modules, 88 mm pitch, one per battery. They **slot into each other** with a full-length sliding dovetail. 16 slots = two rows of 8 (70.4 cm each) |
 | Slot board | 72 × 47.5 mm, 4 layers. LTC4162-LAD: 5S Li-ion, I²C-programmable 3.81–4.20 V/cell, 0.1–3.2 A, telemetry and battery-resistance measurement. PCA9554 for switch, LED and bleed resistor. **KiCad design + Gerbers in `electronics/slot-board/`** |
 | Controller board | 112 × 64 mm, 4 layers. ESP32-C6 D1 in Dupont sockets, 2 × TCA9548A (16 I²C channels), switched 24 V to two slot chains, 5 V regulator, voltage sensing, buzzer. **KiCad design + Gerbers in `electronics/controller-board/`** |
-| Wiring | 24 V **daisy-chained** slot to slot (IN/OUT screw terminals), plus one 4-wire JST-XH I²C cable per slot to the controller. Every cable can be plugged in with the enclosures closed |
+| Wiring | 24 V **daisy-chained** slot to slot with XT30 cables (polarised and gendered: a cable can only go OUT → IN, the right way round), plus one 4-wire JST-XH I²C cable per slot to the controller. Every cable can be plugged in with the enclosures closed |
 | Power | Mean Well **LOP-400-24** open-frame PSU (250 W fanless), built into the controller box in its own mains compartment. The battery-side budget (10 A) is shared across the slots |
 | Presence | Microswitch per slot, with the pack's BMS signal (ID contact) and voltage as a fallback |
 | Safety | Per-slot fuses on both sides, the pack's BMS signal gates charging, slot NTC window 5–45 °C plus JEITA, charge timeout, fault latching, ambient limit, default-off soft-start bus switch, **70 °C thermal cut-out in the AC line** |
-| Estimated cost | about €24 per slot plus about €181 fixed: about €420 for 10 slots, about €565 for 16 ([BOM.md](BOM.md)) |
+| Estimated cost | about €24 per slot plus about €190 fixed: about €430 for 10 slots, about €580 for 16; with the parts already at hand, about €330 / €465 to buy ([BOM.md](BOM.md)) |
 
 ## Contents
 

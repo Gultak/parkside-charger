@@ -93,9 +93,9 @@ output:
       inverted: true
 
 sensor:
-  - platform: sht4x
+  - platform: htu21d     # SHT21 breakout (fixed address 0x40)
+    model: SHT21
     i2c_id: i2c_main
-    address: 0x44
     temperature:
       id: enclosure_temp
       name: "Enclosure temperature"

@@ -4,7 +4,7 @@
 
 ```
 esphome/
-  parkside-charger.yaml      main config: ESP32-C6 D1, I2C, 2x TCA9548A, SHT40, bus switch, ADCs, hub
+  parkside-charger.yaml      main config: ESP32-C6 D1, I2C, 2x TCA9548A, SHT21, bus switch, ADCs, hub
   slot.yaml                  per-slot package (included up to 16x with vars: n; delete unused ones)
   secrets.yaml.example       copy to secrets.yaml
   components/
@@ -75,7 +75,7 @@ Plus:
   charge: status *Pack BMS blocks charging*, entity `Slot n pack BMS fault`.
 - **Temperature:** charging only runs between 5 and 45 °C on the slot's NTC (next to the battery
   contacts), with 2 K hysteresis.
-  The LTC4162's own JEITA control is on as well. If the enclosure is above 45 °C (SHT40), all
+  The LTC4162's own JEITA control is on as well. If the enclosure is above 45 °C (SHT21), all
   charging stops and the 24 V bus switch opens.
 - **Power budget:** `max_total_current: 8A` is shared out every 2 s. "100 %" requests go first,
   then the emptiest packs. A pack in its CV phase only reserves what it actually draws plus
@@ -161,7 +161,7 @@ action:
 
 ## Bring-up checklist
 
-1. Controller board only, no slots, SHT40 plugged in: the `i2c scan` must show 0x44, 0x70 and
+1. Controller board only, no slots, SHT21 plugged in: the `i2c scan` must show 0x40, 0x70 and
    0x71. *PSU voltage* should read about 24.5 V. *Slot bus voltage* should read 0 V, then about
    24.5 V after *Charging enabled* is switched on.
 2. One slot board **without a battery**: the log shows the slot's LTC4162 and PCA9554, with no

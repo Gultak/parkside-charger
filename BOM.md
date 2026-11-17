@@ -1,118 +1,131 @@
 # Bill of materials
 
-Prices are rough unit prices in EUR (small quantities, without VAT and shipping); use them for
-budgeting only. Links go to **DigiKey Ireland** where DigiKey stocks the part (most of them are
-searches for the exact manufacturer part number, which open the product page directly), and to
-**Amazon.ie** for generic hardware. Only two parts need another vendor: the ESP32-C6 D1 module
-(Tindie) and the PCBs (JLCPCB, Gerbers in `electronics/*/fab`).
+Prices are rough unit prices in EUR (small quantities, without VAT and shipping), for
+budgeting only. Links go to **DigiKey Ireland** where DigiKey stocks the part itself (no
+Marketplace), otherwise to **Amazon.ie**. The ESP32 board, filament and cables are already at hand.
 
-The per-board BOMs with every passive and the pick-and-place files are generated with the boards:
+**Status column**
+
+| | Meaning |
+|---|---|
+| ✅ at hand | You have it already: don't order |
+| 📄 CSV | Board part that is in the **DigiKey order CSV** (see below): upload the CSV, don't order the row by hand |
+| 🛒 order | Order separately, with the link in the row |
+
+**The DigiKey order CSVs** are generated with the boards and list one board's parts, minus
+everything marked at hand or bought elsewhere (XT30s):
 [`electronics/slot-board/fab/slot_board_bom.csv`](electronics/slot-board/fab/slot_board_bom.csv) and
 [`electronics/controller-board/fab/controller_board_bom.csv`](electronics/controller-board/fab/controller_board_bom.csv).
-DigiKey's BOM Manager can import those files directly.
+Upload them to DigiKey's [BOM Manager](https://www.digikey.ie/en/mylists/bom-manager) and set the build quantity: **number of slots**
+for the slot board, **1** for the controller. (`*_bom_all.csv` beside them lists every part, with
+where it comes from.)
 
 ## Per slot: slot board
 
-| Qty | Part | Example / MPN | ≈ € each | Notes | Buy |
-|---:|---|---|---:|---|---|
-| 1 | Li-ion step-down charger 1-8 cells I2C | Analog Devices LTC4162EUFD-LAD#PBF | 9.50 | must be the -LAD (I2C adjustable) version | [DigiKey](https://www.digikey.ie/en/products/result?keywords=LTC4162EUFD-LAD%23PBF) |
-| 1 | Power inductor 6.8 uH Isat>=4.5A shielded | Coilcraft XAL6060-682MEC | 1.00 | L >= 0.3*Vin(max)/1.5MHz = 5 uH | [DigiKey](https://www.digikey.ie/en/products/result?keywords=XAL6060-682MEC) |
-| 2 | Current sense resistor 10 mOhm 1% 1 W 2512 | Vishay WSL2512R0100FEA | 0.40 | RSNSB + RSNSI (2512 footprint) | [DigiKey](https://www.digikey.ie/en/products/result?keywords=WSL2512R0100FEA) |
-| 2 | N-channel MOSFET 40 V Power33 (INFET + BATFET) | onsemi FDMC8327L | 0.50 | check the land pattern (VSON-8 NexFET footprint) | [DigiKey](https://www.digikey.ie/en/products/result?keywords=FDMC8327L) |
-| 1 | NTC 10k 0603 B3380 1% (board temperature) | Murata NCP18XH103F03RB | 0.15 | RT1 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=NCP18XH103F03RB) |
-| 1 | Resistor 10k 0.1% 25 ppm 0603 (NTC bias) | Panasonic ERA-3AEB103V | 0.30 | R3 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=ERA-3AEB103V) |
-| 1 | Passives set (caps 50 V X7R + polymer 47 uF; 0603 resistors) | see fab/slot_board_bom.csv | 1.20 |  | [DigiKey BOM Manager (upload the CSV)](https://www.digikey.ie/en/mylists/bom-manager) |
-| 1 | Comparator push-pull rail-to-rail input SOT-23-5 | TI TLV7031DBVR | 0.60 | pack BMS / ID input | [DigiKey](https://www.digikey.ie/en/products/result?keywords=TLV7031DBVR) |
-| 1 | I/O expander 8-bit I2C | NXP PCA9554PW,118 (or TI TCA9554PWR) | 0.80 | address 0x20 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PCA9554PW%2C118) |
-| 2 | Fuse 5 A fast SMD 1206 | Littelfuse 0466005.NR | 0.50 | input + battery side | [DigiKey](https://www.digikey.ie/en/products/result?keywords=0466005.NR) |
-| 1 | TVS 26 V SMB | Littelfuse SMBJ26A | 0.20 |  | [DigiKey](https://www.digikey.ie/en/products/result?keywords=SMBJ26A) |
-| 1 | ESD diode I2C (5 V) SOT-23 | Nexperia PESD5V0S2UT,215 | 0.10 |  | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PESD5V0S2UT%2C215) |
-| 1 | N-MOSFET SOT-23 (bleed switch) | onsemi 2N7002KT1G | 0.10 |  | [DigiKey](https://www.digikey.ie/en/products/result?keywords=2N7002KT1G) |
-| 2 | Resistor 100 Ohm 2 W axial | Vishay PR02000201000JR500 | 0.25 | bleed (optional) | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PR02000201000JR500) |
-| 2 | Screw terminal 2p 5.08 mm | Phoenix MKDS 1,5/2-5,08 (1715721) | 0.60 | 24 V IN + OUT (daisy chain) | [DigiKey](https://www.digikey.ie/en/products/result?keywords=1715721) |
-| 1 | Screw terminal 3p 3.5 mm | Phoenix PT 1,5/3-3,5-H (1984620) | 0.70 | battery B+ GND ID | [DigiKey](https://www.digikey.ie/en/products/result?keywords=1984620) |
-| 1 | JST-XH 4p vertical header | JST B4B-XH-A(LF)(SN) | 0.10 | I2C cable | [DigiKey](https://www.digikey.ie/en/products/result?keywords=B4B-XH-A%28LF%29%28SN%29) |
-| 1 | JST-PH 2p vertical header | JST B2B-PH-K-S(LF)(SN) | 0.10 | microswitch | [DigiKey](https://www.digikey.ie/en/products/result?keywords=B2B-PH-K-S%28LF%29%28SN%29) |
-| 1 | JST-PH 4p vertical header | JST B4B-PH-K-S(LF)(SN) | 0.10 | LED | [DigiKey](https://www.digikey.ie/en/products/result?keywords=B4B-PH-K-S%28LF%29%28SN%29) |
-| 1 | JST-PH housings 2p + 4p with crimp contacts | JST PHR-2 + PHR-4 + SPH-002T-P0.5S | 0.30 | switch + LED cables | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PHR-4) |
-| 1 | PCB 72x47.5 4-layer 1oz (electronics/slot-board/fab) | JLCPCB/PCBWay | 1.00 | per board in a 10-20 pcs order | [JLCPCB](https://jlcpcb.com/) |
+| Qty | Part | Example / MPN | ≈ € each | Notes | Status | Buy |
+|---:|---|---|---:|---|---|---|
+| 1 | Li-ion step-down charger 1-8 cells I2C | Analog Devices LTC4162EUFD-LAD#PBF | 9.50 | must be the -LAD (I2C adjustable) version | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=LTC4162EUFD-LAD%23PBF) |
+| 1 | Power inductor 6.8 uH Isat>=4.5A shielded | Coilcraft XAL6060-682MEC | 1.00 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=XAL6060-682MEC) |
+| 2 | Current sense resistor 10 mOhm 1% 1 W 2512 | Vishay WSL2512R0100FEA | 0.40 | RSNSB + RSNSI | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=WSL2512R0100FEA) |
+| 2 | N-channel MOSFET 40 V Power33 (INFET + BATFET) | onsemi FDMC8327L | 0.50 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=FDMC8327L) |
+| 1 | NTC 10k 0603 B3380 1% (board temperature) | Murata NCP18XH103F03RB | 0.15 | RT1 | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=NCP18XH103F03RB) |
+| 1 | Resistor 10k 0.1% 25 ppm 0603 (NTC bias) | Panasonic ERA-3AEB103V | 0.30 | R3 | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=ERA-3AEB103V) |
+| 1 | Passives (caps 50 V X7R + polymer 47 uF; 0603 resistors) | see the CSV | 1.20 |  | 📄 CSV | [DigiKey BOM Manager](https://www.digikey.ie/en/mylists/bom-manager) |
+| 1 | Comparator push-pull SOT-23-5 | TI TLV7031DBVR | 0.60 | pack BMS / ID input | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=TLV7031DBVR) |
+| 1 | I/O expander 8-bit I2C | NXP PCA9554PW,118 (or TI TCA9554PWR) | 0.80 | address 0x20 | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PCA9554PW%2C118) |
+| 2 | Fuse 5 A fast SMD 1206 | Littelfuse 0466005.NR | 0.50 | input + battery side | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=0466005.NR) |
+| 1 | TVS 26 V SMB | Littelfuse SMBJ26A | 0.20 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=SMBJ26A) |
+| 1 | ESD diode I2C (5 V) SOT-23 | Nexperia PESD5V0S2UT,215 | 0.10 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PESD5V0S2UT%2C215) |
+| 1 | N-MOSFET SOT-23 (bleed switch) | onsemi 2N7002KT1G | 0.10 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=2N7002KT1G) |
+| 2 | Resistor 100 Ohm 2 W axial | Vishay PR02000201000JR500 | 0.25 | bleed | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PR02000201000JR500) |
+| 1 | Screw terminal 3p 3.5 mm | Phoenix PT 1,5/3-3,5-H (1984620) | 0.70 | J3 battery: B+ GND ID | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=1984620) |
+| 1 | JST-XH 4p vertical header | JST B4B-XH-A(LF)(SN) | 0.10 | J2 I2C cable | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=B4B-XH-A%28LF%29%28SN%29) |
+| 1 | XT30 PCB connector, right angle, **male** (24 V IN) | Amass XT30PW-M | 0.60 | J1; not at DigiKey. Buy as a set with the females | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=XT30PW%20male%20female%20PCB%20right%20angle) |
+| 1 | XT30 PCB connector, right angle, **female** (24 V OUT) | Amass XT30PW-F | 0.60 | J6 | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=XT30PW%20male%20female%20PCB%20right%20angle) |
+| 1 | Pin header 1x2 + 1x4, 2.54 mm |  | 0.05 | J4 switch, J5 LED (Dupont cables) | ✅ at hand |  |
+| 1 | PCB 72x47.5 4-layer (electronics/slot-board/fab) | JLCPCB | 1.00 | per board in a 10-20 pcs order | 🛒 order | [JLCPCB](https://jlcpcb.com/) |
 
-Subtotal: **≈ €21** per slot
+Subtotal: **≈ €20** per slot, of which to buy **≈ €20**
 
-## Per slot: printed module
+## Per slot: printed module and cables
 
-| Qty | Part | Example / MPN | ≈ € each | Notes | Buy |
-|---:|---|---|---:|---|---|
-| 1 | Microswitch with lever | Omron D2F-01L | 1.50 | clones ~0.30 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=D2F-01L) |
-| 1 | LED 5 mm RGB common cathode diffused | Kingbright L-154A4SUREQBFZGEW | 0.60 | standard T-1 3/4: 5.8 mm flange; driven from PCA9554 at 5 V | [DigiKey](https://www.digikey.ie/en/products/result?keywords=L-154A4SUREQBFZGEW) |
-| 3 | 6.3 mm (FASTON 250) male crimp tab with **locking lance** (housing-lock type), 6.2-6.35 x 0.7-0.8 mm, uninsulated, for 0.5-1.5 mm² (+, ID, −) | generic; the pocket is sized for 14 mm tip to side ears, lance end 13 mm from the tip | 0.10 | clicks into the contact block, wire straight to J3 | [Amazon.ie](https://www.amazon.ie/s?k=6.3mm%20male%20crimp%20terminal%20locking%20tongue)<br>[DigiKey](https://www.digikey.ie/en/products/result?keywords=250%20tab%20housing%20lock) |
-| 0.5 | m silicone wire 0.75 mm² (18 AWG), red / black / one more colour | | 0.80 | 3 x about 15 cm per slot (contact tabs to J3) | [Amazon.ie](https://www.amazon.ie/s?k=18AWG%20silicone%20wire%20set) |
-| 1 | Wood screw 4x25 countersunk (flat head) |  | 0.03 | front - centre of the channel ceiling | [Amazon.ie](https://www.amazon.ie/s?k=wood%20screws%204x25%20countersunk) |
-| 1 | Wood screw 4x25 pan head |  | 0.03 | rear - inside the bay, through the hole in the slot PCB | [Amazon.ie](https://www.amazon.ie/s?k=wood%20screws%204x25%20pan%20head) |
-| 1 | 2-wire jumper 1.5 mm2 with ferrules (24 V daisy chain) |  | 0.50 | slot J6 OUT -> next slot J1 IN | [Amazon.ie (wire)](https://www.amazon.ie/s?k=1.5mm2%20silicone%20wire%20red%20black)<br>[Amazon.ie (ferrules)](https://www.amazon.ie/s?k=ferrule%20crimp%20kit%201.5mm2) |
+| Qty | Part | Example / MPN | ≈ € each | Notes | Status | Buy |
+|---:|---|---|---:|---|---|---|
+| 1 | Microswitch with lever | Omron D2F-01L | 1.50 | clones ~0.30 | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=D2F-01L) |
+| 1 | LED 5 mm RGB common cathode diffused | Kingbright L-154A4SUREQBFZGEW | 0.60 | 5.8 mm flange | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=L-154A4SUREQBFZGEW) |
+| 2 | Dupont cables: 2-pin (switch) + 4-pin (LED), female housings + contacts |  | 0.10 |  | ✅ at hand |  |
+| 3 | 6.3 mm male crimp tab with locking lance (+, ID, −) | the spade connectors | 0.10 | clicks into the contact block | ✅ at hand |  |
+| 0.5 | m wire 0.75 mm², three colours |  | 0.80 | contact tabs to J3 | ✅ at hand |  |
+| 2 | Wood screws 4x25 (1 countersunk, 1 pan head) |  | 0.03 |  | ✅ at hand |  |
+| 1 | XT30 cable plug pair (male + female) for the 24 V chain cable | Amass XT30U-M + XT30U-F | 0.60 | one chain cable per slot: OUT (female PCB) -> IN (male PCB) | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=XT30U%20male%20female%20connector%20pairs) |
+| 0.3 | m wire 1.5 mm² (blue = GND, brown = +24 V) |  | 0.50 | chain cable | ✅ at hand |  |
+| 0.1 | m heat-shrink tube for the XT30 solder cups |  | 1.00 |  | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=heat%20shrink%20tubing%20assortment) |
 
-Subtotal: **≈ €3.5** per slot
+Subtotal: **≈ €4** per slot, of which to buy **≈ €3**
 
 ## Controller (once)
 
-| Qty | Part | Example / MPN | ≈ € each | Notes | Buy |
-|---:|---|---|---:|---|---|
-| 1 | ESP32-C6 D1 dev board | xyzroe ESP32_C6_D1 (Tindie / Elecrow / Lectronz) | 12.00 | plugs into the female headers (module needs male pin headers); not sold by DigiKey | [Tindie (xyzroe)](https://www.tindie.com/search/?q=ESP32-C6+D1)<br>[Project page](https://github.com/xyzroe/ESP32_C6_D1) |
-| 2 | Female header 1x8 2.54 mm | Sullins PPTC081LFBN-RC | 0.30 | socket for the ESP32-C6 D1 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PPTC081LFBN-RC) |
-| 1 | Controller PCB 4-layer | electronics/controller-board/fab | 4.00 | per board in a 5 pcs order | [JLCPCB](https://jlcpcb.com/) |
-| 2 | I2C mux 8 ch | TI TCA9548APWR | 1.50 | 0x70 + 0x71 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=TCA9548APWR) |
-| 8 | Resistor array 4x4.7k 0603 | Yageo YC164-JR-074K7L | 0.05 | slot bus pull-ups | [DigiKey](https://www.digikey.ie/en/products/result?keywords=YC164-JR-074K7L) |
-| 1 | 5 V regulator SIP-3 1 A | TRACO TSR 1-2450 (or RECOM R-78E5.0-1.0) | 5.50 |  | [DigiKey](https://www.digikey.ie/en/products/result?keywords=TSR%201-2450) |
-| 1 | P-MOSFET -40 V -40 A TO-252 | AOS AOD4185 (or Vishay SQD40P06-15L) | 0.80 | 24 V bus switch | [DigiKey](https://www.digikey.ie/en/products/result?keywords=AOD4185) |
-| 1 | Mini blade fuse holder PCB | Keystone 3568 | 1.00 |  | [DigiKey](https://www.digikey.ie/en/products/result?keywords=3568) |
-| 1 | Mini blade fuse 10 A | Littelfuse 0297010.WXNV | 0.30 |  | [DigiKey](https://www.digikey.ie/en/products/result?keywords=0297010.WXNV) |
-| 1 | PTC 0.5 A 1206 | Littelfuse 1206L050YR | 0.20 | 5 V slot rail | [DigiKey](https://www.digikey.ie/en/products/result?keywords=1206L050YR) |
-| 3 | Screw terminal 2p 5.08 mm | Phoenix MKDS 1,5/2-5,08 (1715721) | 0.60 | PSU in, OUT A, OUT B | [DigiKey](https://www.digikey.ie/en/products/result?keywords=1715721) |
-| 16 | JST-XH 4p vertical header | JST B4B-XH-A(LF)(SN) | 0.10 | slot connectors | [DigiKey](https://www.digikey.ie/en/products/result?keywords=B4B-XH-A%28LF%29%28SN%29) |
-| 32 | JST-XH 4p housing (cable ends) + 4 crimp contacts each | JST XHP-4 + SXH-001T-P0.6 | 0.15 | slot cables 1:1, 4 x 0.14 mm2, up to 1.5 m; or buy ready-made | [DigiKey](https://www.digikey.ie/en/products/result?keywords=XHP-4)<br>[Amazon.ie (ready-made XH cables)](https://www.amazon.ie/s?k=JST%20XH%202.54%204%20pin%20cable%20double%20ended) |
-| 1 | Buzzer 12 mm 5 V internally driven | Same Sky CMI-1275-05TH | 1.00 | check the pin pitch against the 7.6 mm footprint | [DigiKey](https://www.digikey.ie/en/products/detail/same-sky-formerly-cui-devices/CMI-1275-05TH/25577239) |
-| 1 | SHT40 breakout | Adafruit 4885 or clone | 4.00 | on a cable in the low-voltage compartment | [DigiKey](https://www.digikey.ie/en/products/result?keywords=Adafruit%204885)<br>[Amazon.ie (clone)](https://www.amazon.ie/s?k=SHT40%20breakout%20module) |
-| 1 | Passives / small parts (2N7002K, BZT52C12, SMBJ26A, caps, resistors) | see fab/controller_board_bom.csv | 2.00 |  | [DigiKey BOM Manager (upload the CSV)](https://www.digikey.ie/en/mylists/bom-manager) |
-| 14 | M3 heat-set insert + M3x8 screw |  | 0.10 | controller box: 4 board standoffs, 4 PSU standoffs, 6 lid ears | [Amazon.ie](https://www.amazon.ie/s?k=M3%20heat%20set%20inserts%20brass%20kit) |
-| 1 | Open-barrel crimp tool for 2.8 / 4.8 / 6.3 mm tabs, 0.5–1.5 mm² | e.g. IWISS SN-48B | 25.00 | tool, for the contact tabs (once) | [Amazon.ie](https://www.amazon.ie/s?k=IWISS%20SN-48B%20crimping%20tool) |
+| Qty | Part | Example / MPN | ≈ € each | Notes | Status | Buy |
+|---:|---|---|---:|---|---|---|
+| 1 | ESP32-C6 D1 dev board | xyzroe ESP32_C6_D1 | 12.00 |  | ✅ at hand |  |
+| 2 | Female header 1x8 2.54 mm (socket for the ESP32-C6 D1) + male pin headers on the module | Sullins PPTC081LFBN-RC | 0.30 | assumed covered by your pin headers; DigiKey link if not | ✅ at hand | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PPTC081LFBN-RC) |
+| 1 | Controller PCB 4-layer | electronics/controller-board/fab | 4.00 | per board in a 5 pcs order | 🛒 order | [JLCPCB](https://jlcpcb.com/) |
+| 2 | I2C mux 8 ch | TI TCA9548APWR | 1.50 | 0x70 + 0x71 | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=TCA9548APWR) |
+| 8 | Resistor array 4x4.7k 0603 | Yageo YC164-JR-074K7L | 0.05 | slot bus pull-ups | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=YC164-JR-074K7L) |
+| 1 | 5 V regulator SIP-3 1 A | TRACO TSR 1-2450 (or RECOM R-78E5.0-1.0) | 5.50 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=TSR%201-2450) |
+| 1 | P-MOSFET -40 V TO-252 | AOS AOD4185 | 0.80 | 24 V bus switch | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=AOD4185) |
+| 1 | Mini blade fuse holder PCB | Keystone 3568 | 1.00 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=3568) |
+| 1 | Mini blade fuse 10 A | Littelfuse 0297010.WXNV | 0.30 | not on the board: order it with the CSV | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=0297010.WXNV) |
+| 1 | PTC 0.5 A 1206 | Littelfuse 1206L050YR | 0.20 | 5 V slot rail | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=1206L050YR) |
+| 1 | JST-VH 6p vertical header (24 V from the PSU) | JST B6P-VH | 0.40 | J1 | ✅ at hand |  |
+| 2 | XT30 PCB connector, vertical, female (OUT A / OUT B) | Amass XT30UPB-F | 0.70 | J2, J3; not at DigiKey | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=XT30UPB%20female%20PCB) |
+| 16 | JST-XH 4p vertical header | JST B4B-XH-A(LF)(SN) | 0.10 | slot connectors | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=B4B-XH-A%28LF%29%28SN%29) |
+| 32 | JST-XH 4p housing + 4 crimp contacts | JST XHP-4 + SXH-001T-P0.6 | 0.15 | both ends of the slot cables (28-22 AWG) | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=XHP-4)<br>[DigiKey](https://www.digikey.ie/en/products/result?keywords=SXH-001T-P0.6) |
+| 16 | Slot cable, 4-core 22 AWG, up to 1.5 m |  | 0.50 |  | ✅ at hand |  |
+| 1 | Buzzer 12 mm 5 V internally driven | Same Sky CMI-1275-05TH | 1.00 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=CMI-1275-05TH) |
+| 1 | SHT21 breakout (+ Dupont cable) |  | 4.00 | J4: VIN GND SCL SDA; check the order on your board | ✅ at hand |  |
+| 1 | Passives / small parts (2N7002K, BZT52C12, SMBJ26A, caps, resistors) | see the CSV | 2.00 |  | 📄 CSV | [DigiKey BOM Manager](https://www.digikey.ie/en/mylists/bom-manager) |
+| 14 | M3 heat-set insert + M3x8 screw |  | 0.10 | 4 board, 4 PSU, 6 lid ears | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=M3%20heat%20set%20inserts%20brass%20kit) |
+| 1 | Crimp tool (open barrel, for the tabs and VH/XH contacts) |  | 25.00 |  | ✅ at hand |  |
 
-Subtotal: **≈ €69**
+Subtotal: **≈ €77**, of which to buy **≈ €27**
 
-## Power supply (once)
+## Power supply and mains side (once)
 
-| Qty | Part | Example / MPN | ≈ € each | Notes | Buy |
-|---:|---|---|---:|---|---|
-| 1 | PSU 24 V open frame | Mean Well LOP-400-24 (250 W fanless; LOP-300-24 = 180 W) | 40.00 | in the controller box; trim to 24.5 V; 4x M3 heat-set inserts + screws | [DigiKey](https://www.digikey.ie/en/products/detail/mean-well-usa-inc/LOP-400-24/22040935) |
-| 1 | IEC C14 inlet with fuse holder and switch | Schurter DD11.0121.1111 | 12.00 | panel cut-out 47.1 x 28.1 mm (the box is drawn for it) | [DigiKey](https://www.digikey.ie/en/products/detail/schurter-inc/DD11-0121-1111/1646868) |
-| 1 | Fuse 5x20 mm T3.15 A | Littelfuse 02183.15MXP | 0.50 | in the inlet | [DigiKey](https://www.digikey.ie/en/products/result?keywords=02183.15MXP) |
-| 1 | VH 3p housing + 2 crimp contacts (PSU AC input) | JST VHR-3N + SVH-21T-P1.1 | 0.30 |  | [DigiKey](https://www.digikey.ie/en/products/result?keywords=VHR-3N) |
-| 1 | Ring lug M3 (PE to the PSU) + ferrules |  | 0.50 |  | [DigiKey (ring lug)](https://www.digikey.ie/en/products/result?keywords=ring%20terminal%20M3%201.5mm2)<br>[Amazon.ie (ferrules)](https://www.amazon.ie/s?k=ferrule%20crimp%20kit%201.5mm2) |
-| 1 | Thermal cut-out NC 70 C 250 V AC | KSD301 70C | 1.50 | in AC line - hardware failsafe; not sold by DigiKey | [Amazon.ie](https://www.amazon.ie/s?k=KSD301%2070C%20normally%20closed) |
-| 2 | m wire 1.5 mm2 red/black |  | 1.00 | PSU -> controller -> chains | [Amazon.ie](https://www.amazon.ie/s?k=1.5mm2%20silicone%20wire%20red%20black) |
+| Qty | Part | Example / MPN | ≈ € each | Notes | Status | Buy |
+|---:|---|---|---:|---|---|---|
+| 1 | PSU 24 V open frame | Mean Well LOP-400-24 (250 W fanless) or LOP-300-24 (180 W) | 40.00 | LOP-300: VH output, plugs 1:1 into J1. LOP-400: M3.5 screw output, use ring lugs on the PSU end | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/detail/mean-well-usa-inc/LOP-400-24/22040935) |
+| 2 | JST-VHR-6N housing with 6 contacts, crimped | JST VHR-6N + SVH-21T-P1.1 | 0.40 | PSU -> J1 cable: 3 x 0.75 mm² per pole (LOP-400: one housing + 2 ring lugs) | ✅ at hand |  |
+| 1 | IEC C14 inlet with fuse holder and switch, 50 mm snap-in | Schurter DD11.0121.1111 | 12.00 | the box cut-out also fits the ISL MIS-I-80485 (DigiKey Marketplace only) | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/detail/schurter-inc/DD11-0121-1111/1646868) |
+| 1 | Fuse 5x20 mm T3.15 A | Littelfuse 02183.15MXP | 0.50 | in the inlet | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=02183.15MXP) |
+| 1 | VH 3p housing + 2 crimp contacts (PSU AC input) | JST VHR-3N + SVH-21T-P1.1 | 0.30 | your 2-pin VH plug does not fit the 3-pin input (pin 2 is left out) | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=VHR-3N) |
+| 1 | Ring lugs M3 / M3.5 + ferrules |  | 1.00 | PE to the PSU; LOP-400 output | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=ring%20terminal%20kit%20insulated)<br>[Amazon.ie (ferrules)](https://www.amazon.ie/s?k=ferrule%20crimp%20kit%201.5mm2) |
+| 1 | Thermal cut-out NC 70 C 250 V AC | KSD301 70C | 1.50 | in the AC line; not at DigiKey | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=KSD301%2070C%20normally%20closed) |
+| 2 | m wire 1.5 mm² (blue / brown) |  | 1.00 | mains side inside the box | ✅ at hand |  |
 
-Subtotal: **≈ €57**
+Subtotal: **≈ €58**, of which to buy **≈ €55**
 
 ## Filament
 
-| Qty | Part | Example / MPN | ≈ € each | Notes | Buy |
-|---:|---|---|---:|---|---|
-| 2 | kg PETG (V-0) or ASA filament; bay covers in PETG (flexible tabs); controller box ASA/PC/V-0 PETG |  | 20.00 | 16 slots + controller box | [Amazon.ie (PETG V-0)](https://www.amazon.ie/s?k=PETG%20V0%20flame%20retardant%20filament)<br>[Amazon.ie (ASA)](https://www.amazon.ie/s?k=ASA%20filament%201.75) |
+| Qty | Part | Example / MPN | ≈ € each | Notes | Status | Buy |
+|---:|---|---|---:|---|---|---|
+| 2 | kg PETG / PETG V-0 filament |  | 20.00 | 16 slots + covers + controller box | ✅ at hand |  |
 
-Subtotal: **≈ €40**
+Subtotal: **≈ €40**, of which to buy **≈ €0**
 
 ## Safety
 
-| Qty | Part | Example / MPN | ≈ € each | Notes | Buy |
-|---:|---|---|---:|---|---|
-| 1 | Steel/alu sheet 0.5-1 mm for shelf underside |  | 15.00 | recommended on wooden shelves | [Amazon.ie](https://www.amazon.ie/s?k=aluminium%20sheet%201mm) |
+| Qty | Part | Example / MPN | ≈ € each | Notes | Status | Buy |
+|---:|---|---|---:|---|---|---|
+| 1 | Steel/alu sheet 0.5-1 mm for the shelf underside |  | 15.00 | recommended on wooden shelves | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=aluminium%20sheet%201mm) |
 
-Subtotal: **≈ €15**
+Subtotal: **≈ €15**, of which to buy **≈ €15**
 
 ## Totals
 
-| | ≈ € |
-|---|---:|
-| Per slot (board + module) | 24 |
-| Fixed (controller, power supply, filament, safety) | 181 |
-| 8 slots | 374 |
-| 16 slots | 567 |
+| | Total ≈ € | To buy ≈ € |
+|---|---:|---:|
+| Per slot (board + module) | 24 | 23 |
+| Fixed (controller, power supply, filament, safety) | 190 | 98 |
+| 8 slots | 384 | 282 |
+| 16 slots | 578 | 466 |

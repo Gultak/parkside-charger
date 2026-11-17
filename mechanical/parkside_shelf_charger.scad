@@ -150,7 +150,7 @@ cov_cl     = 0.3;    // clearance to the side walls (per side)
 tongue_h   = 2.5;    // the cover's front tongue goes this far up into a slot under the end wall
 tongue_w   = 54;     // its width (the end wall is 2 * outer_x wide)
 cov_notch_bot = 24;  // cable cut-outs in the back face reach down to this depth below the plate
-cov_notch_l = [-34.9, -9];   // X range: 24 V IN/OUT terminals (left)
+cov_notch_l = [-34.9, -0.5]; // X range: 24 V IN/OUT XT30s (left; their noses reach through)
 cov_notch_r = [14, 29];      // X range: I2C plug (right)
 tab_z      = [-32, -24];     // spring tabs rising from the floor near the rear corners
 tab_l      = 8;      // their length along Y
@@ -169,7 +169,9 @@ psu = "LOP-400";          // [LOP-400, LOP-300, none]
 psu_gap = 8;              // PSU board edge to the compartment walls (wiring, airflow)
 psu_standoff = 6;         // M3 standoffs (datasheet: max 3 mm of pins below the PSU board)
 part_t = 2.4;             // partition wall between the mains and the low-voltage compartment
-iec_cut = [47.3, 28.3];   // IEC C14 inlet with fuse + switch, Schurter DD11.0121.1111: cut-out 47.1 x 28.1 (+0.2)
+iec_cut = [47.2, 28.1];   // IEC C14 inlet with fuse + switch, 50 mm snap-in size: Schurter DD11.0121.1111 (47.1 x 28.1)
+                          // or ISL MIS-I-80485 (47 x 27.9, flange 50 x 30.5) both fit
+iec_panel_t = 2.0;        // wall thickness at the inlet for its snap-in clips (recessed from the inside; CHECK)
 vent_w = 2.5;             // vent slot width (finger-safe)
 
 $fn = 48;
@@ -513,7 +515,7 @@ module end_gauge() {
 // Low-voltage compartment: every connector group gets a U-notch open towards the lid,
 // so all cables can be plugged in first and the lid put on afterwards:
 //   left/right walls: slot cables 1-8 / 9-16, and OUT A/B (they run along the cable
-//   channel behind the board); top wall: ESP32 USB-C, SHT40 / Qwiic / expansion.
+//   channel behind the board); top wall: ESP32 USB-C, SHT21 / Qwiic / expansion.
 // Mains compartment: closed walls, IEC C14 inlet (fuse + switch) in the rear wall,
 // finger-safe vent slots; the PSU's 24 V leads pass the partition in one small notch.
 // PSU data [L, W, H], first hole from the corner [x, y], hole spacing [x, y] (datasheets)
@@ -521,7 +523,7 @@ function psu_spec() = psu == "LOP-300" ? [[101.6, 50.8, 25.4], [3.175, 3.175], [
                                        : [[127, 76.2, 27.5], [5.7, 5.7], [115.6, 64.8]];
 function has_psu() = psu != "none";
 function ctl_ix() = max(ctl_pcb[0] + 2 * ctl_gap, has_psu() ? psu_spec()[0][0] + 2 * psu_gap : 0);
-function ctl_iz() = 42;
+function ctl_iz() = 48;   // room above the board for the vertical XT30 plugs (OUT A/B) and their cables
 function ctl_y1() = ctl_wall + ctl_gap + ctl_pcb[1] + (has_psu() ? ctl_chan : ctl_gap);  // end of LV cavity
 function psu_y0() = ctl_y1() + part_t;                                                   // start of PSU cavity
 function psu_y1() = psu_y0() + psu_spec()[0][1] + 2 * psu_gap;
@@ -568,13 +570,16 @@ module controller_box() {
         // bottom wall (no PSU): PSU in, OUT A, OUT B (board x 14..92)
         if (!has_psu())
             translate([ctl_pcb_xy([14, 0])[0], o[1] - ctl_wall - eps, pz + 1]) cube([78, ctl_wall + 2 * eps, top]);
-        // top: SHT40 / Qwiic / ESP USB-C / expansion (board x 28..77)
+        // top: SHT21 / Qwiic / ESP USB-C / expansion (board x 28..77)
         translate([ctl_pcb_xy([28, 0])[0], -eps, pz + 1]) cube([49, ctl_wall + 2 * eps, top]);
         if (has_psu()) {
             // 24 V leads from the PSU output terminals (right end) through the partition
             translate([ix / 2 - psu_gap - 22, ctl_y1() - eps, ctl_wall + psu_standoff + 6]) cube([14, part_t + 2 * eps, top]);
             // IEC C14 inlet (fuse + switch) in the rear wall, next to the PSU's AC input (left end)
             translate([-ix / 2 + psu_gap + 4, o[1] - ctl_wall - eps, ctl_wall + 5]) cube([iec_cut[0], ctl_wall + 2 * eps, iec_cut[1]]);
+            if (iec_panel_t < ctl_wall)   // thinner wall around the cut-out, for the snap-in clips
+                translate([-ix / 2 + psu_gap + 4 - 2, o[1] - ctl_wall - eps, ctl_wall + 5 - 2])
+                    cube([iec_cut[0] + 4, ctl_wall - iec_panel_t + eps, iec_cut[1] + 4]);
             // vent slots in both side walls of the mains compartment (low and high rows)
             for (sx = [-1, 1]) for (y = [psu_y0() + 14 : 6 : psu_y1() - 8]) for (z = [ctl_wall + 4, ctl_wall + 22])
                 translate([sx > 0 ? o[0] / 2 - ctl_wall - eps : -o[0] / 2 - eps, y, z]) cube([ctl_wall + 2 * eps, vent_w, 14]);

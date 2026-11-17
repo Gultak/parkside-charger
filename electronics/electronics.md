@@ -10,7 +10,7 @@
    │                 │                              └─► 0.5 A PTC ─► 5V_SLOT (slot logic + pull-ups)   │
    │                 └─► P-MOSFET bus switch (GPIO19, soft start) ─► J2 OUT A / J3 OUT B (24 V)         │
    │ GPIO22/23 I2C ─► TCA9548A 0x70 (slots 1-8) + TCA9548A 0x71 (slots 9-16), RESET GPIO4             │
-   │ GPIO0/1: PSU / bus voltage   GPIO18: buzzer   headers: SHT40, Qwiic, expansion                    │
+   │ GPIO0/1: PSU / bus voltage   GPIO18: buzzer   headers: SHT21, Qwiic, expansion                    │
    └──────┬───────────────────────────────┬────────────────────────────────┬───────────────────────────┘
           │ OUT A: 24 V daisy chain        │ OUT B: 24 V daisy chain         │ 16 × 4-wire cable (5V GND SDA SCL)
           ▼                                ▼                                 │ one per slot, star topology
@@ -156,11 +156,11 @@ off the PCB and away from plastic. If you don't fit them, delete `bleed_output:`
 
 | Connector | Type | Pins |
 |---|---|---|
-| J1 24 V IN / J6 24 V OUT | 2 × 5.08 mm screw terminal, 2-pin (Phoenix MKDS 1,5/2) | Connected straight through, so the slots **daisy-chain**: `GND +24V | +24V GND`. Use 1.5 mm² wire for the chain jumpers. Each terminal is rated 13.5 A |
+| J1 24 V IN / J6 24 V OUT | Amass **XT30PW-M** (IN, male) / **XT30PW-F** (OUT, female), right angle, sticking out of the rear edge | Connected straight through, so the slots **daisy-chain**. Polarised and gendered: a chain cable (1.5 mm², XT30 plug at each end) only fits OUT → IN, the right way round. Pin 1 GND, pin 2 +24 V on every XT30. 15 A |
 | J2 I²C | JST-XH 4-pin | 5V_SLOT, GND, SDA, SCL |
 | J3 battery | 3.5 mm screw terminal, 3-pin | B+, B−, ID (the pack's BMS contact; the T contact is not used). The wires come straight from the crimp tabs in the contact block: 0.75 mm² (18 AWG) silicone, keep them short |
-| J4 switch | JST-PH 2-pin | IO0, GND |
-| J5 LED | JST-PH 4-pin | GND (common cathode), R, G, B |
+| J4 switch | 2.54 mm pin header, 2-pin (Dupont cable) | IO0, GND |
+| J5 LED | 2.54 mm pin header, 4-pin (Dupont cable) | GND (common cathode), R, G, B |
 
 ## 4. Controller board, 112 × 64 mm, 4 layers
 
@@ -170,8 +170,8 @@ up to **16 slots**.
 | Function | Part | Connection |
 |---|---|---|
 | MCU | **xyzroe ESP32-C6 D1** (ESP32-C6-MINI-1-N4, Wemos D1 form factor), plugged into **2 × 1×8 female Dupont headers** soldered into the board (holes 1.0 mm, rows 22.86 mm apart). USB-C points at the box wall | 5 V pin from the regulator. Its own 3.3 V LDO feeds the I²C side |
-| 24 V input | J1 (5.08 mm screw terminal), **10 A mini blade fuse**, SMBJ26A, 47 µF | From the PSU |
-| 24 V bus switch | AOD4185 P-MOSFET (−40 V/−40 A, TO-252). 12 V gate zener, 100 k gate pull-up, 2N7002 driver from **GPIO19**, 47 k + 1 µF soft start (about 50 ms) | Default off. Switches **OUT A (J2)** and **OUT B (J3)**: two slot daisy chains, e.g. one per shelf row |
+| 24 V input | J1 (**JST B6P-VH**: pins 1-3 +V, 4-6 −V, the same pinout as the LOP-300 output), **10 A mini blade fuse**, SMBJ26A, 47 µF | From the PSU: with a LOP-300 a 1:1 VH cable; with a LOP-400 (screw output) a VH plug on this end and ring lugs on the PSU end, 3 × 0.75 mm² per pole |
+| 24 V bus switch | AOD4185 P-MOSFET (−40 V/−40 A, TO-252). 12 V gate zener, 100 k gate pull-up, 2N7002 driver from **GPIO19**, 47 k + 1 µF soft start (about 50 ms) | Default off. Switches **OUT A (J2)** and **OUT B (J3)**, vertical XT30 females (XT30UPB-F): two slot daisy chains, e.g. one per shelf row |
 | 5 V | TRACO TSR 1-2450 (or RECOM R-78E5.0-1.0), 3-pin SIP, 1 A | Always on. Feeds the ESP and, via a 500 mA PTC, the **5V_SLOT** rail |
 | I²C | GPIO22 = SDA, GPIO23 = SCL, 4.7 k to 3.3 V | |
 | Muxes | 2 × TCA9548APWR: **0x70** (slots 1–8) and **0x71** (slots 9–16). VCC = 3.3 V, RESET on **GPIO4** (10 k pull-up) | Channel → slot order follows the layout; ESPHome uses the same table |
@@ -179,7 +179,7 @@ up to **16 slots**.
 | Slot connectors | 16 × JST-XH 4 (5V, GND, SDA, SCL): slots 1–8 on the left edge, 9–16 on the right | Same pin order as the slot board's J2, so cables are wired 1:1 |
 | Supply sensing | 100 k / 10 k dividers: PSU voltage → **GPIO0**, switched bus voltage → **GPIO1** | Firmware entities *PSU voltage* and *Slot bus voltage* |
 | Buzzer | 12 mm 5 V active buzzer, 2N7002 from **GPIO18** | Sounds on any slot fault or enclosure > 50 °C |
-| Headers | SHT40 breakout (3V3 GND SCL SDA, on a cable near the PSU), Qwiic (spare I²C), 7-pin expansion (3V3 GND IO5 IO6 IO7 TX RX) | |
+| Headers | SHT21 breakout (3V3 GND SCL SDA, on a cable near the PSU), Qwiic (spare I²C), 7-pin expansion (3V3 GND IO5 IO6 IO7 TX RX) | |
 
 **Why the slot side runs at 5 V:** the green and blue chips of a typical RGB LED have
 V_F ≈ 3.0–3.4 V. At 3.3 V they would barely light, whichever way the LED is wired. At 5 V the PCA9554

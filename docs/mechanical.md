@@ -188,7 +188,7 @@ No cable has to be threaded through a part before it is connected.
 
 **Slot module.** The slot board's connectors all face down.
 - **Open bay:** without its cover the bay is open at the bottom and the rear. You reach the
-  screws of the **24 V IN (J1) / OUT (J6)** terminals and the **JST-XH I²C plug (J2)** from below.
+  **24 V IN (J1) / OUT (J6)** XT30s at the rear edge and the **JST-XH I²C plug (J2)** from below.
 - **Clip-on cover** (front face, floor and back face in one U-shaped part, no screws):
   1. Plug in all cables.
   2. Put the cover's front **tongue** up into the slot under the end wall (it has gaps where the
@@ -204,23 +204,25 @@ No cable has to be threaded through a part before it is connected.
   board (J3/J4/J5). Wire these once, before you slide the board in.
 
 **Daisy chain:**
-- Each slot's 24 V OUT (J6) goes to the next slot's IN (J1) with a short 1.5 mm² 2-wire jumper
-  with ferrules. The terminals are mirrored (`GND +24V | +24V GND`), so the jumper wires never cross.
+- Each slot's 24 V OUT (J6, XT30 female) goes to the next slot's IN (J1, XT30 male) with a short
+  cable: 1.5 mm² wire (brown +24 V, blue GND) between an XT30 male and an XT30 female plug. XT30s
+  are polarised and gendered, so a cable can't be plugged in reversed or OUT to OUT. The XT30s
+  stick out of the board's rear edge into the cover's left cable cut-out.
 - The controller's OUT A feeds the first slot of row 1, and OUT B the first slot of row 2.
 - One JST-XH 4-pin cable per slot runs to the controller, wired 1:1 (5V, GND, SDA, SCL). Run them
   in a cable duct along the rear.
 
-**Controller box** (148 × 179 × 44 mm with the LOP-400). Two compartments:
+**Controller box** (148 × 179 × 50 mm with the LOP-400). Two compartments:
 - **Low-voltage side:** the board sits on 4 standoffs with its components facing the lid. Its
   walls have U-notches **open towards the lid**:
   - left and right walls: slot cables 1–8 and 9–16, and OUT A / OUT B. Those leave the board's
     bottom edge, run along the 12 mm cable channel behind it and out at the side (row 1 left,
     row 2 right)
-  - top wall: the ESP32's USB-C, plus the SHT40, Qwiic and expansion cables
+  - top wall: the ESP32's USB-C, plus the SHT21, Qwiic and expansion cables
 - **Mains side**, behind a closed partition: the PSU on four 6 mm M3 standoffs (heat-set inserts),
-  an **IEC C14 inlet with switch and fuse** (Schurter DD11.0121.1111) in the rear wall (cut-out 47.3 × 28.3 mm;
+  an **IEC C14 inlet with switch and fuse** (Schurter DD11.0121.1111 or ISL MIS-I-80485, both the common 50 mm snap-in size) in the rear wall (cut-out 47.2 × 28.1 mm, wall thinned to `iec_panel_t` = 2 mm around it for the clips;
   check your part), and 2.5 mm vent slots in both side walls and the lid. The PSU's 24 V leads
-  pass the partition through one small notch next to its output terminals, to J1.
+  pass the partition through one small notch next to its output terminals, to J1 (a 6-pin JST VH plug).
   - **PE:** connect the inlet's earth to the PSU's earth-marked mounting hole (ring lug under that
     screw, with a star washer). The datasheet requires it for class I.
   - **Thermal cut-out** (KSD301, 70 °C, NC) in the L line between inlet and PSU, fixed with a cable

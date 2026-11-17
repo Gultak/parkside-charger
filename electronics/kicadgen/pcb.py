@@ -22,6 +22,7 @@ import pcbnew
 FPLIB = "/usr/share/kicad/footprints"
 OX, OY = 100.0, 100.0          # board origin on the sheet (mm)
 BW, BH, EDGE_KEEP = 0.0, 0.0, 2.0   # set by configure()
+OVERHANG = set()   # refs whose body may stick out over the board edge (e.g. horizontal connectors)
 CLEAR = 0.15                   # copper clearance (DRC rule)
 RMARGIN = 0.03                 # extra margin the router keeps
 VIA_D, VIA_DRILL = 0.6, 0.3
@@ -44,7 +45,8 @@ def configure(design, layout, board_dir):
     g.update(PARTS=design.PARTS, NET_WIDTH=getattr(design, "NET_WIDTH", {}),
              DEFAULT_WIDTH=getattr(design, "DEFAULT_WIDTH", 0.2), BOARD_DIR=Path(board_dir))
     for k in ("PROJECT", "BW", "BH", "EDGE_KEEP", "PLACE", "POURS", "FIXED_TRACKS", "FIXED_VIAS", "KELVIN",
-              "ROUTE_ORDER_FIRST", "ROUTE_ORDER_LAST", "LABELS", "KEEPOUTS", "GND_VIA_SKIP", "CUTOUTS"):
+              "ROUTE_ORDER_FIRST", "ROUTE_ORDER_LAST", "LABELS", "KEEPOUTS", "GND_VIA_SKIP", "CUTOUTS",
+              "OVERHANG"):
         if hasattr(layout, k):
             g[k] = getattr(layout, k)
 
@@ -469,7 +471,7 @@ def build(outdir: Path, promote=()):
                 ys += [mm(b.GetTop()) - OY, mm(b.GetBottom()) - OY]
         boxes[ref] = (min(xs), min(ys), max(xs), max(ys))
         x0, y0, x1, y1 = boxes[ref]
-        if x0 < EDGE_KEEP or x1 > BW - EDGE_KEEP or y0 < 0.25 or y1 > BH - 0.25:
+        if ref not in OVERHANG and (x0 < EDGE_KEEP or x1 > BW - EDGE_KEEP or y0 < 0.25 or y1 > BH - 0.25):
             problems.append(f"{ref} courtyard outside keep-in: {boxes[ref]}")
     refs = list(boxes)
     for a in range(len(refs)):
