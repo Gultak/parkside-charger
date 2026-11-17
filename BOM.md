@@ -57,11 +57,9 @@ Subtotal: **≈ €20** per slot, of which to buy **≈ €20**
 | 3 | 6.3 mm male crimp tab with locking lance (+, ID, −) | the spade connectors | 0.10 | clicks into the contact block | ✅ at hand |  |
 | 0.5 | m wire 0.75 mm², three colours |  | 0.80 | contact tabs to J3 | ✅ at hand |  |
 | 2 | Wood screws 4x25 (1 countersunk, 1 pan head) |  | 0.03 |  | ✅ at hand |  |
-| 1 | XT30 cable plug pair (male + female) for the 24 V chain cable | Amass XT30U-M + XT30U-F | 0.60 | one chain cable per slot: OUT (female PCB) -> IN (male PCB) | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=XT30U%20male%20female%20connector%20pairs) |
-| 0.3 | m wire 1.5 mm² (blue = GND, brown = +24 V) |  | 0.50 | chain cable | ✅ at hand |  |
-| 0.1 | m heat-shrink tube for the XT30 solder cups |  | 1.00 |  | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=heat%20shrink%20tubing%20assortment) |
+| 1 | XT30 extension cable male-female, 10-15 cm, 16 AWG (18 AWG is enough) | pre-made | 1.50 | chain cable OUT -> next slot's IN (about 8 cm of free wire needed) | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=XT30%20extension%20cable%20male%20female%2010cm) |
 
-Subtotal: **≈ €4** per slot, of which to buy **≈ €3**
+Subtotal: **≈ €5** per slot, of which to buy **≈ €4**
 
 ## Controller (once)
 
@@ -85,10 +83,11 @@ Subtotal: **≈ €4** per slot, of which to buy **≈ €3**
 | 1 | Buzzer 12 mm 5 V internally driven | Same Sky CMI-1275-05TH | 1.00 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=CMI-1275-05TH) |
 | 1 | SHT21 breakout (+ Dupont cable) |  | 4.00 | J4: VIN GND SCL SDA; check the order on your board | ✅ at hand |  |
 | 1 | Passives / small parts (2N7002K, BZT52C12, SMBJ26A, caps, resistors) | see the CSV | 2.00 |  | 📄 CSV | [DigiKey BOM Manager](https://www.digikey.ie/en/mylists/bom-manager) |
+| 2 | XT30 extension cable male-female, length to suit | pre-made | 3.00 | controller OUT A / OUT B -> first slot of each chain | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=XT30%20extension%20cable%20male%20female%2050cm) |
 | 14 | M3 heat-set insert + M3x8 screw |  | 0.10 | 4 board, 4 PSU, 6 lid ears | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=M3%20heat%20set%20inserts%20brass%20kit) |
 | 1 | Crimp tool (open barrel, for the tabs and VH/XH contacts) |  | 25.00 |  | ✅ at hand |  |
 
-Subtotal: **≈ €77**, of which to buy **≈ €27**
+Subtotal: **≈ €83**, of which to buy **≈ €33**
 
 ## Power supply and mains side (once)
 
@@ -125,7 +124,7 @@ Subtotal: **≈ €15**, of which to buy **≈ €15**
 
 | | Total ≈ € | To buy ≈ € |
 |---|---:|---:|
-| Per slot (board + module) | 24 | 22 |
-| Fixed (controller, power supply, filament, safety) | 190 | 98 |
-| 8 slots | 383 | 276 |
-| 16 slots | 575 | 455 |
+| Per slot (board + module) | 25 | 23 |
+| Fixed (controller, power supply, filament, safety) | 196 | 104 |
+| 8 slots | 394 | 289 |
+| 16 slots | 591 | 474 |
