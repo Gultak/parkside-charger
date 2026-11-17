@@ -20,7 +20,7 @@ Qty,References,Value,Footprint,MPN / notes,Source
 1,F2,5A fast,Fuse_1206_3216Metric,"Littelfuse 0466005.NR - mandatory, battery side",DigiKey (this CSV)
 1,J1,24V IN,AMASS_XT30PW-M_1x02_P2.50mm_Horizontal,"Amass XT30PW-M (male, right angle): 24 V from the previous slot / controller","Amazon.ie (XT30PW-M, not at DigiKey)"
 1,J2,I2C,JST_XH_B4B-XH-A_1x04_P2.50mm_Vertical,"JST B4B-XH-A: 5V, GND, SDA, SCL",DigiKey (this CSV)
-1,J3,BATTERY,"TerminalBlock_Phoenix_PT-1,5-3-3.5-H_1x03_P3.50mm_Horizontal","B+, B-, pack ID contact (BMS status: ~10k NTC + transistor to B-, released on faults)",DigiKey (this CSV)
+1,J3,BATTERY,"TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm_Horizontal","5.0 mm 3-pole screw terminal (e.g. Phoenix MKDS 1,5/3-5,0 or any KF301/DG301-5.0): B+, B-, pack ID contact",at hand (3-pole 5.0 mm screw terminal)
 1,J4,SWITCH,PinHeader_1x02_P2.54mm_Vertical,"2.54 mm pin header (Dupont cable): presence microswitch, closes to GND",at hand (2.54 mm pin header)
 1,J5,LED,PinHeader_1x04_P2.54mm_Vertical,"2.54 mm pin header (Dupont cable): RGB LED, common cathode on pin 1",at hand (2.54 mm pin header)
 1,J6,24V OUT,AMASS_XT30PW-F_1x02_P2.50mm_Horizontal,"Amass XT30PW-F (female, right angle): 24 V on to the next slot","Amazon.ie (XT30PW-F, not at DigiKey)"

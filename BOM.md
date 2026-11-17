@@ -38,7 +38,7 @@ where it comes from.)
 | 1 | ESD diode I2C (5 V) SOT-23 | Nexperia PESD5V0S2UT,215 | 0.10 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PESD5V0S2UT%2C215) |
 | 1 | N-MOSFET SOT-23 (bleed switch) | onsemi 2N7002KT1G | 0.10 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=2N7002KT1G) |
 | 2 | Resistor 100 Ohm 2 W axial | Vishay PR02000201000JR500 | 0.25 | bleed | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PR02000201000JR500) |
-| 1 | Screw terminal 3p 3.5 mm | Phoenix PT 1,5/3-3,5-H (1984620) | 0.70 | J3 battery: B+ GND ID | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=1984620) |
+| 1 | Screw terminal 3p 5.0 mm | your 5 mm terminals (or Phoenix MKDS 1,5/3-5,0) | 0.50 | J3 battery: ID GND B+ | ✅ at hand |  |
 | 1 | JST-XH 4p vertical header | JST B4B-XH-A(LF)(SN) | 0.10 | J2 I2C cable | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=B4B-XH-A%28LF%29%28SN%29) |
 | 1 | XT30 PCB connector, right angle, **male** (24 V IN) | Amass XT30PW-M | 0.60 | J1; not at DigiKey. Buy as a set with the females | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=XT30PW%20male%20female%20PCB%20right%20angle) |
 | 1 | XT30 PCB connector, right angle, **female** (24 V OUT) | Amass XT30PW-F | 0.60 | J6 | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=XT30PW%20male%20female%20PCB%20right%20angle) |
@@ -125,7 +125,7 @@ Subtotal: **≈ €15**, of which to buy **≈ €15**
 
 | | Total ≈ € | To buy ≈ € |
 |---|---:|---:|
-| Per slot (board + module) | 24 | 23 |
+| Per slot (board + module) | 24 | 22 |
 | Fixed (controller, power supply, filament, safety) | 190 | 98 |
-| 8 slots | 384 | 282 |
-| 16 slots | 578 | 466 |
+| 8 slots | 383 | 276 |
+| 16 slots | 575 | 455 |

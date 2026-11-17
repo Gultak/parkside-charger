@@ -156,9 +156,9 @@ off the PCB and away from plastic. If you don't fit them, delete `bleed_output:`
 
 | Connector | Type | Pins |
 |---|---|---|
-| J1 24 V IN / J6 24 V OUT | Amass **XT30PW-M** (IN, male) / **XT30PW-F** (OUT, female), right angle, sticking out of the rear edge | Connected straight through, so the slots **daisy-chain**. Polarised and gendered: a chain cable (1.5 mm², XT30 plug at each end) only fits OUT → IN, the right way round. Pin 1 GND, pin 2 +24 V on every XT30. 15 A |
+| J1 24 V IN / J6 24 V OUT | Amass **XT30PW-M** (IN, male) / **XT30PW-F** (OUT, female), right angle, sticking out of the rear edge | Connected straight through, so the slots **daisy-chain**. Polarised and gendered: a chain cable (1.5 mm², XT30 plug at each end) only fits OUT → IN, the right way round. Pin 1 GND, pin 2 +24 V on every XT30. Both sit in one row at the rear edge; seen from the top, + is on the right of IN and on the left of OUT, because a male and a female facing the same way are mirror images. 15 A |
 | J2 I²C | JST-XH 4-pin | 5V_SLOT, GND, SDA, SCL |
-| J3 battery | 3.5 mm screw terminal, 3-pin | B+, B−, ID (the pack's BMS contact; the T contact is not used). The wires come straight from the crimp tabs in the contact block: 0.75 mm² (18 AWG) silicone, keep them short |
+| J3 battery | 5.0 mm screw terminal, 3-pin | B+, B−, ID (the pack's BMS contact; the T contact is not used). The wires come straight from the crimp tabs in the contact block: 0.75 mm² (18 AWG) silicone, keep them short |
 | J4 switch | 2.54 mm pin header, 2-pin (Dupont cable) | IO0, GND |
 | J5 LED | 2.54 mm pin header, 4-pin (Dupont cable) | GND (common cathode), R, G, B |
 

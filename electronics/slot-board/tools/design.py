@@ -79,9 +79,9 @@ PARTS = {
     "F2": ("5A fast", "Device:Fuse", "Fuse:Fuse_1206_3216Metric",
            {"1": "BAT", "2": "BAT_F"}, "Littelfuse 0466005.NR - mandatory, battery side"),
     "J3": ("BATTERY", "Connector:Screw_Terminal_01x03",
-           "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-3-3.5-H_1x03_P3.50mm_Horizontal",
+           "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm_Horizontal",
            {"1": "BAT_F", "2": "GND", "3": "BMS"},
-           "B+, B-, pack ID contact (BMS status: ~10k NTC + transistor to B-, released on faults)"),
+           "5.0 mm 3-pole screw terminal (e.g. Phoenix MKDS 1,5/3-5,0 or any KF301/DG301-5.0): B+, B-, pack ID contact"),
     # ---------------------------------------------- temperature / pack BMS --
     # The LTC4162 thermistor input reads a 10k NTC on this board, at the front edge
     # next to the battery contacts. The pack's own NTC sits in series with its BMS
@@ -160,4 +160,5 @@ if __name__ == "__main__":
 NOT_IN_ORDER_BOM = {
     "J1": "Amazon.ie (XT30PW-M, not at DigiKey)", "J6": "Amazon.ie (XT30PW-F, not at DigiKey)",
     "J4": "at hand (2.54 mm pin header)", "J5": "at hand (2.54 mm pin header)",
+    "J3": "at hand (3-pole 5.0 mm screw terminal)",
 }
