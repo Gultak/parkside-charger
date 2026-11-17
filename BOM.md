@@ -45,7 +45,7 @@ Subtotal: **≈ €21** per slot
 |---:|---|---|---:|---|---|
 | 1 | Microswitch with lever | Omron D2F-01L | 1.50 | clones ~0.30 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=D2F-01L) |
 | 1 | LED 5 mm RGB common cathode diffused | Kingbright L-154A4SUREQBFZGEW | 0.60 | standard T-1 3/4: 5.8 mm flange; driven from PCA9554 at 5 V | [DigiKey](https://www.digikey.ie/en/products/result?keywords=L-154A4SUREQBFZGEW) |
-| 4 | Brass strip 0.8 x 6.3 x 50 mm (contact blade) |  | 0.05 | Faston tabs are too short for the contact block + end wall + bevel | [Amazon.ie (K&S 0.032" x 1/4" = 0.81 x 6.35 mm)](https://www.amazon.ie/s?k=K%26S%20brass%20strip%200.032%20x%201/4) |
+| 3 | Brass strip 0.8 x 6 x 50 mm (contact blade: +, ID, −) | Albion Alloys 6 x 0.8 mm brass strip, 305 mm (pack of 4) | 0.10 | one pack = 24 blades = 8 slots; Faston tabs are too short for the contact block + end wall + bevel | [Amazon.ie](https://www.amazon.ie/Albion-Alloys-0-8mm-Brass-Strip/dp/B00CEHFF20) |
 | 1 | Wood screw 4x25 countersunk (flat head) |  | 0.03 | front - centre of the channel ceiling | [Amazon.ie](https://www.amazon.ie/s?k=wood%20screws%204x25%20countersunk) |
 | 1 | Wood screw 4x25 pan head |  | 0.03 | rear - inside the bay, through the hole in the slot PCB | [Amazon.ie](https://www.amazon.ie/s?k=wood%20screws%204x25%20pan%20head) |
 | 1 | 2-wire jumper 1.5 mm2 with ferrules (24 V daisy chain) |  | 0.50 | slot J6 OUT -> next slot J1 IN | [Amazon.ie (wire)](https://www.amazon.ie/s?k=1.5mm2%20silicone%20wire%20red%20black)<br>[Amazon.ie (ferrules)](https://www.amazon.ie/s?k=ferrule%20crimp%20kit%201.5mm2) |
