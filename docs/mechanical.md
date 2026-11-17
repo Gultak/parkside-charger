@@ -72,7 +72,7 @@
 
 | Measurement | Value | Model parameter |
 |---|---|---|
-| Tongue width (above the grooves) | 46.3 mm | `chan_w` = 46.8 |
+| Tongue width (above the grooves) | 46.3 mm | `chan_w` = 46.9 |
 | Groove depth / height | 4.5 / 5.4 mm | `lip_in` = 4.2, `lip_t` = 5.0 |
 | Tongue top → groove | 4.8 mm | `lip_gap` = 5.1 |
 | Battery body width | 86 mm | `pitch` = 88 |
@@ -96,7 +96,7 @@ values in the model come from one measured pack; check them on yours. With calip
 
 | Parameter | What to measure on the pack |
 |---|---|
-| `chan_w` | Width of the raised "tongue" on top of the pack, above the side grooves, **+ 0.5 mm** (0.6 printed a bit loose) |
+| `chan_w` | Width of the raised "tongue" on top of the pack, above the side grooves, **+ 0.6 mm** |
 | `lip_in` | Depth of the side grooves (how far the tool's rail goes in), **− 0.3 mm** |
 | `lip_t` | Height of the side grooves, **− 0.4 mm** |
 | `lip_gap` | Top of the tongue down to the top edge of the groove, **+ 0.3 mm** |
