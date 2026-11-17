@@ -83,7 +83,7 @@ build ten boards, check on one pack:
    cells through the BMS signal.
 3. **Deeply discharged packs** (BMS released) are not charged. Wake them in the original
    charger first.
-4. Measure the blade/slot geometry for the 3D model (see `docs/mechanical.md`).
+4. Measure the contact slot geometry for the 3D model (see `docs/mechanical.md`).
 
 ## 3. Slot board (×16 max), 72 × 47.5 mm, 4 layers
 
@@ -158,7 +158,7 @@ off the PCB and away from plastic. If you don't fit them, delete `bleed_output:`
 |---|---|---|
 | J1 24 V IN / J6 24 V OUT | 2 × 5.08 mm screw terminal, 2-pin (Phoenix MKDS 1,5/2) | Connected straight through, so the slots **daisy-chain**: `GND +24V | +24V GND`. Use 1.5 mm² wire for the chain jumpers. Each terminal is rated 13.5 A |
 | J2 I²C | JST-XH 4-pin | 5V_SLOT, GND, SDA, SCL |
-| J3 battery | 3.5 mm screw terminal, 3-pin | B+, B−, ID (the pack's BMS contact; the T contact is not used). Use 1.0 mm² silicone wire for B+/B− and keep it short |
+| J3 battery | 3.5 mm screw terminal, 3-pin | B+, B−, ID (the pack's BMS contact; the T contact is not used). The wires come straight from the crimp tabs in the contact block: 0.75 mm² (18 AWG) silicone, keep them short |
 | J4 switch | JST-PH 2-pin | IO0, GND |
 | J5 LED | JST-PH 4-pin | GND (common cathode), R, G, B |
 

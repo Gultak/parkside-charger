@@ -45,12 +45,13 @@ Subtotal: **≈ €21** per slot
 |---:|---|---|---:|---|---|
 | 1 | Microswitch with lever | Omron D2F-01L | 1.50 | clones ~0.30 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=D2F-01L) |
 | 1 | LED 5 mm RGB common cathode diffused | Kingbright L-154A4SUREQBFZGEW | 0.60 | standard T-1 3/4: 5.8 mm flange; driven from PCA9554 at 5 V | [DigiKey](https://www.digikey.ie/en/products/result?keywords=L-154A4SUREQBFZGEW) |
-| 3 | Contact blade 0.8 x 6.3 x 50 mm, brass (+, ID, −) | QUARKZMAN brass plate 100 x 100 x 0.8 mm, cut into strips | 0.27 | one plate = about 30 blades (two rows of 15): 16 slots need 2 plates (€8 each, free delivery). Cut with tin snips or score and snap, file the edges, round the tip; Faston tabs are too short for the contact block + end wall + bevel | [Amazon.ie](https://www.amazon.ie/dp/B0CMJ9V6R9) |
+| 3 | FASTON 250 male crimp tab, 6.35 x 0.81 mm, uninsulated, 22-18 AWG (+, ID, −) | TE Connectivity 42475-4 | 0.30 | sits in the contact block, wire straight to J3 | [DigiKey](https://www.digikey.ie/en/products/result?keywords=42475-4) |
+| 0.5 | m silicone wire 0.75 mm² (18 AWG), red / black / one more colour | | 0.80 | 3 x about 15 cm per slot (contact tabs to J3) | [Amazon.ie](https://www.amazon.ie/s?k=18AWG%20silicone%20wire%20set) |
 | 1 | Wood screw 4x25 countersunk (flat head) |  | 0.03 | front - centre of the channel ceiling | [Amazon.ie](https://www.amazon.ie/s?k=wood%20screws%204x25%20countersunk) |
 | 1 | Wood screw 4x25 pan head |  | 0.03 | rear - inside the bay, through the hole in the slot PCB | [Amazon.ie](https://www.amazon.ie/s?k=wood%20screws%204x25%20pan%20head) |
 | 1 | 2-wire jumper 1.5 mm2 with ferrules (24 V daisy chain) |  | 0.50 | slot J6 OUT -> next slot J1 IN | [Amazon.ie (wire)](https://www.amazon.ie/s?k=1.5mm2%20silicone%20wire%20red%20black)<br>[Amazon.ie (ferrules)](https://www.amazon.ie/s?k=ferrule%20crimp%20kit%201.5mm2) |
 
-Subtotal: **≈ €3** per slot
+Subtotal: **≈ €4** per slot
 
 ## Controller (once)
 
@@ -73,8 +74,9 @@ Subtotal: **≈ €3** per slot
 | 1 | SHT40 breakout | Adafruit 4885 or clone | 4.00 | on a cable in the low-voltage compartment | [DigiKey](https://www.digikey.ie/en/products/result?keywords=Adafruit%204885)<br>[Amazon.ie (clone)](https://www.amazon.ie/s?k=SHT40%20breakout%20module) |
 | 1 | Passives / small parts (2N7002K, BZT52C12, SMBJ26A, caps, resistors) | see fab/controller_board_bom.csv | 2.00 |  | [DigiKey BOM Manager (upload the CSV)](https://www.digikey.ie/en/mylists/bom-manager) |
 | 14 | M3 heat-set insert + M3x8 screw |  | 0.10 | controller box: 4 board standoffs, 4 PSU standoffs, 6 lid ears | [Amazon.ie](https://www.amazon.ie/s?k=M3%20heat%20set%20inserts%20brass%20kit) |
+| 1 | Open-barrel crimp tool for 2.8 / 4.8 / 6.3 mm tabs, 0.5–1.5 mm² | e.g. IWISS SN-48B | 25.00 | tool, for the contact tabs (once) | [Amazon.ie](https://www.amazon.ie/s?k=IWISS%20SN-48B%20crimping%20tool) |
 
-Subtotal: **≈ €44**
+Subtotal: **≈ €69**
 
 ## Power supply (once)
 
@@ -110,7 +112,7 @@ Subtotal: **≈ €15**
 
 | | ≈ € |
 |---|---:|
-| Per slot (board + module) | 24 |
-| Fixed (controller, power supply, filament, safety) | 156 |
-| 8 slots | 350 |
-| 16 slots | 544 |
+| Per slot (board + module) | 25 |
+| Fixed (controller, power supply, filament, safety) | 181 |
+| 8 slots | 379 |
+| 16 slots | 577 |

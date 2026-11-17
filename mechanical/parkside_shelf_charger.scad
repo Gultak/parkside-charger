@@ -65,15 +65,19 @@ latch_w  = 25;    // latch pocket width (reference holder)
 // latch pocket profile in the nose: [distance forward of the contact face, depth]
 latch_prof = [[nose_l + 0.2, 1.7], [52.9, 1.8], [50.5, 5], [49.5, 5], [front_l, 2]];
 
-/* [Battery contacts (male 6.3 x 0.8 mm tabs or 0.8 mm brass)] */
+/* [Battery contacts: FASTON 250 male crimp tabs (TE 42475-4, 6.35 x 0.81 mm, 22-18 AWG)] */
 // X positions of the contact tabs, measured from the channel centre line.
 // Parkside X20V: B+, ID (BMS status, ~10k to B-), T (unused, ~512k), B-
 contact_x   = [-12, -4, 4, 12];   // measured: 8 mm pitch; seen from the front: +, ID, T, - (T not used)
 contact_z   = 5.5;  // tab centre below the plate face
-contact_len = 8;    // how far the tab sticks out of the contact face (battery slots are 9.8 deep)
-tab_w       = 6.35;  // blade width: 0.8 mm brass cut to ~6.3 mm (slot = tab_w + 0.3)
-tab_t       = 0.8;
-tab_vertical = true; // blade plane vertical (true) or horizontal (false)
+contact_used = [true, true, false, true];   // + ID T -: T needs no tab
+contact_len = 6.5;  // how far the tab tip sticks out of the contact face (battery slots are 9.8 deep)
+tab_w       = 6.35; // tab width
+tab_t       = 0.81; // tab thickness
+tab_flat    = 8.2;  // flat tab length, tip to where it starts to widen into the crimp barrel  CHECK on your part
+barrel_w    = 5.0;  // pocket for the crimped barrel + wire, across the tab plane (the tab is vertical);
+                    // the barrel sits on one side of the tab plane: fit the tabs barrel-side inwards
+tab_vertical = true; // blade plane vertical (the pockets assume this)
 
 /* [Module frame] */
 pitch    = 88;    // module width = slot spacing (battery body 86 + 2, batteries are grabbed from below)
@@ -115,7 +119,7 @@ pcb_t = 1.6;
 pcb_z = 9;      // PCB bottom face below plate face
 
 /* [Microswitch: Omron D2F-01L / similar, M2 holes 6.5 mm apart] */
-sw_x    = -18;  // switch window centre from channel centre (between + contact and wall)
+sw_x    = -18;  // switch window centre from channel centre (behind the left prong)
 sw_z    = 3.5;
 sw_win  = [9, 4];   // window through the end stop for the lever (X, Z)
 
@@ -353,13 +357,21 @@ module slot_module() {
                            [for (q = latch_prof) [q[1], rail_len - q[0]]],
                            [[-eps, rail_len - front_l + eps]]));
 
-        // contact tab slots through the end stop
-        for (x = contact_x)
-            translate([x, y_stop - cblock_ch - eps, -contact_z])
-                if (tab_vertical) translate([-(tab_t + 0.15) / 2, 0, -(tab_w + 0.3) / 2])
-                    cube([tab_t + 0.15, y_bay0 + wall_h - y_stop + cblock_ch + 2 * eps, tab_w + 0.3]);
-                else translate([-(tab_w + 0.3) / 2, 0, -(tab_t + 0.15) / 2])
-                    cube([tab_w + 0.3, y_bay0 + wall_h - y_stop + cblock_ch + 2 * eps, tab_t + 0.15]);
+        // crimp-tab pockets: a slot for the flat tab at the front, a 45 deg taper where the
+        // terminal widens, then the pocket for the crimp barrel and wire straight back into
+        // the bay. The taper is the stop; a drop of epoxy in the pocket holds the tab.
+        for (i = [0 : len(contact_x) - 1]) if (contact_used[i]) let (x = contact_x[i], zc = -contact_z,
+                ya = y_stop - contact_len + tab_flat, h = tab_w + 0.3, ts = tab_t + 0.15,
+                sd = x < 0 ? 1 : -1,                                     // barrel side: towards the centre
+                x0 = sd > 0 ? x - ts / 2 - 0.15 : x + ts / 2 + 0.15 - barrel_w, // pocket [x0, x0 + barrel_w]
+                yb = ya + barrel_w - ts - 0.15) {                         // end of the 45 deg taper
+            translate([x - ts / 2, y_stop - cblock_ch - eps, zc - h / 2]) cube([ts, ya - y_stop + cblock_ch + eps, h]);
+            hull() {
+                translate([x - ts / 2, ya - eps, zc - h / 2]) cube([ts, eps, h]);
+                translate([x0, yb, zc - h / 2]) cube([barrel_w, eps, h]);
+            }
+            translate([x0, yb, zc - h / 2]) cube([barrel_w, y_bay0 + wall_h + 1 - yb, h]);
+        }
 
         // microswitch lever window + 2x M2 pilot holes (switch screwed to the
         // rear face of the end stop, inside the bay)
@@ -451,7 +463,8 @@ module slot_cover() {
             }
         }
         // gaps in the tongue where the contact blades pass through the end wall
-        for (x = contact_x) translate([x - 1, y_bay0 - 2, -wall_h - 0.5]) cube([2, 2, tongue_h + 1]);
+        for (i = [0 : len(contact_x) - 1]) if (contact_used[i])
+            translate([contact_x[i] - barrel_w - 0.5, y_bay0 - 2, -wall_h - 0.5]) cube([2 * barrel_w + 1, 2, tongue_h + 1]);
         // cable cut-outs, open at the top
         for (n = [cov_notch_l, cov_notch_r])
             translate([n[0], cov_back_y() - eps, -cov_notch_bot]) cube([n[1] - n[0], cov_t + 2 * eps, cov_notch_bot + 2]);
