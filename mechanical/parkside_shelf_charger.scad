@@ -43,7 +43,7 @@ rail_len = 64;    // measured: tongue end (release button) -> contact face
 prong_l  = 14;    // prong tips -> this far beyond the contact face
 prong_cl = 0.5;   // extra room in front of the prong tips
 cblock_w = 29.6;  // contact block width (fills the pocket between the prongs, 30 on the reference)
-cblock_ch = 4;    // 45 deg chamfer on the contact block's front corners
+cblock_ch = 0.8;  // small 45 deg chamfer on the contact block's front corners (the original charger has a square block)
 wing_l   = 7;     // the wide part tapers to the groove width over the last 7 mm
 // Battery top surface: beside the tongue there is a trough (at least as wide as
 // the reference holder, +-34.9 mm) down to below the grooves; further out the
