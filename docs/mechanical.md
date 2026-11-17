@@ -110,7 +110,7 @@ Then:
 
 1. Print `stl/joint_gauge.stl` (two 20 mm pieces, about 10 min) and slide the tongue piece into
    the groove piece from the open end. It should slide firmly without play. If it binds, raise
-   `jt_clear` (default 0.2 mm per side). If it is loose, lower it.
+   `jt_clear` (default 0.15 mm per side; 0.2 was a bit loose). If it is loose, lower it.
 2. Print `stl/gauge.stl` (rear face down, about 20 min): the front 37 mm of the channel with the
    nose, latch pocket, sloped walls and the start of the lips. Slide it onto the pack from the
    front until the lips engage. It should run smoothly without wobbling up and down, nothing may

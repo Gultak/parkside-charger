@@ -103,7 +103,7 @@ jt_d     = 5;         // dovetail depth
 jt_root  = 5;         // dovetail height at the root (narrow end)
 jt_tip   = 7;         // dovetail height at the tip (wide end)
 jt_zc    = (keep_z + plate_t) / 2;   // dovetail centre height (0 = channel ceiling)
-jt_clear = 0.2;       // clearance per side (raise to 0.25-0.3 if it binds)
+jt_clear = 0.15;      // clearance per side (0.2 test-fitted loose; raise to 0.2-0.25 if it binds)
 jt_front = 3;         // closed front end of the groove (front-edge alignment stop)
 jt_r     = 1.0;       // radius on the tongue's edges (groove follows with r + clearance)
 // The tongue's front end and the groove's closed end are both bevelled at 45 deg
