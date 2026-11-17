@@ -32,7 +32,7 @@
 part = "assembly"; // [slot, slot_cover, gauge, end_gauge, joint_gauge, controller, controller_preview, controller_lid, assembly, single, joint_section, joint_check]
 
 /* [Battery interface: MEASURE YOUR PACK] */
-chan_w   = 46.9;  // clear width between the rail walls, above the lips (tongue width 46.3 + 0.6)
+chan_w   = 46.8;  // clear width between the rail walls, above the lips (tongue width 46.3 + 0.5, test-fitted)
 lip_in   = 4.2;   // how far each lip sticks inward (groove depth 4.5 - 0.3)
 lip_t    = 5.0;   // lip thickness (groove height 5.4 - 0.4)
 lip_gap  = 5.1;   // plate face -> top face of lip (tongue top -> groove 4.8 + 0.3)
