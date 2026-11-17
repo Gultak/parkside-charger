@@ -96,8 +96,8 @@ is shared with the controller board in `../kicadgen/`. It needs KiCad 7 (`kicad-
 1. **FDMC8327L footprint:** it uses KiCad's `VSON-8_3.3x3.3mm_P0.65mm_NexFET` (the same
    S-S-S-G / drain-pad pinout as Power33). Compare it with the Onsemi land pattern, or pick a
    MOSFET specified for that footprint.
-2. **Terminal block orientation:** check which way the wire-entry side of J1/J6/J3 faces in the
-   3D viewer, and that it suits how the board slides into the bay.
+2. **Connector orientation:** check in the 3D viewer that J3's wire entry faces the front edge
+   (towards the contact block) and that the XT30 noses of J1/J6 stick out of the rear edge.
 3. **Review the routing in KiCad:** a custom grid router routed this board automatically.
    Electrically it is DRC-clean, but a human pass is recommended, especially:
    - the long ID trace from J3 to the comparator (R15/R16)
