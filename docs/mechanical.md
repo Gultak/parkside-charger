@@ -234,7 +234,8 @@ No cable has to be threaded through a part before it is connected.
     longer than L and N, so it is the last to tear off.
   - **Thermal cut-out** (KSD301, 70 °C, NC) in the L line, fixed with a cable tie or
     high-temperature adhesive against the PSU's heatsink; insulating sleeves on its terminals.
-  - All mains wiring stays in this compartment; ferrules on the flex ends. The Wagos lie in the
+  - All mains wiring stays in this compartment. Bare stranded ends go straight into the Wagos,
+    the earth ring lug is crimped straight onto the wire (no ferrule). The Wagos lie in the
     wiring bay behind the PSU.
 
 Plug everything in, lay the cables into the notches, then screw the lid on through the six outer

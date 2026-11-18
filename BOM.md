@@ -101,7 +101,8 @@ Subtotal: **≈ €83**, of which to buy **≈ €33**
 | 3 | Wago 221-412 lever connector (or 221-413) | Wago 221-412 | 0.40 | L: flex -> KSD301 -> PSU, N: flex -> PSU | ✅ at hand |  |
 | 1 | Heat alarm (for the hot press) |  | 20.00 | recommended | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=heat%20alarm%2010%20year) |
 | 1 | VH 3p housing + 2 crimp contacts (PSU AC input) | JST VHR-3N + SVH-21T-P1.1 | 0.30 | your 2-pin VH plug does not fit the 3-pin input (pin 2 is left out) | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=VHR-3N) |
-| 1 | Ring lugs M3 / M3.5 + ferrules |  | 1.00 | PE to the PSU; LOP-400 output | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=ring%20terminal%20kit%20insulated)<br>[Amazon.ie (ferrules)](https://www.amazon.ie/s?k=ferrule%20crimp%20kit%201.5mm2) |
+| 1 | Insulated ring lugs M3 / M3.5 |  | 1.00 | earth to the PSU's earth hole; LOP-400 screw output. Crimped straight onto the stranded wire, no ferrule | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=ring%20terminal%20kit%20insulated) |
+| 3 | Ferrules 0.75 mm² (optional) |  | 0.05 | only for the flex ends in the fused spur's screw clamps | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=ferrule%20crimp%20kit%200.75mm2) |
 | 1 | Thermal cut-out NC 70 C 250 V AC | KSD301 70C | 1.50 | in the AC line; not at DigiKey | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=KSD301%2070C%20normally%20closed) |
 | 2 | m wire 1.5 mm² (blue / brown) |  | 1.00 | mains side inside the box | ✅ at hand |  |
 
