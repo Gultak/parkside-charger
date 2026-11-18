@@ -75,7 +75,7 @@ Plus:
   charge: status *Pack BMS blocks charging*, entity `Slot n pack BMS fault`.
 - **Temperature:** charging only runs between 5 and 45 °C on the slot's NTC (next to the battery
   contacts), with 2 K hysteresis.
-  The LTC4162's own JEITA control is on as well. If the enclosure is above 45 °C (SHT21), all
+  The LTC4162's own JEITA control is on as well. If the enclosure is above 45 °C (SHT21; adjustable, see the safety interlock), all
   charging stops and the 24 V bus switch opens.
 - **Power budget:** `max_total_current: 8A` is shared out every 2 s. "100 %" requests go first,
   then the emptiest packs. A pack in its CV phase only reserves what it actually draws plus
@@ -83,6 +83,28 @@ Plus:
 - **Fault latching:** battery short or deep discharge, failed detection, the LTC4162 max-time
   fault, or a 10 h timeout put the slot in "Fault". It stays there until the pack is removed,
   and the buzzer sounds.
+
+## Safety interlock
+
+The controller switches the 24 V bus off, and no slot charges, while any of these holds. It
+overrides the "Charging enabled" switch and releases by itself once everything is fine again.
+
+| | Condition | Limit (Home Assistant config entity) |
+|---|---|---|
+| A | Enclosure (SHT21) too hot, or no SHT21 reading for the grace period | "Safety: max enclosure temperature", 45 °C, 3 °C hysteresis |
+| B | Room too hot (`room_temperature_entity`, default `sensor.hotpress_temperature_sensor_temperature`), or that value unknown / unavailable for the grace period | "Safety: max room temperature", 36 °C, 2 °C hysteresis |
+| C | Home Assistant not connected for the grace period | "Safety: Home Assistant grace period", 120 s |
+
+- After a boot nothing charges until Home Assistant has connected and sent the room temperature.
+- **"Safety: allow charging without Home Assistant"** (off by default) skips C and the
+  room-temperature-unknown check, e.g. while Home Assistant is down for maintenance. The
+  enclosure check stays.
+- **Entities:** "Safety interlock" (problem binary sensor) and "Safety interlock reason" (text);
+  the charger status shows "Stopped: <reason>" as well.
+- The component's own `max_ambient_temperature: 50` stays as a hard backstop, and the buzzer
+  sounds above 50 °C.
+- Change the room sensor with the `room_temperature_entity` substitution at the top of
+  `parkside-charger.yaml`.
 
 ## Home Assistant entities (per slot)
 

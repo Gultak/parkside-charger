@@ -8,6 +8,8 @@
 substitutions:
   name: parkside-charger
   friendly_name: Parkside Charger
+  # Home Assistant entity with the temperature of the room / cupboard the charger is in
+  room_temperature_entity: sensor.hotpress_temperature_sensor_temperature
 
 esphome:
   name: ${name}
@@ -102,6 +104,11 @@ sensor:
     humidity:
       name: "Enclosure humidity"
     update_interval: 30s
+  # room temperature from Home Assistant (safety interlock B)
+  - platform: homeassistant
+    id: room_temp
+    entity_id: ${room_temperature_entity}
+    internal: true
   - platform: wifi_signal
     name: "WiFi signal"
     update_interval: 120s
@@ -125,6 +132,43 @@ sensor:
     update_interval: 10s
 
 number:
+  # ---- safety interlock limits (see "Safety interlock" below)
+  - platform: template
+    id: max_enclosure_temp
+    name: "Safety: max enclosure temperature"
+    icon: mdi:thermometer-alert
+    unit_of_measurement: °C
+    min_value: 30
+    max_value: 50
+    step: 1
+    initial_value: 45
+    optimistic: true
+    restore_value: true
+    entity_category: config
+  - platform: template
+    id: max_room_temp
+    name: "Safety: max room temperature"
+    icon: mdi:home-thermometer
+    unit_of_measurement: °C
+    min_value: 25
+    max_value: 45
+    step: 1
+    initial_value: 36
+    optimistic: true
+    restore_value: true
+    entity_category: config
+  - platform: template
+    id: ha_grace
+    name: "Safety: Home Assistant grace period"
+    icon: mdi:timer-sand
+    unit_of_measurement: s
+    min_value: 30
+    max_value: 900
+    step: 30
+    initial_value: 120
+    optimistic: true
+    restore_value: true
+    entity_category: config
   - platform: template
     id: storage_days
     name: "Auto mode: storage after (days)"
@@ -139,6 +183,13 @@ number:
     entity_category: config
 
 switch:
+  - platform: template
+    id: allow_without_ha
+    name: "Safety: allow charging without Home Assistant"
+    icon: mdi:home-off-outline
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF # keep off: only for HA maintenance, and you then
+    entity_category: config           # lose the room temperature check as well
   - platform: template
     id: charging_enabled
     name: "Charging enabled"
@@ -174,7 +225,7 @@ parkside_charger:
   max_total_current: 10A
   enable_output: bus_switch
   ambient_temperature: enclosure_temp
-  max_ambient_temperature: 45
+  max_ambient_temperature: 50 # hard backstop; the adjustable limit is the safety interlock below
   storage_after_days_number: storage_days
   total_input_power:
     name: "Total charging power"
@@ -185,8 +236,75 @@ parkside_charger:
   status:
     name: "Charger status"
 
-# Audible alarm on any slot fault or overheating (optional)
+binary_sensor:
+  - platform: template
+    id: safety_interlock
+    name: "Safety interlock"
+    device_class: problem
+
+text_sensor:
+  - platform: template
+    id: safety_reason
+    name: "Safety interlock reason"
+    icon: mdi:shield-alert-outline
+
+# Safety interlock: the 24 V bus is switched off and no slot charges while
+#   A) the enclosure (SHT21) is above "max enclosure temperature" (3 degC hysteresis),
+#      or the SHT21 has not delivered a value for the grace period,
+#   B) the room (${room_temperature_entity}) is above "max room temperature" (2 degC
+#      hysteresis), or that value has been unknown / unavailable for the grace period,
+#   C) Home Assistant has not been connected for the grace period (unless "allow charging
+#      without Home Assistant" is on). After a boot, charging waits for Home Assistant.
+# It overrides the "Charging enabled" switch and releases by itself once all is well again.
 interval:
+  - interval: 5s
+    then:
+      - lambda: |-
+          const uint32_t now = millis();
+          const uint32_t grace = (uint32_t) id(ha_grace).state * 1000;
+          // when each input went missing (0 = fine, UINT32_MAX = not seen since boot: fail at once)
+          static uint32_t api_lost = UINT32_MAX, room_lost = UINT32_MAX, enc_lost = UINT32_MAX;
+          static bool enc_hot = false, room_hot = false;
+          auto since = [&](bool ok, uint32_t &t) {
+            if (ok) t = 0; else if (t == 0) t = now ? now : 1;
+            return !ok && (t == UINT32_MAX || now - t >= grace);
+          };
+          std::vector<std::string> why;
+
+          // A) enclosure temperature (SHT21 on the controller board)
+          float te = id(enclosure_temp).state;
+          bool enc_ok = id(enclosure_temp).has_state() && !std::isnan(te);
+          if (since(enc_ok, enc_lost)) why.push_back("enclosure sensor not responding");
+          if (enc_ok) {
+            if (te > id(max_enclosure_temp).state) enc_hot = true;
+            else if (te < id(max_enclosure_temp).state - 3) enc_hot = false;
+          }
+          if (enc_hot) why.push_back(str_sprintf("enclosure %.1f °C too hot", te));
+
+          // C) Home Assistant connection
+          bool api_ok = api::global_api_server != nullptr && api::global_api_server->is_connected();
+          if (since(api_ok, api_lost) && !id(allow_without_ha).state)
+            why.push_back("Home Assistant not connected");
+
+          // B) room temperature from Home Assistant (NaN when HA reports it unavailable)
+          float tr = id(room_temp).state;
+          bool room_ok = id(room_temp).has_state() && !std::isnan(tr);
+          if (since(room_ok, room_lost) && !(id(allow_without_ha).state && !api_ok))
+            why.push_back("room temperature unknown");
+          if (room_ok) {
+            if (tr > id(max_room_temp).state) room_hot = true;
+            else if (tr < id(max_room_temp).state - 2) room_hot = false;
+          }
+          if (room_hot) why.push_back(str_sprintf("room %.1f °C too hot", tr));
+
+          std::string reason;
+          for (auto &w : why) reason += (reason.empty() ? "" : ", ") + w;
+          id(charger).set_interlock(!why.empty(), reason);
+          id(safety_interlock).publish_state(!why.empty());
+          if (id(safety_reason).state != (why.empty() ? "OK" : reason))
+            id(safety_reason).publish_state(why.empty() ? "OK" : reason);
+
+  # Audible alarm on any slot fault or overheating (optional)
   - interval: 10s
     then:
       - lambda: |-

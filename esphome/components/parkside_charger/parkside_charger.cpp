@@ -765,6 +765,22 @@ float ParksideCharger::storage_after_days() const {
   return this->storage_after_days_;
 }
 
+void ParksideCharger::set_interlock(bool active, const std::string &reason) {
+  this->interlock_reason_ = reason;
+  if (active == this->interlock_)
+    return;
+  this->interlock_ = active;
+  if (active) {
+    ESP_LOGW(TAG, "Safety interlock: %s - charging stopped", reason.c_str());
+    for (auto *s : this->slots_)
+      s->set_allocation(0);
+    if (this->enable_out_ != nullptr)
+      this->enable_out_->turn_off();
+  } else {
+    ESP_LOGI(TAG, "Safety interlock released");
+  }
+}
+
 void ParksideCharger::setup() {
   if (this->enable_out_ != nullptr)
     this->enable_out_->turn_on();
@@ -820,7 +836,9 @@ void ParksideCharger::update() {
     this->present_s_->publish_state(present);
   if (this->status_ts_ != nullptr) {
     std::string s;
-    if (this->overtemp_)
+    if (this->interlock_)
+      s = "Stopped: " + this->interlock_reason_;
+    else if (this->overtemp_)
       s = "Stopped: enclosure too hot";
     else if (!this->enabled_)
       s = "Disabled";

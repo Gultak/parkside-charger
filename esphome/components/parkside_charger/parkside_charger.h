@@ -285,7 +285,12 @@ class ParksideCharger : public PollingComponent {
       s->request_full_charge();
   }
 
-  bool is_enabled() const { return this->enabled_ && !this->overtemp_; }
+  // Safety interlock, independent of the user's enable switch (e.g. from YAML: hot press too
+  // hot, Home Assistant gone). Active = 24 V bus off, no slot charges. Turns off at once.
+  void set_interlock(bool active, const std::string &reason = "");
+  bool interlock_active() const { return this->interlock_; }
+
+  bool is_enabled() const { return this->enabled_ && !this->overtemp_ && !this->interlock_; }
   const std::vector<ParksideSlot *> &slots() const { return this->slots_; }
   float storage_after_days() const;
 
@@ -301,6 +306,8 @@ class ParksideCharger : public PollingComponent {
   text_sensor::TextSensor *status_ts_{nullptr};
   bool enabled_{true};
   bool overtemp_{false};
+  bool interlock_{false};
+  std::string interlock_reason_;
   std::string last_status_;
 };
 

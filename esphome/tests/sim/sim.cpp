@@ -234,6 +234,17 @@ int main(int argc, char **argv) {
     r.run(0.01);
     CHECK(r.charging() == 0, "global disable stops all");
     r.hub.set_enabled(true);
+    r.run(0.05);
+    CHECK(r.slots[0]->is_charging(), "re-enabled -> charging");
+    r.hub.set_interlock(true, "hot press too hot");
+    r.run(0.01);
+    CHECK(r.charging() == 0 && !r.hub.is_enabled(), "safety interlock stops all");
+    r.hub.set_enabled(true);  // the user switch must not override the interlock
+    r.run(0.01);
+    CHECK(r.charging() == 0, "user enable does not override the interlock");
+    r.hub.set_interlock(false);
+    r.run(0.05);
+    CHECK(r.slots[0]->is_charging(), "interlock released -> charging again");
     r.chips[1]->online = true;
     r.insert(1, 50, 2.0f, 0.12f);  // old, worn 2 Ah pack
     r.nominal[1]->state = 2.0f;
