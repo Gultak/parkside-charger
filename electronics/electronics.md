@@ -217,8 +217,9 @@ first draft) are not available. The bus switch and buzzer therefore use GPIO19/1
   charged again until you take it out.
 - Print the holders in **PETG or ASA**, not PLA, which softens near 55 °C. If the shelf is wood
   or chipboard, screw a 0.5–1 mm **steel or aluminium sheet** between the shelf and the modules.
-  Keep nothing flammable directly below the rack. In a hot press or other closed space, fit a
-  **heat alarm** (smoke alarms false-trigger on steam). Ambient up to about 30 °C is fine; the
+  Keep nothing flammable directly below the rack. In a hot press or other closed space, have a
+  temperature sensor in there with an alert (e.g. in Home Assistant, which also gets the
+  charger's own enclosure temperature), or a heat alarm (smoke alarms false-trigger on steam). Ambient up to about 30 °C is fine; the
   firmware stops charging when the box itself goes above 45 °C.
 - Never charge packs that are swollen, dropped hard, or have been below 0 °C.
 - The AC side (fused spur, flex, gland, thermal cut-out, PSU) must be built by a qualified person, with PE

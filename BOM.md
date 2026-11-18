@@ -99,13 +99,12 @@ Subtotal: **≈ €83**, of which to buy **≈ €33**
 | 1 | Cable spur -> box, round 3-core (e.g. 3-core 1.5 mm² or H05VV-F 3G1.0), length to suit |  | 2.00 | round, so the gland seals and clamps it; solid or stranded both suit the Wagos | 🛒 order |  |
 | 1 | Cable gland M20 nylon IP68 with locknut |  | 0.50 | for 6-12 mm cable; hole 20.5 mm in the box | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=M20%20cable%20gland%20nylon%20locknut) |
 | 4 | Wago 221-412 lever connector (or 221-413) | Wago 221-412 | 0.40 | L: cable -> KSD301 -> PSU, N: cable -> PSU, PE: cable -> earth lead to the PSU | ✅ at hand |  |
-| 1 | Heat alarm (for the hot press) |  | 20.00 | recommended | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=heat%20alarm%2010%20year) |
 | 1 | VH 3p housing + 2 crimp contacts (PSU AC input) | JST VHR-3N + SVH-21T-P1.1 | 0.30 | your 2-pin VH plug does not fit the 3-pin input (pin 2 is left out) | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=VHR-3N) |
 | 1 | Insulated ring lugs M3 / M3.5 |  | 1.00 | on a short stranded green/yellow lead from the earth Wago to the PSU's earth hole; LOP-400 screw output | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=ring%20terminal%20kit%20insulated) |
 | 1 | Thermal cut-out NC 70 C 250 V AC | KSD301 70C | 1.50 | in the AC line; not at DigiKey | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=KSD301%2070C%20normally%20closed) |
 | 2 | m wire 1.5 mm² (blue / brown) |  | 1.00 | mains side inside the box | ✅ at hand |  |
 
-Subtotal: **≈ €82**, of which to buy **≈ €77**
+Subtotal: **≈ €62**, of which to buy **≈ €57**
 
 ## Filament
 
@@ -128,6 +127,6 @@ Subtotal: **≈ €15**, of which to buy **≈ €15**
 | | Total ≈ € | To buy ≈ € |
 |---|---:|---:|
 | Per slot (board + module) | 25 | 23 |
-| Fixed (controller, power supply, filament, safety) | 220 | 126 |
-| 8 slots | 417 | 311 |
-| 16 slots | 615 | 496 |
+| Fixed (controller, power supply, filament, safety) | 200 | 106 |
+| 8 slots | 397 | 291 |
+| 16 slots | 595 | 476 |
