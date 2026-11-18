@@ -96,17 +96,16 @@ Subtotal: **≈ €83**, of which to buy **≈ €33**
 | 1 | PSU 24 V open frame | Mean Well LOP-400-24 (250 W fanless) or LOP-300-24 (180 W) | 40.00 | LOP-300: VH output, plugs 1:1 into J1. LOP-400: M3.5 screw output, use ring lugs on the PSU end | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/detail/mean-well-usa-inc/LOP-400-24/22040935) |
 | 2 | JST-VHR-6N housing with 6 contacts, crimped | JST VHR-6N + SVH-21T-P1.1 | 0.40 | PSU -> J1 cable: 3 x 0.75 mm² per pole (LOP-400: one housing + 2 ring lugs) | ✅ at hand |  |
 | 1 | Switched fused spur with flex outlet, 3 A fuse |  | 12.00 | wall side; replaces an inlet's switch and fuse. Fitted by an electrician | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=switched%20fused%20spur%20flex%20outlet) |
-| 1 | Flex 3-core 0.75-1.0 mm² (H05VV-F 3G0.75), length to suit |  | 2.00 | spur -> controller box | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=H05VV-F%203G0.75%20flex) |
+| 1 | Cable spur -> box, round 3-core (e.g. 3-core 1.5 mm² or H05VV-F 3G1.0), length to suit |  | 2.00 | round, so the gland seals and clamps it; solid or stranded both suit the Wagos | 🛒 order |  |
 | 1 | Cable gland M20 nylon IP68 with locknut |  | 0.50 | for 6-12 mm cable; hole 20.5 mm in the box | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=M20%20cable%20gland%20nylon%20locknut) |
-| 3 | Wago 221-412 lever connector (or 221-413) | Wago 221-412 | 0.40 | L: flex -> KSD301 -> PSU, N: flex -> PSU | ✅ at hand |  |
+| 4 | Wago 221-412 lever connector (or 221-413) | Wago 221-412 | 0.40 | L: cable -> KSD301 -> PSU, N: cable -> PSU, PE: cable -> earth lead to the PSU | ✅ at hand |  |
 | 1 | Heat alarm (for the hot press) |  | 20.00 | recommended | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=heat%20alarm%2010%20year) |
 | 1 | VH 3p housing + 2 crimp contacts (PSU AC input) | JST VHR-3N + SVH-21T-P1.1 | 0.30 | your 2-pin VH plug does not fit the 3-pin input (pin 2 is left out) | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=VHR-3N) |
-| 1 | Insulated ring lugs M3 / M3.5 |  | 1.00 | earth to the PSU's earth hole; LOP-400 screw output. Crimped straight onto the stranded wire, no ferrule | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=ring%20terminal%20kit%20insulated) |
-| 3 | Ferrules 0.75 mm² (optional) |  | 0.05 | only for the flex ends in the fused spur's screw clamps | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=ferrule%20crimp%20kit%200.75mm2) |
+| 1 | Insulated ring lugs M3 / M3.5 |  | 1.00 | on a short stranded green/yellow lead from the earth Wago to the PSU's earth hole; LOP-400 screw output | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=ring%20terminal%20kit%20insulated) |
 | 1 | Thermal cut-out NC 70 C 250 V AC | KSD301 70C | 1.50 | in the AC line; not at DigiKey | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=KSD301%2070C%20normally%20closed) |
 | 2 | m wire 1.5 mm² (blue / brown) |  | 1.00 | mains side inside the box | ✅ at hand |  |
 
-Subtotal: **≈ €81**, of which to buy **≈ €77**
+Subtotal: **≈ €82**, of which to buy **≈ €77**
 
 ## Filament
 
@@ -131,4 +130,4 @@ Subtotal: **≈ €15**, of which to buy **≈ €15**
 | Per slot (board + module) | 25 | 23 |
 | Fixed (controller, power supply, filament, safety) | 220 | 126 |
 | 8 slots | 417 | 311 |
-| 16 slots | 614 | 496 |
+| 16 slots | 615 | 496 |

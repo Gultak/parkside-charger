@@ -222,20 +222,22 @@ No cable has to be threaded through a part before it is connected.
 - **Mains side**, behind a closed partition: the PSU on four 6 mm M3 standoffs (heat-set inserts),
   a 20.5 mm hole for an **M20 cable gland** in the rear wall (`mains_entry = "gland"`), and 2.5 mm
   vent slots in both side walls and the lid. The charger is **hard-wired**: 3-core flex from a
-  switched fused spur (3 A fuse) comes in through the gland, which clamps it. A 25 mm wiring bay (`mains_bay`) between the PSU and the rear wall
+  switched fused spur (3 A fuse) comes in through the gland, which clamps it. Use **round**
+  cable (flat twin & earth doesn't seal or clamp properly in a round gland; M20 grips 6-12 mm). A 25 mm wiring bay (`mains_bay`) between the PSU and the rear wall
   holds the gland nut, the flex bend, the Wagos and the KSD301. (`mains_entry = "iec"`
   gives the cut-out for a 50 mm snap-in IEC C14 inlet with switch and fuse instead: 47.2 × 28.1 mm,
   wall thinned to `iec_panel_t` = 2 mm around it.) The PSU's 24 V leads
   pass the partition through one small notch next to its output terminals, to J1 (a 6-pin JST VH plug).
-  - **L and N:** three **Wago 221** lever connectors: flex L → KSD301 → PSU L, and flex N → PSU N.
+  - **L and N:** three **Wago 221** lever connectors: cable L → KSD301 → PSU L, and cable N → PSU N.
     The PSU side is a JST VHR-3 plug on its AC input (pin 1 L, pin 3 N) with short leads.
-  - **PE:** the flex's earth with a ring lug to the PSU's earth-marked mounting hole (under that
-    screw, with a star washer). The datasheet requires it for class I. Leave the earth a little
-    longer than L and N, so it is the last to tear off.
+  - **PE:** the cable's earth (sleeved green/yellow if it is bare) into a fourth Wago, and from there
+    a short stranded green/yellow lead with a crimped ring lug to the PSU's earth-marked mounting
+    hole (under that screw, with a star washer). The datasheet requires it for class I. Leave the
+    earth a little longer than L and N, so it is the last to tear off.
   - **Thermal cut-out** (KSD301, 70 °C, NC) in the L line, fixed with a cable tie or
     high-temperature adhesive against the PSU's heatsink; insulating sleeves on its terminals.
-  - All mains wiring stays in this compartment. Bare stranded ends go straight into the Wagos,
-    the earth ring lug is crimped straight onto the wire (no ferrule). The Wagos lie in the
+  - All mains wiring stays in this compartment. Solid or stranded ends go straight into the
+    Wagos, no ferrules needed. The Wagos lie in the
     wiring bay behind the PSU.
 
 Plug everything in, lay the cables into the notches, then screw the lid on through the six outer
