@@ -11,7 +11,7 @@
 ![Clip-on bay cover: front face with the tongue, floor, back face with cable cut-outs open at the top, spring tabs near the rear](img/slot_cover.png)
 ![Inside the bay: 45° bevel behind the end wall, with the contact slots and the microswitch pocket](img/bay_bevel.png)
 ![Print orientation: rear face on the bed, nose on top](img/slot_print.png)
-![Controller box: low-voltage side with cable notches open towards the lid, closed mains compartment for the LOP-400 (green) with IEC inlet cut-out and vent slots](img/controller_box.png)
+![Controller box: low-voltage side with cable notches open towards the lid, closed mains compartment for the LOP-400 (green) with cable gland hole and vent slots](img/controller_box.png)
 
 ## Concept
 
@@ -144,7 +144,7 @@ For the end modules, add `-D joint_left=false` (leftmost, no groove) or `-D join
 | `joint_gauge.stl` | 1 | as exported | Tests the dovetail fit |
 | `gauge.stl`, `end_gauge.stl` | 1 each | as exported (rear face down) | Test the front end + latch, and the channel end + contacts |
 | `slot_cover.stl` | 1 per slot | floor on the bed (as exported) | Clip-on bay cover. Print it in **PETG (V-0)**: the spring tabs need its flexibility |
-| `controller.stl` | 1 | open side up | All cable notches open to the top, so no support is needed (the IEC cut-out's top edge is a short bridge). Print the box with the PSU in **ASA, PC or flame-retardant (V-0) PETG**: the PSU's heatsinks get warm |
+| `controller.stl` | 1 | open side up | All cable notches open to the top, so no support is needed (the gland hole is a short bridge). Print the box with the PSU in **ASA, PC or flame-retardant (V-0) PETG**: the PSU's heatsinks get warm |
 | `controller_lid.stl` | 1 | flat | |
 
 **Material: PETG or ASA** (PC-FR if you can). Do **not** use PLA: it creeps under the constant
@@ -212,7 +212,7 @@ No cable has to be threaded through a part before it is connected.
 - One JST-XH 4-pin cable per slot runs to the controller, wired 1:1 (5V, GND, SDA, SCL). Run them
   in a cable duct along the rear.
 
-**Controller box** (148 × 179 × 50 mm with the LOP-400). Two compartments:
+**Controller box** (148 × 204 × 50 mm with the LOP-400). Two compartments:
 - **Low-voltage side:** the board sits on 4 standoffs with its components facing the lid. Its
   walls have U-notches **open towards the lid**:
   - left and right walls: slot cables 1–8 and 9–16, and OUT A / OUT B. Those leave the board's
@@ -220,15 +220,22 @@ No cable has to be threaded through a part before it is connected.
     row 2 right)
   - top wall: the ESP32's USB-C, plus the SHT21, Qwiic and expansion cables
 - **Mains side**, behind a closed partition: the PSU on four 6 mm M3 standoffs (heat-set inserts),
-  an **IEC C14 inlet with switch and fuse** (Schurter DD11.0121.1111 or ISL MIS-I-80485, both the common 50 mm snap-in size) in the rear wall (cut-out 47.2 × 28.1 mm, wall thinned to `iec_panel_t` = 2 mm around it for the clips;
-  check your part), and 2.5 mm vent slots in both side walls and the lid. The PSU's 24 V leads
+  a 20.5 mm hole for an **M20 cable gland** in the rear wall (`mains_entry = "gland"`), and 2.5 mm
+  vent slots in both side walls and the lid. The charger is **hard-wired**: 3-core flex from a
+  switched fused spur (3 A fuse) comes in through the gland, which clamps it. A 25 mm wiring bay (`mains_bay`) between the PSU and the rear wall
+  holds the gland nut, the flex bend, the Wagos and the KSD301. (`mains_entry = "iec"`
+  gives the cut-out for a 50 mm snap-in IEC C14 inlet with switch and fuse instead: 47.2 × 28.1 mm,
+  wall thinned to `iec_panel_t` = 2 mm around it.) The PSU's 24 V leads
   pass the partition through one small notch next to its output terminals, to J1 (a 6-pin JST VH plug).
-  - **PE:** connect the inlet's earth to the PSU's earth-marked mounting hole (ring lug under that
-    screw, with a star washer). The datasheet requires it for class I.
-  - **Thermal cut-out** (KSD301, 70 °C, NC) in the L line between inlet and PSU, fixed with a cable
-    tie or high-temperature adhesive against the PSU's heatsink.
-  - All mains wiring stays in this compartment; use ferrules or crimped VH contacts, and
-    insulating sleeves on the inlet's spade terminals.
+  - **L and N:** three **Wago 221** lever connectors: flex L → KSD301 → PSU L, and flex N → PSU N.
+    The PSU side is a JST VHR-3 plug on its AC input (pin 1 L, pin 3 N) with short leads.
+  - **PE:** the flex's earth with a ring lug to the PSU's earth-marked mounting hole (under that
+    screw, with a star washer). The datasheet requires it for class I. Leave the earth a little
+    longer than L and N, so it is the last to tear off.
+  - **Thermal cut-out** (KSD301, 70 °C, NC) in the L line, fixed with a cable tie or
+    high-temperature adhesive against the PSU's heatsink; insulating sleeves on its terminals.
+  - All mains wiring stays in this compartment; ferrules on the flex ends. The Wagos lie in the
+    wiring bay behind the PSU.
 
 Plug everything in, lay the cables into the notches, then screw the lid on through the six outer
 ears (corners plus a pair at the partition). The ears sit at the four corners, outside the notches, each on a 45° gusset, so the box

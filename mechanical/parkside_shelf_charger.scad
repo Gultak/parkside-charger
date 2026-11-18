@@ -169,6 +169,10 @@ psu = "LOP-400";          // [LOP-400, LOP-300, none]
 psu_gap = 8;              // PSU board edge to the compartment walls (wiring, airflow)
 psu_standoff = 6;         // M3 standoffs (datasheet: max 3 mm of pins below the PSU board)
 part_t = 2.4;             // partition wall between the mains and the low-voltage compartment
+mains_entry = "gland";    // [gland, iec] hard-wired flex through a cable gland, or an IEC C14 inlet
+gland_d = 20.5;           // M20 cable gland: clearance hole (the nut goes inside)
+mains_bay = 25;           // extra room between the PSU and the rear wall for the gland nut, the
+                          // flex bend, the Wago connectors and the KSD301 (gland version only)
 iec_cut = [47.2, 28.1];   // IEC C14 inlet with fuse + switch, 50 mm snap-in size: Schurter DD11.0121.1111 (47.1 x 28.1)
                           // or ISL MIS-I-80485 (47 x 27.9, flange 50 x 30.5) both fit
 iec_panel_t = 2.0;        // wall thickness at the inlet for its snap-in clips (recessed from the inside; CHECK)
@@ -516,7 +520,7 @@ module end_gauge() {
 // so all cables can be plugged in first and the lid put on afterwards:
 //   left/right walls: slot cables 1-8 / 9-16, and OUT A/B (they run along the cable
 //   channel behind the board); top wall: ESP32 USB-C, SHT21 / Qwiic / expansion.
-// Mains compartment: closed walls, IEC C14 inlet (fuse + switch) in the rear wall,
+// Mains compartment: closed walls, M20 cable gland (or IEC C14 inlet) in the rear wall,
 // finger-safe vent slots; the PSU's 24 V leads pass the partition in one small notch.
 // PSU data [L, W, H], first hole from the corner [x, y], hole spacing [x, y] (datasheets)
 function psu_spec() = psu == "LOP-300" ? [[101.6, 50.8, 25.4], [3.175, 3.175], [95.25, 44.45]]
@@ -526,7 +530,7 @@ function ctl_ix() = max(ctl_pcb[0] + 2 * ctl_gap, has_psu() ? psu_spec()[0][0] +
 function ctl_iz() = 48;   // room above the board for the vertical XT30 plugs (OUT A/B) and their cables
 function ctl_y1() = ctl_wall + ctl_gap + ctl_pcb[1] + (has_psu() ? ctl_chan : ctl_gap);  // end of LV cavity
 function psu_y0() = ctl_y1() + part_t;                                                   // start of PSU cavity
-function psu_y1() = psu_y0() + psu_spec()[0][1] + 2 * psu_gap;
+function psu_y1() = psu_y0() + psu_spec()[0][1] + 2 * psu_gap + (mains_entry == "gland" ? mains_bay : 0);
 function ctl_o() = [ctl_ix() + 2 * ctl_wall, (has_psu() ? psu_y1() : ctl_y1()) + ctl_wall, ctl_iz() + ctl_wall];
 function ctl_pcb_xy(p) = [p[0] - ctl_pcb[0] / 2, ctl_wall + ctl_gap + p[1]];   // board -> box coords
 function psu_xy0() = [-psu_spec()[0][0] / 2, psu_y0() + psu_gap];              // PSU board corner
@@ -575,9 +579,14 @@ module controller_box() {
         if (has_psu()) {
             // 24 V leads from the PSU output terminals (right end) through the partition
             translate([ix / 2 - psu_gap - 22, ctl_y1() - eps, ctl_wall + psu_standoff + 6]) cube([14, part_t + 2 * eps, top]);
-            // IEC C14 inlet (fuse + switch) in the rear wall, next to the PSU's AC input (left end)
-            translate([-ix / 2 + psu_gap + 4, o[1] - ctl_wall - eps, ctl_wall + 5]) cube([iec_cut[0], ctl_wall + 2 * eps, iec_cut[1]]);
-            if (iec_panel_t < ctl_wall)   // thinner wall around the cut-out, for the snap-in clips
+            // mains entry in the rear wall, next to the PSU's AC input (left end): an M20 cable
+            // gland for the hard-wired flex (default), or an IEC C14 inlet with fuse + switch
+            if (mains_entry == "gland")
+                translate([-ix / 2 + psu_gap + 4 + 14, o[1] + eps, ctl_wall + 5 + 14]) rotate([90, 0, 0])
+                    cylinder(d = gland_d, h = ctl_wall + 2 * eps, $fn = 64);
+            if (mains_entry == "iec")
+                translate([-ix / 2 + psu_gap + 4, o[1] - ctl_wall - eps, ctl_wall + 5]) cube([iec_cut[0], ctl_wall + 2 * eps, iec_cut[1]]);
+            if (mains_entry == "iec" && iec_panel_t < ctl_wall)   // thinner wall around the cut-out, for the snap-in clips
                 translate([-ix / 2 + psu_gap + 4 - 2, o[1] - ctl_wall - eps, ctl_wall + 5 - 2])
                     cube([iec_cut[0] + 4, ctl_wall - iec_panel_t + eps, iec_cut[1] + 4]);
             // vent slots in both side walls of the mains compartment (low and high rows)

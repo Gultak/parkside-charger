@@ -3,7 +3,7 @@
 ## 1. System overview
 
 ```
- 230 V AC ─[IEC inlet, switch, T3.15 A fuse]─[KSD301 70 °C cut-out, NC]─► Mean Well LOP-400-24 (in the controller box)
+ 230 V AC ─[switched fused spur, 3 A]─ flex ─[M20 gland, Wago]─[KSD301 70 °C cut-out, NC]─► Mean Well LOP-400-24 (in the controller box)
                                                                             │ 24 V
    ┌─────────────────────────────────── CONTROLLER BOARD ──────────────────┴──────────────────────────┐
    │ J1 ─ 10 A fuse ─┬─ always on ─► TSR 1-2450 5 V ─┬─► ESP32-C6 D1 (Dupont sockets) ─ 3V3 ─► I2C side │
@@ -217,9 +217,11 @@ first draft) are not available. The bus switch and buzzer therefore use GPIO19/1
   charged again until you take it out.
 - Print the holders in **PETG or ASA**, not PLA, which softens near 55 °C. If the shelf is wood
   or chipboard, screw a 0.5–1 mm **steel or aluminium sheet** between the shelf and the modules.
-  Keep nothing flammable directly below the rack, and put a smoke detector in the room.
+  Keep nothing flammable directly below the rack. In a hot press or other closed space, fit a
+  **heat alarm** (smoke alarms false-trigger on steam). Ambient up to about 30 °C is fine; the
+  firmware stops charging when the box itself goes above 45 °C.
 - Never charge packs that are swollen, dropped hard, or have been below 0 °C.
-- The AC side (inlet, fuse, thermal cut-out, PSU) must be built by a qualified person, with PE
+- The AC side (fused spur, flex, gland, thermal cut-out, PSU) must be built by a qualified person, with PE
   connected to the PSU's earth-marked mounting hole. The LOP is an **open-frame** supply: it must
   sit in the closed mains compartment of the controller box (lid screwed on, only finger-safe
   2.5 mm vents), never open on the shelf. Print that box in ASA, PC or V-0 rated PETG.
