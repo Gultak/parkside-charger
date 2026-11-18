@@ -18,7 +18,7 @@ verdict** for every slot to Home Assistant.
 | Power | Mean Well **LOP-400-24** open-frame PSU (250 W fanless), built into the controller box in its own mains compartment. The battery-side budget (10 A) is shared across the slots |
 | Presence | Microswitch per slot, with the pack's BMS signal (ID contact) and voltage as a fallback |
 | Safety | Per-slot fuses on both sides, the pack's BMS signal gates charging, slot NTC window 5–45 °C plus JEITA, charge timeout, fault latching, ambient limit, default-off soft-start bus switch, **70 °C thermal cut-out in the AC line** |
-| Estimated cost | about €25 per slot plus about €195 fixed: about €445 for 10 slots, about €590 for 16; with the parts already at hand, about €335 / €475 to buy ([BOM.md](BOM.md)) |
+| Estimated cost | about €25 per slot plus about €220 fixed (incl. fused spur and heat alarm): about €465 for 10 slots, about €615 for 16; with the parts already at hand, about €360 / €500 to buy ([BOM.md](BOM.md)) |
 
 ## Contents
 
