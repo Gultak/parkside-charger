@@ -176,6 +176,13 @@ mains_bay = 25;           // extra room between the PSU and the rear wall for th
 iec_cut = [47.2, 28.1];   // IEC C14 inlet with fuse + switch, 50 mm snap-in size: Schurter DD11.0121.1111 (47.1 x 28.1)
                           // or ISL MIS-I-80485 (47 x 27.9, flange 50 x 30.5) both fit
 iec_panel_t = 2.0;        // wall thickness at the inlet for its snap-in clips (recessed from the inside; CHECK)
+psu_fan = true;           // 90/92 mm 12 V PWM fan on the lid, blowing onto the PSU (finger-safe grille)
+fan_size = 92;            // fan frame
+fan_hole_pitch = 82.5;    // fan screw holes (92 mm fan: 82.5, 80 mm fan: 71.5)
+fan_hole_d = 4.4;         // fan screws / M4
+power_led = true;         // panel LED (Lumex SSI-LXMP059ID, snap-in) in the lid over the low-voltage side
+led_cut = [6.6, 4.6];     // its rectangular cut-out (catalogue: 0.258 x 0.177 in)  CHECK against your part
+led_panel_t = 1.6;        // lid thickness at the LED, for its snap-in clips (recessed from the inside)  CHECK
 vent_w = 2.5;             // vent slot width (finger-safe)
 
 $fn = 48;
@@ -620,10 +627,30 @@ module controller_lid() {
             translate([e[0] * (o[0] / 2 + 4), e[1] + 4, -eps]) cylinder(d = 3.4, h = 10);
         // vent slots above the regulator / bus switch area
         for (i = [0:7]) translate([-30 + i * 8, ctl_y1() - 26, -eps]) cube([3, 18, 3]);
-        // vent slots above the PSU (finger-safe width)
-        if (has_psu())
+        // above the PSU: the fan's grille and screw holes, or plain vent slots (finger-safe width)
+        if (has_psu() && psu_fan) {
+            fc = [0, psu_xy0()[1] + psu_spec()[0][1] / 2];      // fan centred over the PSU
+            intersection() {
+                translate([fc[0], fc[1], -eps]) cylinder(d = fan_size - 6, h = 3, $fn = 96);
+                for (y = [-fan_size / 2 : vent_w + 2.5 : fan_size / 2])
+                    translate([fc[0] - fan_size / 2, fc[1] + y, -2 * eps]) cube([fan_size, vent_w, 3 + 2 * eps]);
+            }
+            for (dx = [-1, 1], dy = [-1, 1])
+                translate([fc[0] + dx * fan_hole_pitch / 2, fc[1] + dy * fan_hole_pitch / 2, -eps])
+                    cylinder(d = fan_hole_d, h = 10, $fn = 24);
+            // slot for the fan's 4-pin plug into the low-voltage side (to J7 on the board)
+            translate([40 - 6, ctl_y1() - 7 - 3, -eps]) cube([12, 6, 3]);
+        } else if (has_psu())
             for (y = [psu_y0() + psu_gap + 6 : 6 : psu_y1() - psu_gap - 6])
                 translate([-psu_spec()[0][0] / 2 + 12, y, -eps]) cube([psu_spec()[0][0] - 24, vent_w, 3]);
+        // power LED, near the low-voltage compartment's corner
+        if (power_led) {
+            lp = [-ix / 2 + 18, ctl_wall + 14];
+            translate([lp[0] - led_cut[0] / 2, lp[1] - led_cut[1] / 2, -eps]) cube([led_cut[0], led_cut[1], 3]);
+            if (led_panel_t < 2.4)
+                translate([lp[0] - led_cut[0] / 2 - 3, lp[1] - led_cut[1] / 2 - 3, led_panel_t])
+                    cube([led_cut[0] + 6, led_cut[1] + 6, 3]);
+        }
     }
 }
 // for previews: the PSU as a block

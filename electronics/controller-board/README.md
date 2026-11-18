@@ -29,7 +29,7 @@ ground pour around them, and the 24 V band stays separate. The extra cost is sma
 | Where | What |
 |---|---|
 | Top edge, centre | **ESP32-C6 D1** in 2 × 1×8 female Dupont headers (holes 1.0 mm, rows 22.86 mm apart). The USB-C faces the edge for flashing. The antenna points into the board, and the board has **no copper on any layer** below it |
-| Beside the module | Left: **J5** Qwiic, **J4** SHT21 breakout (3V3 GND SCL SDA, 2.54 mm), the I²C pull-ups and the buzzer. Right: **J6** expansion (3V3 GND IO5 IO6 IO7 TX RX, vertical) and the voltage dividers |
+| Beside the module | Left: **J8** power LED (2-pin), **J5** Qwiic, **J4** SHT21 breakout (3V3 GND SCL SDA, 2.54 mm), the I²C pull-ups and the buzzer. Right: **J6** expansion (3V3 GND IO5 IO6 IO7 TX RX, vertical), the voltage dividers, **J7** 4-pin PC fan header with its PWM driver, and **J9**, the +12 V input from the PSU's fan connector |
 | Left / right edge | **J101–J108**: slots 1–8. **J109–J116**: slots 9–16, at a 7 mm pitch. All are JST-XH 4-pin, `5V GND SDA SCL`, the same order as the slot board's J2, so cables are wired 1:1 |
 | Bottom edge | **J1** 24 V from the PSU (JST B6P-VH, pins 1-3 +V, 4-6 −V, as on the LOP-300 output) → **10 A mini blade fuse** → TVS → AOD4185 bus switch (soft start, GPIO19) → **J2 OUT A** and **J3 OUT B** (vertical XT30 females, two slot daisy chains). Above OUT B: the **TSR 1-2450** 5 V regulator and a 0.5 A PTC for the slot 5 V rail |
 | Between module and connectors | 2 × TCA9548A (0x70 for slots 1–8, 0x71 for 9–16), rotated so each pin row faces its connectors, plus 8 × 4.7 kΩ pull-up arrays to 5V_SLOT |

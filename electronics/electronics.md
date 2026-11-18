@@ -179,7 +179,9 @@ up to **16 slots**.
 | Slot connectors | 16 × JST-XH 4 (5V, GND, SDA, SCL): slots 1–8 on the left edge, 9–16 on the right | Same pin order as the slot board's J2, so cables are wired 1:1 |
 | Supply sensing | 100 k / 10 k dividers: PSU voltage → **GPIO0**, switched bus voltage → **GPIO1** | Firmware entities *PSU voltage* and *Slot bus voltage* |
 | Buzzer | 12 mm 5 V active buzzer, 2N7002 from **GPIO18** | Sounds on any slot fault or enclosure > 50 °C |
-| Headers | SHT21 breakout (3V3 GND SCL SDA, on a cable near the PSU), Qwiic (spare I²C), 7-pin expansion (3V3 GND IO5 IO6 IO7 TX RX) | |
+| PSU fan | **J7** standard 4-pin PC fan header (GND, +12 V, tach, PWM). +12 V comes from the PSU's own +12 V aux fan output to the 1-pin header **J9**. PWM from **GPIO6** through a 2N7002 (open drain, 25 kHz), tach into **GPIO7** with a 10 k pull-up to 3.3 V | 90/92 mm fan on the lid, blowing onto the PSU. Firmware: see "PSU fan" in docs/firmware.md |
+| Power LED | **J8** 2-pin header: +5 V through 330 Ω (about 9 mA), anode on pin 1 | Lumex SSI-LXMP059ID snap-in panel LED in the lid |
+| Headers | SHT21 breakout (3V3 GND SCL SDA, on a cable near the PSU), Qwiic (spare I²C), 7-pin expansion (3V3 GND IO5 IO6 IO7 TX RX; IO6/IO7 are the fan's PWM/tach) | |
 
 **Why the slot side runs at 5 V:** the green and blue chips of a typical RGB LED have
 V_F ≈ 3.0–3.4 V. At 3.3 V they would barely light, whichever way the LED is wired. At 5 V the PCA9554

@@ -80,6 +80,12 @@ Subtotal: **≈ €5** per slot, of which to buy **≈ €4**
 | 16 | JST-XH 4p vertical header | JST B4B-XH-A(LF)(SN) | 0.10 | slot connectors | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=B4B-XH-A%28LF%29%28SN%29) |
 | 32 | JST-XH 4p housing + 4 crimp contacts | JST XHP-4 + SXH-001T-P0.6 | 0.15 | both ends of the slot cables (28-22 AWG) | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=XHP-4)<br>[DigiKey](https://www.digikey.ie/en/products/result?keywords=SXH-001T-P0.6) |
 | 16 | Slot cable, 4-core 22 AWG, up to 1.5 m |  | 0.50 |  | ✅ at hand |  |
+| 1 | 4-pin PC fan header | Molex 47053-1000 | 0.40 | J7 | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=47053-1000) |
+| 1 | Fan 90/92 mm, 12 V, 4-pin PWM |  | 0.00 | on the lid over the PSU | ✅ at hand |  |
+| 4 | Screw M4 x 30 + nut |  | 0.10 | fan to the lid | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=M4%20x%2030%20screws%20nuts) |
+| 1 | PSU fan plug with 1 lead to J9 (LOP-400 CN2: TKP 2502 housing; LOP-300 CN101: JST PHR-2) | e.g. JST PHR-2 + SPH-002T-P0.5S (LOP-300) | 0.20 | +12 V aux to the 1-pin header J9 | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=PHR-2) |
+| 1 | Panel LED, red, snap-in | Lumex SSI-LXMP059ID | 0.90 | power LED in the lid, on J8 | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=SSI-LXMP059ID) |
+| 2 | Pin headers 1x2 + 1x1, 2.54 mm, and a Dupont lead |  | 0.05 | J8 LED, J9 fan 12 V | ✅ at hand |  |
 | 1 | Buzzer 12 mm 5 V internally driven | Same Sky CMI-1275-05TH | 1.00 |  | 📄 CSV | [DigiKey](https://www.digikey.ie/en/products/result?keywords=CMI-1275-05TH) |
 | 1 | SHT21 breakout (+ Dupont cable) |  | 4.00 | J4: VIN GND SCL SDA; check the order on your board | ✅ at hand |  |
 | 1 | Passives / small parts (2N7002K, BZT52C12, SMBJ26A, caps, resistors) | see the CSV | 2.00 |  | 📄 CSV | [DigiKey BOM Manager](https://www.digikey.ie/en/mylists/bom-manager) |
@@ -87,7 +93,7 @@ Subtotal: **≈ €5** per slot, of which to buy **≈ €4**
 | 14 | M3 heat-set insert + M3x8 screw |  | 0.10 | 4 board, 4 PSU, 6 lid ears | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=M3%20heat%20set%20inserts%20brass%20kit) |
 | 1 | Crimp tool (open barrel, for the tabs and VH/XH contacts) |  | 25.00 |  | ✅ at hand |  |
 
-Subtotal: **≈ €83**, of which to buy **≈ €33**
+Subtotal: **≈ €85**, of which to buy **≈ €35**
 
 ## Power supply and mains side (once)
 
@@ -127,6 +133,6 @@ Subtotal: **≈ €15**, of which to buy **≈ €15**
 | | Total ≈ € | To buy ≈ € |
 |---|---:|---:|
 | Per slot (board + module) | 25 | 23 |
-| Fixed (controller, power supply, filament, safety) | 200 | 106 |
-| 8 slots | 397 | 291 |
-| 16 slots | 595 | 476 |
+| Fixed (controller, power supply, filament, safety) | 202 | 108 |
+| 8 slots | 399 | 293 |
+| 16 slots | 597 | 478 |

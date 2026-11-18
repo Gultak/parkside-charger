@@ -2,7 +2,8 @@
 # Controller: xyzroe ESP32-C6 D1 (ESP32-C6-MINI-1-N4) on the controller board
 # (electronics/controller-board). GPIO map (controller board):
 #   GPIO22 SDA, GPIO23 SCL, GPIO19 24 V bus switch, GPIO18 buzzer,
-#   GPIO4 TCA9548A reset (active low), GPIO0 PSU voltage /11, GPIO1 bus voltage /11
+#   GPIO4 TCA9548A reset (active low), GPIO0 PSU voltage /11, GPIO1 bus voltage /11,
+#   GPIO6 PSU fan PWM (open drain via 2N7002, so inverted), GPIO7 PSU fan tach
 # Fewer slots? Delete the unused "slotN" packages at the end.
 
 substitutions:
@@ -10,6 +11,11 @@ substitutions:
   friendly_name: Parkside Charger
   # Home Assistant entity with the temperature of the room / cupboard the charger is in
   room_temperature_entity: sensor.hotpress_temperature_sensor_temperature
+  # charging budget (battery side) without / with the PSU fan running (LOP-400-24:
+  # 250 W by convection, 400 W with forced air; the fan blows onto the board from above,
+  # not the datasheet's direction, so stay well below 400 W)
+  budget_no_fan: "10.0"
+  budget_with_fan: "13.0"
 
 esphome:
   name: ${name}
@@ -85,6 +91,14 @@ output:
   - platform: gpio
     id: bus_switch # P-MOSFET switch for the 24 V bus to all slot boards (default off)
     pin: GPIO19
+  - platform: ledc
+    id: fan_pwm
+    pin:
+      number: GPIO6
+      inverted: true # the 2N7002 pulls the fan's PWM line low
+    frequency: 25000Hz
+    min_power: 0.2 # most PC fans stop below ~20 %
+    zero_means_zero: true
   - platform: gpio
     id: buzzer_out
     pin: GPIO18
@@ -95,6 +109,17 @@ output:
       inverted: true
 
 sensor:
+  # PSU fan tach: 2 pulses per revolution
+  - platform: pulse_counter
+    id: fan_rpm
+    name: "PSU fan speed"
+    pin: GPIO7 # 10k pull-up on the board
+    unit_of_measurement: rpm
+    icon: mdi:fan
+    accuracy_decimals: 0
+    update_interval: 5s
+    filters:
+      - multiply: 0.5
   - platform: htu21d     # SHT21 breakout (fixed address 0x40)
     model: SHT21
     i2c_id: i2c_main
@@ -182,6 +207,13 @@ number:
     restore_value: true
     entity_category: config
 
+fan:
+  - platform: speed
+    id: psu_fan
+    name: "PSU fan"
+    output: fan_pwm
+    restore_mode: ALWAYS_OFF
+
 switch:
   - platform: template
     id: allow_without_ha
@@ -222,12 +254,13 @@ parkside_charger:
   # Battery-side current budget shared by all slots. Size it to the PSU:
   #   LOP-400-24 built in, no fan (250 W): 10A    LOP-300-24 (180 W): 7A
   #   external LRS-200-24 (200 W): 8A    LRS-350-24 / HLG-320H-24 (320-350 W): 14A
-  max_total_current: 10A
+  max_total_current: 10A # changed at run time: ${budget_no_fan} A / ${budget_with_fan} A with the fan
   enable_output: bus_switch
   ambient_temperature: enclosure_temp
   max_ambient_temperature: 50 # hard backstop; the adjustable limit is the safety interlock below
   storage_after_days_number: storage_days
   total_input_power:
+    id: total_power
     name: "Total charging power"
   charging_count:
     name: "Batteries charging"
@@ -237,6 +270,10 @@ parkside_charger:
     name: "Charger status"
 
 binary_sensor:
+  - platform: template
+    id: fan_fault_bs
+    name: "PSU fan fault"
+    device_class: problem
   - platform: template
     id: safety_interlock
     name: "Safety interlock"
@@ -305,10 +342,41 @@ interval:
             id(safety_reason).publish_state(why.empty() ? "OK" : reason);
 
   # Audible alarm on any slot fault or overheating (optional)
+  # PSU fan: off below 100 W charging power and 35 degC in the box, then 30-100 % with
+  # power (100-300 W) or enclosure temperature (35-45 degC), whichever asks for more.
+  # The higher budget is only allowed while the tach confirms the fan turns; a stalled
+  # fan drops it back to the convection budget at once (and the buzzer sounds).
+  - interval: 5s
+    then:
+      - lambda: |-
+          float p = id(total_power).has_state() ? id(total_power).state : 0;
+          float t = id(enclosure_temp).has_state() && !std::isnan(id(enclosure_temp).state) ? id(enclosure_temp).state : 50;
+          float want = std::max((p - 100.0f) / 200.0f, (t - 35.0f) / 10.0f);
+          static bool on = false;
+          if (want > 0.0f) on = true; else if (p < 80.0f && t < 33.0f) on = false;
+          float duty = on ? std::min(1.0f, std::max(0.3f, want)) : 0.0f;
+          if (duty > 0) {
+            auto call = id(psu_fan).turn_on();
+            call.set_speed((int) roundf(duty * 100));
+            call.perform();
+          } else {
+            id(psu_fan).turn_off().perform();
+          }
+          // fan check: turning for 15 s -> higher budget; not turning for 10 s while on -> fault
+          static uint32_t spin_since = 0, stall_since = 0;
+          const uint32_t now = millis();
+          bool turning = id(fan_rpm).has_state() && id(fan_rpm).state > 300;
+          if (on && !turning) { if (!stall_since) stall_since = now; } else stall_since = 0;
+          if (on && turning) { if (!spin_since) spin_since = now; } else spin_since = 0;
+          bool fan_fault = stall_since && now - stall_since > 10000;
+          bool boost = on && spin_since && now - spin_since > 15000 && !fan_fault;
+          id(charger).set_max_total_current(boost ? ${budget_with_fan} : ${budget_no_fan});
+          if (id(fan_fault_bs).state != fan_fault || !id(fan_fault_bs).has_state())
+            id(fan_fault_bs).publish_state(fan_fault);
   - interval: 10s
     then:
       - lambda: |-
-          bool alarm = id(enclosure_temp).has_state() && id(enclosure_temp).state > 50;
+          bool alarm = (id(enclosure_temp).has_state() && id(enclosure_temp).state > 50) || id(fan_fault_bs).state;
           for (auto *s : id(charger)->slots())
             alarm |= s->phase() == esphome::parkside_charger::Phase::FAULT;
           id(buzzer_out).set_state(alarm);

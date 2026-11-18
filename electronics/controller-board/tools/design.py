@@ -79,7 +79,24 @@ PARTS = {
            "Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
            {"1": "GND", "2": "+3V3", "3": "SDA", "4": "SCL"}, "Qwiic / STEMMA QT spare I2C"),
     "J6": ("EXP", "Connector_Generic:Conn_01x07", "Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical",
-           {"1": "+3V3", "2": "GND", "3": "IO5", "4": "IO6", "5": "IO7", "6": "TX", "7": "RX"}, "spare GPIO"),
+           {"1": "+3V3", "2": "GND", "3": "IO5", "4": "IO6", "5": "IO7", "6": "TX", "7": "RX"},
+           "spare GPIO (IO6 / IO7 are also the fan's PWM / tach)"),
+    # --------------------------------------------------- PSU fan + power LED --
+    # Standard 4-pin PC fan header (GND, +12V, TACH, PWM). 12 V comes from the PSU's own
+    # +12 V aux fan output on a single Dupont pin (J9). PWM: open drain, 25 kHz from IO6;
+    # tach: open collector from the fan, pulled up to 3.3 V, into IO7.
+    "J7": ("FAN", "Connector_Generic:Conn_01x04", "Connector:FanPinHeader_1x04_P2.54mm_Vertical",
+           {"1": "GND", "2": "+12V_FAN", "3": "IO7", "4": "FAN_PWM"}, "4-pin PC fan header (Molex 47053-1000 or KF2510-4A)"),
+    "J9": ("12V FAN IN", "Connector_Generic:Conn_01x01", "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",
+           {"1": "+12V_FAN"}, "1-pin header: +12 V aux from the PSU's fan connector"),
+    "Q4": ("2N7002K", "Device:Q_NMOS_GSD", "Package_TO_SOT_SMD:SOT-23",
+           {"1": "FAN_G", "2": "GND", "3": "FAN_PWM"}, "fan PWM, open drain"),
+    "R14": ("100", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "IO6", "2": "FAN_G"}, ""),
+    "R15": ("100k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "FAN_G", "2": "GND"}, ""),
+    "R16": ("10k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "+3V3", "2": "IO7"}, "fan tach pull-up"),
+    "J8": ("PWR LED", "Connector_Generic:Conn_01x02", "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
+           {"1": "LED_A", "2": "GND"}, "2-pin header: power LED (Lumex SSI-LXMP059ID), anode on pin 1"),
+    "R17": ("330", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "+5V", "2": "LED_A"}, "power LED, about 9 mA"),
 }
 for i in range(1, 5):
     PARTS[f"H{i}"] = ("M3", "Mechanical:MountingHole", "MountingHole:MountingHole_3.2mm_M3", {}, "")
@@ -119,7 +136,7 @@ for s in range(1, 17):  # same pin order as the slot board's J2: 5V GND SDA SCL 
 NO_CONNECT = {"U2": ["1"]}
 
 DEFAULT_WIDTH = 0.2
-NET_WIDTH = {"+5V": 0.6, "+5V_SLOT": 0.5, "+3V3": 0.4, "+24V": 0.6, "MUX_RST": 0.25}
+NET_WIDTH = {"+5V": 0.6, "+5V_SLOT": 0.5, "+3V3": 0.4, "+24V": 0.6, "MUX_RST": 0.25, "+12V_FAN": 0.4}
 # fmt: on
 
 
@@ -127,6 +144,7 @@ NET_WIDTH = {"+5V": 0.6, "+5V_SLOT": 0.5, "+3V3": 0.4, "+24V": 0.6, "MUX_RST": 0
 NOT_IN_ORDER_BOM = {
     "J1": "at hand (JST B6P-VH)", "U2": "at hand (ESP32-C6 D1 + headers)",
     "J4": "at hand (2.54 mm pin header)", "J6": "at hand (2.54 mm pin header)",
+    "J8": "at hand (2.54 mm pin header)", "J9": "at hand (2.54 mm pin header)",
     "J2": "Amazon.ie (XT30UPB-F, not at DigiKey)", "J3": "Amazon.ie (XT30UPB-F, not at DigiKey)",
     "H1": "mounting hole", "H2": "mounting hole", "H3": "mounting hole", "H4": "mounting hole",
 }
