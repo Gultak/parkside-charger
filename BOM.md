@@ -98,14 +98,14 @@ Subtotal: **≈ €83**, of which to buy **≈ €33**
 | 1 | Switched fused spur with flex outlet, 3 A fuse |  | 12.00 | wall side; replaces an inlet's switch and fuse. Fitted by an electrician | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=switched%20fused%20spur%20flex%20outlet) |
 | 1 | Flex 3-core 0.75-1.0 mm² (H05VV-F 3G0.75), length to suit |  | 2.00 | spur -> controller box | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=H05VV-F%203G0.75%20flex) |
 | 1 | Cable gland M20 nylon IP68 with locknut |  | 0.50 | for 6-12 mm cable; hole 20.5 mm in the box | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=M20%20cable%20gland%20nylon%20locknut) |
-| 3 | Wago 221-412 lever connector (or 221-413) | Wago 221-412 | 0.40 | L: flex -> KSD301 -> PSU, N: flex -> PSU | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=Wago%20221-412) |
+| 3 | Wago 221-412 lever connector (or 221-413) | Wago 221-412 | 0.40 | L: flex -> KSD301 -> PSU, N: flex -> PSU | ✅ at hand |  |
 | 1 | Heat alarm (for the hot press) |  | 20.00 | recommended | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=heat%20alarm%2010%20year) |
 | 1 | VH 3p housing + 2 crimp contacts (PSU AC input) | JST VHR-3N + SVH-21T-P1.1 | 0.30 | your 2-pin VH plug does not fit the 3-pin input (pin 2 is left out) | 🛒 order | [DigiKey](https://www.digikey.ie/en/products/result?keywords=VHR-3N) |
 | 1 | Ring lugs M3 / M3.5 + ferrules |  | 1.00 | PE to the PSU; LOP-400 output | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=ring%20terminal%20kit%20insulated)<br>[Amazon.ie (ferrules)](https://www.amazon.ie/s?k=ferrule%20crimp%20kit%201.5mm2) |
 | 1 | Thermal cut-out NC 70 C 250 V AC | KSD301 70C | 1.50 | in the AC line; not at DigiKey | 🛒 order | [Amazon.ie](https://www.amazon.ie/s?k=KSD301%2070C%20normally%20closed) |
 | 2 | m wire 1.5 mm² (blue / brown) |  | 1.00 | mains side inside the box | ✅ at hand |  |
 
-Subtotal: **≈ €81**, of which to buy **≈ €78**
+Subtotal: **≈ €81**, of which to buy **≈ €77**
 
 ## Filament
 
@@ -128,6 +128,6 @@ Subtotal: **≈ €15**, of which to buy **≈ €15**
 | | Total ≈ € | To buy ≈ € |
 |---|---:|---:|
 | Per slot (board + module) | 25 | 23 |
-| Fixed (controller, power supply, filament, safety) | 220 | 127 |
-| 8 slots | 417 | 312 |
-| 16 slots | 614 | 497 |
+| Fixed (controller, power supply, filament, safety) | 220 | 126 |
+| 8 slots | 417 | 311 |
+| 16 slots | 614 | 496 |
