@@ -12,8 +12,8 @@ Qty,References,Value,Footprint,MPN / notes,Source
 1,F2,0.5A PTC,Fuse_1206_3216Metric,Bourns MF-NSMF050 - slot 5 V rail,DigiKey (this CSV)
 4,H1 H2 H3 H4,M3,MountingHole_3.2mm_M3,,mounting hole
 1,J1,24V PSU IN,JST_VH_B6P-VH_1x06_P3.96mm_Vertical,"JST B6P-VH (pins 1-3 +V, 4-6 -V, as on the LOP-300 CN2)",at hand (JST B6P-VH)
-1,J2,24V OUT A,AMASS_XT30UPB-F_1x02_P5.0mm_Vertical,Amass XT30UPB-F: to the first slot of chain A (slot J1 IN),"Amazon.ie (XT30UPB-F, not at DigiKey)"
-1,J3,24V OUT B,AMASS_XT30UPB-F_1x02_P5.0mm_Vertical,Amass XT30UPB-F: to the first slot of chain B,"Amazon.ie (XT30UPB-F, not at DigiKey)"
+1,J2,24V OUT A,AMASS_XT30UPB-F_1x02_P5.0mm_Vertical,Amass XT30UPB-F: to the first slot of chain A (slot J1 IN),at hand (XT30UPB-F)
+1,J3,24V OUT B,AMASS_XT30UPB-F_1x02_P5.0mm_Vertical,Amass XT30UPB-F: to the first slot of chain B,at hand (XT30UPB-F)
 1,J4,SHT21,PinHeader_1x04_P2.54mm_Vertical,"SHT21 breakout (VIN GND SCL SDA), on a Dupont cable; check the order on your board",at hand (2.54 mm pin header)
 1,J5,QWIIC,JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal,Qwiic / STEMMA QT spare I2C,DigiKey (this CSV)
 1,J6,EXP,PinHeader_1x07_P2.54mm_Vertical,spare GPIO (IO6 / IO7 are also the fan's PWM / tach),at hand (2.54 mm pin header)

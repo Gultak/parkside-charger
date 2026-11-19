@@ -145,6 +145,6 @@ NOT_IN_ORDER_BOM = {
     "J1": "at hand (JST B6P-VH)", "U2": "at hand (ESP32-C6 D1 + headers)",
     "J4": "at hand (2.54 mm pin header)", "J6": "at hand (2.54 mm pin header)",
     "J8": "at hand (2.54 mm pin header)", "J9": "at hand (2.54 mm pin header)",
-    "J2": "Amazon.ie (XT30UPB-F, not at DigiKey)", "J3": "Amazon.ie (XT30UPB-F, not at DigiKey)",
+    "J2": "at hand (XT30UPB-F)", "J3": "at hand (XT30UPB-F)",
     "H1": "mounting hole", "H2": "mounting hole", "H3": "mounting hole", "H4": "mounting hole",
 }

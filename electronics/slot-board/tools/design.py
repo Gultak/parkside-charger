@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
 # left out of fab/slot_board_bom.csv (the DigiKey order list); listed in fab/slot_board_bom_all.csv
 NOT_IN_ORDER_BOM = {
-    "J1": "Amazon.ie (XT30PW-M, not at DigiKey)", "J6": "Amazon.ie (XT30PW-F, not at DigiKey)",
+    "J1": "at hand (XT30PW-M)", "J6": "at hand (XT30PW-F)",
     "J4": "at hand (2.54 mm pin header)", "J5": "at hand (2.54 mm pin header)",
     "J3": "at hand (3-pole 5.0 mm screw terminal)",
 }
