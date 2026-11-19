@@ -1,6 +1,6 @@
 Quantity,Digi-Key Part Number,Manufacturer,Manufacturer Part Number,Customer Reference
 10,505-LTC4162EUFD-LAD#PBF-ND,Analog Devices,LTC4162EUFD-LAD#PBF,U1
-10,541-1011-1-ND,Vishay,IHLP2525CZER6R8M01,L1 - CHECK BEFORE ORDERING: footprint: the board has the Coilcraft XAL6060 land pattern; the IHLP-25
+10,541-1011-1-ND,Vishay,IHLP2525CZER6R8M01,L1 (IHLP-2525 footprint)
 20,FDMC8327LCT-ND,onsemi,FDMC8327L,"Q1,Q2"
 20,WSLG-.01CT-ND,Vishay,WSL2512R0100FEA,"R1,R2"
 10,CRT0603-BY-1002ELFCT-ND,Bourns,CRT0603-BY-1002ELF,R3
@@ -26,6 +26,6 @@ Quantity,Digi-Key Part Number,Manufacturer,Manufacturer Part Number,Customer Ref
 10,541-63.4KHCT-ND,Vishay,CRCW060363K4FKEA,R4
 10,455-B4B-XH-A-ND,JST,B4B-XH-A(LF)(SN),J2
 20,455-2267-ND,JST,XHP-4,slot cables
-90,455-4220-100-ND,JST,SXH-001T-P0.6N,"slot cables - CHECK BEFORE ORDERING: SXH-001T-P0.6N takes 26–30 AWG; the slot cables are 22 AWG, whi"
+90,455-1135-100-ND,JST,SXH-001T-P0.6,slot cables
 10,SW154-ND,Omron,D2F-01L,on J4
-10,1830-1015-ND,Inolux,INL-5TB4URGB25,on J5
+10,1830-1015-ND,Inolux,INL-5TB4URGB25,"on J5 (header in its lead order: B, R, cathode, G)"

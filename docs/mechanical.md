@@ -11,7 +11,7 @@
 ![Clip-on bay cover: front face with the tongue, floor, back face with cable cut-outs open at the top, spring tabs near the rear](img/slot_cover.png)
 ![Inside the bay: 45° bevel behind the end wall, with the contact slots and the microswitch pocket](img/bay_bevel.png)
 ![Print orientation: rear face on the bed, nose on top](img/slot_print.png)
-![Controller box: low-voltage side with cable notches open towards the lid, closed mains compartment for the LOP-400 (green) with cable gland hole and vent slots](img/controller_box.png)
+![Controller box: low-voltage side with cable notches open towards the lid, closed mains compartment for the LOP-300 (green) with cable gland hole and vent slots](img/controller_box.png)
 
 ## Concept
 
@@ -65,7 +65,7 @@
 
   ![Section through the LED bore and wire channel](img/led_bore_section.png)
 - A separate **controller box** holds the ESP32-C6 main board and, in its own closed mains
-  compartment, the **Mean Well LOP-400-24** (or LOP-300-24) open-frame PSU (`psu` parameter;
+  compartment, the **Mean Well LOP-300-24** (or LOP-400-24) open-frame PSU (`psu` parameter;
   `psu = "none"` gives the old board-only tray). Mount it at least 5 cm away from the batteries.
 
 ## Measured so far (Parkside X20V)
@@ -212,7 +212,7 @@ No cable has to be threaded through a part before it is connected.
 - One JST-XH 4-pin cable per slot runs to the controller, wired 1:1 (5V, GND, SDA, SCL). Run them
   in a cable duct along the rear.
 
-**Controller box** (148 × 204 × 50 mm with the LOP-400). Two compartments:
+**Controller box** (125 × 179 × 50 mm with the LOP-300; 148 × 204 × 50 mm with the LOP-400). Two compartments:
 - **Low-voltage side:** the board sits on 4 standoffs with its components facing the lid. Its
   walls have U-notches **open towards the lid**:
   - left and right walls: slot cables 1–8 and 9–16, and OUT A / OUT B. Those leave the board's

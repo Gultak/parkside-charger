@@ -28,7 +28,7 @@ Quantity,Digi-Key Part Number,Manufacturer,Manufacturer Part Number,Customer Ref
 1,67-1179-ND,Lumex,SSI-LXMP059ID,on J8
 1,455-1165-ND,JST,PHR-2 + SPH-002T-P0.5S,PSU CN101 → J9
 2,455-1127-1-ND,JST,PHR-2 + SPH-002T-P0.5S,PSU CN101 → J9
-1,1866-LOP-300-24-ND,Mean Well,LOP-300-24,
+1,1866-LOP-300-24-ND,Mean Well,LOP-300-24,"budget 7 A, 10 A with the fan"
 1,480-6788-ND,Honeywell,2455R--00820195,
 1,1195-3042-ND,LAPP,SKINTOP ST-M 20x1.5 (53111020),
 1,281-4710-ND,(see DigiKey),281-4710-ND,

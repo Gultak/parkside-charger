@@ -165,7 +165,7 @@ ctl_holes = [[5.5, 60], [106.5, 60], [36.5, 4], [79.5, 4]];        // PCB mounti
 ctl_chan = 12;            // cable channel between the board's bottom edge and the PSU partition
 
 /* [Built-in power supply (Mean Well LOP open frame)] */
-psu = "LOP-400";          // [LOP-400, LOP-300, none]
+psu = "LOP-300";          // [LOP-400, LOP-300, none]
 psu_gap = 8;              // PSU board edge to the compartment walls (wiring, airflow)
 psu_standoff = 6;         // M3 standoffs (datasheet: max 3 mm of pins below the PSU board)
 part_t = 2.4;             // partition wall between the mains and the low-voltage compartment
@@ -629,7 +629,7 @@ module controller_lid() {
         for (i = [0:7]) translate([-30 + i * 8, ctl_y1() - 26, -eps]) cube([3, 18, 3]);
         // above the PSU: the fan's grille and screw holes, or plain vent slots (finger-safe width)
         if (has_psu() && psu_fan) {
-            fc = [0, psu_xy0()[1] + psu_spec()[0][1] / 2];      // fan centred over the PSU
+            fc = [0, (psu_y0() + psu_y1()) / 2];                // fan centred over the mains compartment
             intersection() {
                 translate([fc[0], fc[1], -eps]) cylinder(d = fan_size - 6, h = 3, $fn = 96);
                 for (y = [-fan_size / 2 : vent_w + 2.5 : fan_size / 2])
@@ -639,7 +639,7 @@ module controller_lid() {
                 translate([fc[0] + dx * fan_hole_pitch / 2, fc[1] + dy * fan_hole_pitch / 2, -eps])
                     cylinder(d = fan_hole_d, h = 10, $fn = 24);
             // slot for the fan's 4-pin plug into the low-voltage side (to J7 on the board)
-            translate([40 - 6, ctl_y1() - 7 - 3, -eps]) cube([12, 6, 3]);
+            translate([fan_size / 2 + 7 - 6, ctl_y1() - 7 - 3, -eps]) cube([12, 6, 3]);   // beside the fan frame
         } else if (has_psu())
             for (y = [psu_y0() + psu_gap + 6 : 6 : psu_y1() - psu_gap - 6])
                 translate([-psu_spec()[0][0] / 2 + 12, y, -eps]) cube([psu_spec()[0][0] - 24, vent_w, 3]);

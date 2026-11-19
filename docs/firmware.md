@@ -86,16 +86,17 @@ Plus:
 
 ## PSU fan
 
-A 90/92 mm 12 V PWM fan on the lid blows onto the LOP-400. The firmware runs it from
+A 90/92 mm 12 V PWM fan on the lid blows onto the power supply (LOP-300-24). The firmware runs it from
 the charging power and the enclosure temperature: off below 100 W and 35 °C, then 30–100 %
 over 100–300 W or 35–45 °C, whichever asks for more (off again below 80 W and 33 °C).
 
-- **Budget:** without the fan the slots share 10 A (`budget_no_fan`, LOP-400 by convection).
-  Once the tach shows the fan turning for 15 s, the budget goes up to 13 A
-  (`budget_with_fan`, about 290 W from the PSU). The LOP-400 is rated 400 W with forced air,
+- **Budget:** without the fan the slots share 7 A (`budget_no_fan`, LOP-300 by convection,
+  180 W). Once the tach shows the fan turning for 15 s, the budget goes up to 10 A
+  (`budget_with_fan`, about 225 W from the PSU). The LOP-300 is rated 300 W with forced air,
   but this fan blows from above instead of along the board, so the limit stays well below that.
 - **Fan check:** if the fan is switched on but the tach reads under 300 rpm for 10 s, "PSU fan
-  fault" turns on, the budget drops back to 10 A at once, and the buzzer sounds.
+  fault" turns on, the budget drops back to 7 A at once, and the buzzer sounds. (With a
+  LOP-400-24 instead: 10 A / 13 A.)
 - **Entities:** "PSU fan" (speed fan, can be set by hand), "PSU fan speed" (rpm), "PSU fan fault".
 - **Wiring:** the fan's 4-pin plug into J7 through the slot in the lid. +12 V from the PSU's fan
   connector (LOP-400: CN2, TKP 8812-2, pin 2 +12 V aux; LOP-300: CN101, JST PH, pin 1) to the

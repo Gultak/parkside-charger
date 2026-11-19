@@ -11,11 +11,11 @@ substitutions:
   friendly_name: Parkside Charger
   # Home Assistant entity with the temperature of the room / cupboard the charger is in
   room_temperature_entity: sensor.hotpress_temperature_sensor_temperature
-  # charging budget (battery side) without / with the PSU fan running (LOP-400-24:
-  # 250 W by convection, 400 W with forced air; the fan blows onto the board from above,
-  # not the datasheet's direction, so stay well below 400 W)
-  budget_no_fan: "10.0"
-  budget_with_fan: "13.0"
+  # charging budget (battery side) without / with the PSU fan running. LOP-300-24: 180 W by
+  # convection, 300 W with forced air; the fan blows onto the board from above, not the
+  # datasheet's direction, so stay well below 300 W. (LOP-400-24: 10.0 / 13.0)
+  budget_no_fan: "7.0"
+  budget_with_fan: "10.0"
 
 esphome:
   name: ${name}
@@ -252,9 +252,9 @@ button:
 parkside_charger:
   id: charger
   # Battery-side current budget shared by all slots. Size it to the PSU:
-  #   LOP-400-24 built in, no fan (250 W): 10A    LOP-300-24 (180 W): 7A
+  #   LOP-300-24 (180 W): 7A, 10A with the fan    LOP-400-24 (250 W): 10A, 13A with the fan
   #   external LRS-200-24 (200 W): 8A    LRS-350-24 / HLG-320H-24 (320-350 W): 14A
-  max_total_current: 10A # changed at run time: ${budget_no_fan} A / ${budget_with_fan} A with the fan
+  max_total_current: 7A # changed at run time: ${budget_no_fan} A / ${budget_with_fan} A with the fan
   enable_output: bus_switch
   ambient_temperature: enclosure_temp
   max_ambient_temperature: 50 # hard backstop; the adjustable limit is the safety interlock below

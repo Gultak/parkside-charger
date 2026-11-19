@@ -3,7 +3,7 @@
 ## 1. System overview
 
 ```
- 230 V AC ─[switched fused spur, 3 A]─ flex ─[M20 gland, Wago]─[KSD301 70 °C cut-out, NC]─► Mean Well LOP-400-24 (in the controller box)
+ 230 V AC ─[switched fused spur, 3 A]─ flex ─[M20 gland, Wago]─[KSD301 70 °C cut-out, NC]─► Mean Well LOP-300-24 (in the controller box)
                                                                             │ 24 V
    ┌─────────────────────────────────── CONTROLLER BOARD ──────────────────┴──────────────────────────┐
    │ J1 ─ 10 A fuse ─┬─ always on ─► TSR 1-2450 5 V ─┬─► ESP32-C6 D1 (Dupont sockets) ─ 3V3 ─► I2C side │
@@ -160,7 +160,7 @@ off the PCB and away from plastic. If you don't fit them, delete `bleed_output:`
 | J2 I²C | JST-XH 4-pin | 5V_SLOT, GND, SDA, SCL |
 | J3 battery | 5.0 mm screw terminal, 3-pin | B+, B−, ID (the pack's BMS contact; the T contact is not used). The wires come straight from the crimp tabs in the contact block: 0.75 mm² (18 AWG) silicone, keep them short |
 | J4 switch | 2.54 mm pin header, 2-pin (Dupont cable) | IO0, GND |
-| J5 LED | 2.54 mm pin header, 4-pin (Dupont cable) | GND (common cathode), R, G, B |
+| J5 LED | 2.54 mm pin header, 4-pin (straight Dupont cable) | In the lead order of the Inolux INL-5TB4URGB25: 1 blue, 2 red, 3 common cathode (longest lead), 4 green. Red 560 Ω ≈ 5 mA, green/blue 270 Ω ≈ 7 mA from 5 V |
 
 ## 4. Controller board, 112 × 64 mm, 4 layers
 
@@ -213,14 +213,13 @@ CSV copies sit next to them.
 
 | | |
 |---|---|
-| PSU (recommended) | Mean Well **LOP-400-24**, open frame 127 × 76.2 × 27.5 mm, built into the controller box. **250 W by convection** (no fan), 400 W only with 23 CFM forced air. Trim to 24.5 V (adjustable 22.8–25.2 V). Leave the remote-sense / PG connector CN3 open. `max_total_current: 10A` (10 A × 21 V / 0.94 ≈ 225 W, plus ~5 W for the electronics) |
-| PSU, smaller | Mean Well **LOP-300-24**, 101.6 × 50.8 × 25.4 mm: **180 W by convection**. `max_total_current: 7A` |
+| PSU (chosen) | Mean Well **LOP-300-24**, open frame 101.6 × 50.8 × 25.4 mm, built into the controller box. **180 W by convection**, 300 W with forced air. Trim to 24.5 V. The 90/92 mm PWM fan on the lid blows onto it: `budget_no_fan` 7 A (7 A × 21 V / 0.94 ≈ 155 W), `budget_with_fan` 10 A (≈ 225 W) while the tach confirms the fan turns |
+| PSU, bigger | Mean Well **LOP-400-24**, 127 × 76.2 × 27.5 mm (`psu = "LOP-400"` in the 3D model): 250 W by convection, 400 W with forced air. Budgets 10 A / 13 A |
 | PSU, external | Mean Well LRS-200-24 (8 A) or LRS-350-24 / HLG-320H-24 (14 A), with `psu = "none"` in the 3D model |
-| Why no fan | The 400 W rating needs 23 CFM, which only a 60 mm fan delivers, and that doesn't fit the 44 mm box. A 250 W budget still keeps 6 packs charging at 1.5 A at once; the others wait their turn |
-| Battery-side current budget | The firmware shares `max_total_current` between the slots. 8 A × 21 V = 168 W, plus about 6 % charger loss |
+| Battery-side current budget | The firmware shares the budget between the slots, about 21 V per amp plus about 6 % charger loss |
 | Per slot | 0.3–3.0 A, set in Home Assistant. Default 1.5 A (0.37C on 4 Ah, 0.75C on 2 Ah) |
-| Typical | 6 packs (10 A, LOP-400) charging at 1.5 A at once (5 with 8 A, 9 with 14 A). The rest wait: "charge to 100 %" requests first, then the emptiest pack |
-| Chain wiring | Two chains (OUT A/B) of up to 8 slots each. Use 1.5 mm² jumpers: worst case each chain carries the whole budget (≤ 14 A, terminals rated 13.5 A, so set ≤ 13 A when running a single chain of 16) |
+| Typical | 4 packs (7 A) or 6 packs (10 A, fan running) charging at 1.5 A at once. The rest wait: "charge to 100 %" requests first, then the emptiest pack |
+| Chain wiring | Two chains (OUT A/B) of up to 8 slots each, XT30 connectors (15 A) and 16 AWG cables. Worst case one chain carries the whole budget (10 A) |
 | Idle consumption | About 2 W (ESP + 16 × LTC4162 quiescent) |
 
 ## 6. Safety: Li-ion charging under a shelf

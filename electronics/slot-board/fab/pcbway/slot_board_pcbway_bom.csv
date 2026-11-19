@@ -7,7 +7,7 @@ Item #,Designator,Qty,Manufacturer,Mfg Part #,Description / Value,Package/Footpr
 6,C10,1,Samsung,CL10B105KP8NNNC,Capacitor 1 uF 10 V X7R 0603 (1u 10V),C_0603_1608Metric,SMD,
 7,D1,1,Vishay,SMB10J26A-E3/52,"TVS diode 26 V unidirectional, SMB (SMBJ26A)",D_SMB,SMD,
 8,"F1,F2",2,Bel Fuse,C1Q 5,Fuse 5 A fast 1206 (5A fast),Fuse_1206_3216Metric,SMD,
-9,L1,1,Coilcraft,XAL6060-682MEC,Power inductor 6.8 uH shielded (footprint is XAL6060) (6.8u),L_Coilcraft_XAL6060-XXX,SMD,
+9,L1,1,Vishay,IHLP2525CZER6R8M01,"Power inductor 6.8 uH shielded, IHLP-2525 (6.8u)",L_Vishay_IHLP-2525,SMD,
 10,"Q1,Q2",2,onsemi,FDMC8327L,N-MOSFET 40 V Power33 (FDMC8327L),VSON-8_3.3x3.3mm_P0.65mm_NexFET,SMD,
 11,Q3,1,Diotec,2N7002,N-MOSFET 60 V SOT-23 (2N7002K),SOT-23,SMD,
 12,"R1,R2",2,Vishay,WSL2512R0100FEA,Current-sense resistor 10 mOhm 1% 1 W 2512 (10m 1%),R_2512_6332Metric,SMD,

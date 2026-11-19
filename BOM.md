@@ -57,7 +57,7 @@ Prices are DigiKey line totals including VAT, from the sheets. DigiKey ships fre
 | 1 | Panel LED, red, snap-in | Lumex | SSI-LXMP059ID | 🛒 DigiKey | 67-1179-ND | 1.05 | on J8 |
 | 1 | Fan 90/92 mm, 12 V, 4-pin PWM | generic | – | ✅ at hand |  |  | on J7 |
 | 1 | Plug for the PSU fan connector: housing + 2 contacts | JST | PHR-2 + SPH-002T-P0.5S | 🛒 DigiKey | 455-1165-ND + 455-1127-1-ND | 0.30 | PSU CN101 → J9 |
-| 1 | Power supply 24 V, open frame | Mean Well | LOP-300-24 | 🛒 DigiKey | 1866-LOP-300-24-ND | 44.65 | firmware budget still set for the LOP-400: change to 7 A / 10 A |
+| 1 | Power supply 24 V, open frame | Mean Well | LOP-300-24 | 🛒 DigiKey | 1866-LOP-300-24-ND | 44.65 | budget 7 A, 10 A with the fan |
 | 2 | VH housing 6-pin | JST | VHR-6N | ✅ at hand |  |  |  |
 | 14 | VH crimp contact | JST | SVH-21T-P1.1 | ✅ at hand |  |  |  |
 | 1 | VH housing 3-pin | JST | VHR-3N | ✅ at hand |  |  |  |
@@ -86,7 +86,7 @@ DigiKey total: **€102.16**
 |---:|---|---|---|---|---|---:|---|
 | 10 | Slot PCB, 72 × 47.5 mm, 4 layers | JLCPCB | electronics/slot-board/fab | 🏭 PCB fab |  |  |  |
 | 10 | Charger IC, QFN-28 4 × 5 | Analog Devices | LTC4162EUFD-LAD#PBF | 🛒 DigiKey | 505-LTC4162EUFD-LAD#PBF-ND | 76.49 | U1 |
-| 10 | Inductor 6.8 µH, shielded | Vishay | IHLP2525CZER6R8M01 | ⚠️ resolve | 541-1011-1-ND | 10.17 | L1; ⚠️ footprint: the board has the Coilcraft XAL6060 land pattern; the IHLP-2525 has different pads |
+| 10 | Inductor 6.8 µH, shielded | Vishay | IHLP2525CZER6R8M01 | 🛒 DigiKey | 541-1011-1-ND | 10.17 | L1 (IHLP-2525 footprint) |
 | 20 | N-MOSFET 40 V, Power33 | onsemi | FDMC8327L | 🛒 DigiKey | FDMC8327LCT-ND | 21.18 | Q1,Q2 |
 | 20 | Current-sense resistor 10 mΩ 1% 1 W, 2512 | Vishay | WSL2512R0100FEA | 🛒 DigiKey | WSLG-.01CT-ND | 7.97 | R1,R2 |
 | 10 | Resistor 10 kΩ 0.1% 25 ppm, 0603 | Bourns | CRT0603-BY-1002ELF | 🛒 DigiKey | CRT0603-BY-1002ELFCT-ND | 0.85 | R3 |
@@ -112,9 +112,9 @@ DigiKey total: **€102.16**
 | 10 | Resistor 63.4 kΩ 1%, 0603 | Vishay | CRCW060363K4FKEA | 🛒 DigiKey | 541-63.4KHCT-ND | 0.34 | R4 |
 | 10 | JST-XH header 4-pin, vertical | JST | B4B-XH-A(LF)(SN) | 🛒 DigiKey | 455-B4B-XH-A-ND | 1.57 | J2 |
 | 20 | JST-XH housing 4-pin | JST | XHP-4 | 🛒 DigiKey | 455-2267-ND | 1.43 | slot cables |
-| 90 | JST-XH crimp contact (80 + 10 spare) | JST | SXH-001T-P0.6N | ⚠️ resolve | 455-4220-100-ND | 6.10 | slot cables; ⚠️ SXH-001T-P0.6**N** takes 26–30 AWG; the slot cables are 22 AWG, which needs SXH-001T-P0.6 |
+| 90 | JST-XH crimp contact (80 + 10 spare), 22-28 AWG | JST | SXH-001T-P0.6 | 🛒 DigiKey | 455-1135-100-ND | 5.14 | slot cables |
 | 10 | Microswitch with lever | Omron | D2F-01L | 🛒 DigiKey | SW154-ND | 12.98 | on J4 |
-| 10 | LED 5 mm RGB, common cathode, diffused, 4 leads | Inolux | INL-5TB4URGB25 | 🛒 DigiKey | 1830-1015-ND | 6.46 | on J5; check the lead order against the Kingbright when wiring; brightness may differ |
+| 10 | LED 5 mm RGB, common cathode, diffused, 4 leads | Inolux | INL-5TB4URGB25 | 🛒 DigiKey | 1830-1015-ND | 6.46 | on J5 (header in its lead order: B, R, cathode, G) |
 | 10 | XT30 PCB socket, right angle, male | Amass | XT30PW-M | ✅ at hand |  |  | J1 |
 | 10 | XT30 PCB socket, right angle, female | Amass | XT30PW-F | ✅ at hand |  |  | J6 |
 | 10 | Screw terminal 3-pole, 5.0 mm | Phoenix Contact | MKDS 1,5/3-5,0 (or KF301-5.0) | ✅ at hand |  |  | J3 |
@@ -129,4 +129,4 @@ DigiKey total: **€102.16**
 | 10 | Wood screw 4 × 25, countersunk | generic | – | ✅ at hand |  |  |  |
 | 10 | Wood screw 4 × 25, pan head | generic | – | ✅ at hand |  |  |  |
 
-DigiKey total: **€229.50** for 10 slots (€22.95 per slot)
+DigiKey total: **€228.54** for 10 slots (€22.85 per slot)

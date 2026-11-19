@@ -19,7 +19,7 @@ Qty,References,Value,Footprint,MPN / notes
 1,F1,5A fast,Fuse_1206_3216Metric,"Littelfuse 0466005.NR (1206, 5 A, very fast)"
 1,F2,5A fast,Fuse_1206_3216Metric,"Littelfuse 0466005.NR - mandatory, battery side"
 1,J2,I2C,JST_XH_B4B-XH-A_1x04_P2.50mm_Vertical,"JST B4B-XH-A: 5V, GND, SDA, SCL"
-1,L1,6.8u,L_Coilcraft_XAL6060-XXX,Coilcraft XAL6060-682MEC (Isat 9 A)
+1,L1,6.8u,L_Vishay_IHLP-2525,"Vishay IHLP2525CZER6R8M01 (6.8 uH, IHLP-2525)"
 1,Q1,FDMC8327L,VSON-8_3.3x3.3mm_P0.65mm_NexFET,"INFET, 40 V logic-level N-MOSFET (Power33). Check land pattern vs. part"
 1,Q2,FDMC8327L,VSON-8_3.3x3.3mm_P0.65mm_NexFET,"BATFET, 40 V logic-level N-MOSFET (only powers the IC from the battery)"
 1,Q3,2N7002K,SOT-23,"60 V, 0.3 A"

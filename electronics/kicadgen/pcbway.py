@@ -44,7 +44,7 @@ MPN = {
     (None, "PinHeader_1x04_P2.54mm_Vertical"): ("generic", "-", "Pin header 1x4 2.54 mm"),
     (None, "PinHeader_1x07_P2.54mm_Vertical"): ("generic", "-", "Pin header 1x7 2.54 mm"),
     (None, "ESP32_C6_D1_Socket"): ("Sullins", "2x PPTC081LFBN-RC", "Socket for the ESP32-C6 D1: 2x female header 1x8 2.54 mm"),
-    ("6.8u", "L_Coilcraft_XAL6060-XXX"): ("Coilcraft", "XAL6060-682MEC", "Power inductor 6.8 uH shielded (footprint is XAL6060)"),
+    ("6.8u", "L_Vishay_IHLP-2525"): ("Vishay", "IHLP2525CZER6R8M01", "Power inductor 6.8 uH shielded, IHLP-2525"),
     ("FDMC8327L", None): ("onsemi", "FDMC8327L", "N-MOSFET 40 V Power33"),
     ("2N7002K", "SOT-23"): ("Diotec", "2N7002", "N-MOSFET 60 V SOT-23"),
     ("AOD4185", "TO-252-2"): ("Alpha & Omega", "AOD4185", "P-MOSFET -40 V TO-252"),
