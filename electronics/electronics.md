@@ -193,6 +193,22 @@ high-side transistor. That takes 6 extra parts per slot.
 The ESP32-C6 D1 breaks out only GPIO 0, 1, 4–7, 16–19, 22 and 23, so GPIO20/21 (used in the
 first draft) are not available. The bus switch and buzzer therefore use GPIO19/18.
 
+## 4a. Ordering assembled boards (PCBWay)
+
+Each board's `fab/pcbway/` folder holds PCBWay's assembly files, generated with the board:
+`*_pcbway_bom.xlsx` (BOM with manufacturer part numbers) and `*_pcbway_cpl.xlsx` (centroid:
+pad centre of each part in mm from the board's lower-left corner, top side, KiCad rotation).
+CSV copies sit next to them.
+
+1. PCB order: upload `fab/*_gerbers.zip`, 4 layers, 1.6 mm, 1 oz. All parts are on the top.
+2. Assembly: "Turnkey" (PCBWay buys the parts), top side, SMD and through-hole. Upload the BOM
+   and centroid .xlsx files. No stencil needs ordering: the assembler makes its own.
+3. Parts marked **DO NOT PLACE** are the ones you already have: the slot board's battery
+   terminal and pin headers, the controller's VH header, pin headers and ESP32 sockets. Solder
+   them afterwards. The 10 A mini blade fuse goes into F1's holder by hand.
+4. PCBWay checks each part number and the rotations against the Gerbers and asks before
+   substituting. Accept equivalents for passives; not for the LTC4162EUFD-**LAD**.
+
 ## 5. Power budget
 
 | | |

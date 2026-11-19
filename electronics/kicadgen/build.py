@@ -37,6 +37,9 @@ def main(tools_dir, steps=("sch", "pcb", "fab", "img")):
         project.write_project(layout.PROJECT, board_dir, layout.ROOT_UUID)  # pcbnew rewrites it on save
     if "fab" in steps:
         fab.run_fab(design.PARTS, layout.PROJECT, board_dir, getattr(design, "NOT_IN_ORDER_BOM", {}))
+    if "fab" in steps:
+        from kicadgen import pcbway
+        pcbway.run(design, layout, board_dir)
     if "img" in steps:
         render.render(str(board_dir / f"{layout.PROJECT}.kicad_pcb"), str(board_dir / "img"))
         render.render_extra(layout.PROJECT, board_dir)

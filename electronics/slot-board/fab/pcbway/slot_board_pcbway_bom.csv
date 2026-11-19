@@ -1,0 +1,32 @@
+Item #,Designator,Qty,Manufacturer,Mfg Part #,Description / Value,Package/Footprint,Type,Your Instructions / Notes
+1,C1,1,Panasonic,EEH-ZA1V470P,"Capacitor hybrid polymer 47 uF 35 V, 6.3 x 7.7 mm (47u 35V)",CP_Elec_6.3x7.7,SMD,
+2,"C2,C5,C11,C13,C14,C16",6,Samsung,CL10B104KB8NNNC,Capacitor 100 nF 50 V X7R 0603 (100n 50V / 100n),C_0603_1608Metric,SMD,
+3,"C3,C4,C7,C8",4,Murata,GRM31CR71H106KA12L,Capacitor 10 uF 50 V X7R 1206 (10u 50V),C_1206_3216Metric,SMD,
+4,C6,1,Murata,GRM188R71H223KA01D,Capacitor 22 nF 50 V X7R 0603 (22n),C_0603_1608Metric,SMD,
+5,"C9,C12,C15",3,Murata,GRM188R71A475KE15D,Capacitor 4.7 uF 10 V X7R 0603 (4u7 10V),C_0603_1608Metric,SMD,
+6,C10,1,Murata,GRM188R71A105KA61D,Capacitor 1 uF 10 V X7R 0603 (1u 10V),C_0603_1608Metric,SMD,
+7,D1,1,Littelfuse,SMBJ26A,"TVS diode 26 V unidirectional, SMB (SMBJ26A)",D_SMB,SMD,
+8,"F1,F2",2,Littelfuse,0466005.NR,Fuse 5 A very fast 1206 (5A fast),Fuse_1206_3216Metric,SMD,
+9,L1,1,Coilcraft,XAL6060-682MEC,Power inductor 6.8 uH shielded (6.8u),L_Coilcraft_XAL6060-XXX,SMD,
+10,"Q1,Q2",2,onsemi,FDMC8327L,N-MOSFET 40 V Power33 (FDMC8327L),VSON-8_3.3x3.3mm_P0.65mm_NexFET,SMD,
+11,Q3,1,onsemi,2N7002KT1G,N-MOSFET 60 V SOT-23 (2N7002K),SOT-23,SMD,
+12,"R1,R2",2,Vishay,WSL2512R0100FEA,Current-sense resistor 10 mOhm 1% 1 W 2512 (10m 1%),R_2512_6332Metric,SMD,
+13,R3,1,Panasonic,ERA-3AEB103V,Resistor 10 k 0.1% 25 ppm 0603 (10k 0.1%),R_0603_1608Metric,SMD,
+14,R4,1,Yageo,RC0603FR-0763K4L,Resistor 63.4 k 1% 0603 (63k4 1%),R_0603_1608Metric,SMD,
+15,"R5,R15,R17",3,Yageo,RC0603FR-0710KL,Resistor 10 k 1% 0603 (10k),R_0603_1608Metric,SMD,
+16,"R6,R7,R11",3,Yageo,RC0603FR-07100RL,Resistor 100 Ohm 1% 0603 (100),R_0603_1608Metric,SMD,
+17,R8,1,Yageo,RC0603FR-07560RL,Resistor 560 Ohm 1% 0603 (560),R_0603_1608Metric,SMD,
+18,"R9,R10",2,Yageo,RC0603FR-07270RL,Resistor 270 Ohm 1% 0603 (270),R_0603_1608Metric,SMD,
+19,"R12,R16,R18",3,Yageo,RC0603FR-07100KL,Resistor 100 k 1% 0603 (100k),R_0603_1608Metric,SMD,
+20,RT1,1,Murata,NCP18XH103F03RB,NTC thermistor 10 k B3380 1% 0603 (10k NTC B3380),R_0603_1608Metric,SMD,
+21,U1,1,Analog Devices,LTC4162EUFD-LAD#PBF,"Li-ion charger, I2C, QFN-28 4x5 (must be the -LAD) (LTC4162EUFD-LAD)",QFN-28-1EP_4x5mm_P0.5mm_EP2.65x3.65mm_ThermalVias,SMD,Must be the -LAD version; no substitute
+22,U2,1,NXP,"PCA9554PW,118",8-bit I2C I/O expander TSSOP-16 (PCA9554PW),TSSOP-16_4.4x5mm_P0.65mm,SMD,
+23,U3,1,Nexperia,"PESD5V0S2UT,215",ESD protection 5 V SOT-23 (PESD5V0S2UT),SOT-23,SMD,
+24,U4,1,Texas Instruments,TLV7031DBVR,Comparator push-pull SOT-23-5 (TLV7031DBV),SOT-23-5,SMD,
+25,J1,1,Amass,XT30PW-M,"XT30 PCB connector, right angle, male (24V IN)",AMASS_XT30PW-M_1x02_P2.50mm_Horizontal,THT,
+26,J2,1,JST,B4B-XH-A(LF)(SN),JST-XH header 4-pin vertical (I2C),JST_XH_B4B-XH-A_1x04_P2.50mm_Vertical,THT,
+27,J6,1,Amass,XT30PW-F,"XT30 PCB connector, right angle, female (24V OUT)",AMASS_XT30PW-F_1x02_P2.50mm_Horizontal,THT,
+28,"R13,R14",2,Vishay,PR02000201000JR500,"Resistor 100 Ohm 2 W metal film, axial; mount 2-3 mm above the board (100 2W)",R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal,THT,Mount 2-3 mm above the board (heat)
+29,J3,1,Phoenix Contact,1715035,"Screw terminal 3-pole 5.0 mm (MKDS 1,5/3) (BATTERY)","TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm_Horizontal",THT,DO NOT PLACE (customer fits it)
+30,J4,1,generic,-,Pin header 1x2 2.54 mm (SWITCH),PinHeader_1x02_P2.54mm_Vertical,THT,DO NOT PLACE (customer fits it)
+31,J5,1,generic,-,Pin header 1x4 2.54 mm (LED),PinHeader_1x04_P2.54mm_Vertical,THT,DO NOT PLACE (customer fits it)
