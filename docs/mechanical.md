@@ -231,13 +231,15 @@ No cable has to be threaded through a part before it is connected.
   - **power LED** (`power_led`, Lumex SSI-LXMP059ID snap-in) in the front wall, left of the
     notches (`led_pos`): cut-out `led_cut` 6.6 × 4.6 mm, wall thinned to `led_panel_t` = 1.6 mm
     around it from inside. Check both against your part.
-- **Snap-in lid** (`lid_snap`): six tabs on the lid hook into windows through the walls (two in
-  the front wall, two in the rear wall, one in each side wall of the mains compartment). To open
-  it, push the hooks in through the windows from outside. Two screws stay in the rear corners
-  over the mains compartment (`lid_mains_screws`), so getting at mains needs a tool; turn them off
-  only if the box is somewhere nobody else can open it. The lid is modelled as fitted
-  (`controller_closed`) and exported turned over for printing; `controller_lid_check` must render
-  empty (no collision between lid and box).
+- **Snap-in lid** (`lid_snap`), no screws: six tabs on the lid hook into windows through the
+  walls (two in the front wall, two in the rear wall, one in each side wall of the mains
+  compartment, above the vent slots). The tabs taper from 3.6 mm at the lid to 1.8 mm at the hook
+  (`snap_t_base`, `snap_t`), so the bending spreads along them instead of breaking them off at the
+  root. To open the lid, push the hooks in through the windows from outside. Note that the mains
+  side then opens without a tool: `lid_mains_screws = true` adds two screws over it if the box is
+  anywhere others can reach. The lid is modelled as fitted (`controller_closed`) and exported
+  turned over for printing; `controller_lid_check` must render empty (no collision between lid
+  and box).
 - **Mains side**, behind a closed partition: the PSU on four 6 mm M3 standoffs (heat-set inserts),
   a 20.5 mm hole for an **M20 cable gland** in the rear wall (`mains_entry = "gland"`), and 2.5 mm
   vent slots in both side walls. The lid carries a **90/92 mm fan** over the PSU (`psu_fan`, finger-safe

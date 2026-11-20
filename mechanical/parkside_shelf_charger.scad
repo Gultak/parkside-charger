@@ -198,8 +198,8 @@ usb_plug = [13.5, 7.5];   // pocket from outside for the plug's overmold
 usb_skin = 0.8;           // wall left between the pocket and the inside face
 // snap-in lid: tabs on the lid hook into windows through the walls (press in from outside to open)
 lid_snap = true;
-lid_mains_screws = true;  // keep 2 screws over the mains compartment (opening it then needs a tool)
-snap_w = 10; snap_t = 1.8; snap_l = 12; snap_hook = 1.2;
+lid_mains_screws = false; // true: 2 screws over the mains compartment as well (opening it then needs a tool)
+snap_w = 10; snap_t = 1.8; snap_t_base = 3.6; snap_l = 12; snap_hook = 1.2;   // tabs taper from 3.6 at the lid to 1.8
 
 $fn = 48;
 eps = 0.01;
@@ -651,8 +651,10 @@ module controller_box() {
                 translate([-ix / 2 + psu_gap + 4 - 2, o[1] - ctl_wall - eps, ctl_wall + 5 - 2])
                     cube([iec_cut[0] + 4, ctl_wall - iec_panel_t + eps, iec_cut[1] + 4]);
             // vent slots in both side walls of the mains compartment (low and high rows)
-            for (sx = [-1, 1]) for (y = [psu_y0() + 14 : 6 : psu_y1() - 8]) for (z = [ctl_wall + 4, ctl_wall + 22])
-                translate([sx > 0 ? o[0] / 2 - ctl_wall - eps : -o[0] / 2 - eps, y, z]) cube([ctl_wall + 2 * eps, vent_w, 14]);
+            // (upper row ends 2 mm below the lid's snap windows)
+            for (sx = [-1, 1]) for (y = [psu_y0() + 14 : 6 : psu_y1() - 8]) for (z = [ctl_wall + 4, ctl_wall + 20])
+                translate([sx > 0 ? o[0] / 2 - ctl_wall - eps : -o[0] / 2 - eps, y, z])
+                    cube([ctl_wall + 2 * eps, vent_w, min(14, top - snap_l - 0.2 - 2 - z)]);
         }
     }
     // board standoffs (M3 heat-set inserts)
@@ -682,7 +684,8 @@ module controller_lid_installed() {
             for (n = ctl_notches()) wall_block(n[0], n[1], n[2], cable_z() + cable_gap, top + eps, 0.3, [0.15, -0.15]);
             // snap tabs with a hook at the tip (45 deg lead-in, flat catch)
             if (lid_snap) for (sn = ctl_snaps()) at_wall(sn[0], sn[1]) {
-                translate([-snap_w / 2, 0.2, top - snap_l]) cube([snap_w, snap_t, snap_l + eps]);
+                translate([snap_w / 2, 0, 0]) rotate([0, -90, 0]) linear_extrude(snap_w) polygon([   // (z, y)
+                    [top - snap_l, 0.2], [top + eps, 0.2], [top + eps, 0.2 + snap_t_base], [top - snap_l, 0.2 + snap_t]]);
                 translate([snap_w / 2, 0, 0]) rotate([0, -90, 0]) linear_extrude(snap_w) polygon([
                     [top - snap_l, 0.2 + eps], [top - snap_l + snap_hook, 0.2 - snap_hook],
                     [top - 8.7, 0.2 - snap_hook], [top - 8.7, 0.2 + eps]]);
