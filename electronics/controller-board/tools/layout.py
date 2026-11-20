@@ -10,9 +10,11 @@ REV = "C"
 ROOT_UUID = "6b2d1c1b-8e2f-4d4b-8b58-3a7a4d1c0002"
 BW, BH = 112.0, 64.0
 EDGE_KEEP = 0.5
-GND_VIA_SKIP = {("U3", "12"), ("U4", "12"), ("U4", "2")}   # these get the fixed vias below
+GND_VIA_SKIP = {("U3", "12"), ("U3", "21"), ("U4", "12"), ("U4", "2")}   # these get the fixed vias below
 
-ESP_X, ESP_Y = 56.0, 19.5          # module centre; rotated 180 deg: USB at the top edge
+ESP_X, ESP_Y = 56.0, 13.9          # header centre; rotated 180 deg: USB at the top edge. The
+# module's USB-C mouth is 17.88 mm from its header centre (xyzroe Gerbers), so it ends at
+# board y = -3.98: the inside face of the box wall (4 mm gap), and sits in the wall's hole
 
 # Compact layout (rev B): slot connectors at a 7 mm pitch down both sides, the ESP32 at the
 # top centre with the headers beside it, the 24 V power band along the bottom edge.
@@ -66,9 +68,12 @@ POURS = [("+24V_IN", 2, _IN), ("+24V_IN", 2, _IN, "B"),
 # mux GND pins (pin 12) sit at the end of a busy pin row: reserve their GND via before routing
 FIXED_TRACKS = [("GND", "F", 0.3, [(21.625, 25.14), (21.625, 23.4)]),    # U3 (rot 270) pin 12
                 ("GND", "F", 0.3, [(89.575, 30.86), (89.575, 32.6)]),    # U4 (rot 90) pin 12
-                ("GND", "F", 0.2, [(83.075, 30.86), (83.075, 33.4)])]    # U4 pin 2 (A1), between two signals
-FIXED_VIAS = [("GND", (21.625, 23.4)), ("GND", (89.575, 32.6)), ("GND", (83.075, 33.4))]
+                ("GND", "F", 0.2, [(83.075, 30.86), (83.075, 33.4)]),    # U4 pin 2 (A1), between two signals
+                ("GND", "F", 0.2, [(26.875, 30.913), (26.875, 32.7)])]   # U3 pin 21, between two signals
+FIXED_VIAS = [("GND", (21.625, 23.4)), ("GND", (89.575, 32.6)), ("GND", (83.075, 33.4)), ("GND", (26.875, 32.7))]
 # no copper under the ESP antenna (module rotated: antenna at y = ESP_Y + 12 .. + 18)
+# the ESP module overhangs the top edge (its USB-C reaches into the box wall)
+OVERHANG = {"U2"}
 KEEPOUTS = [[(ESP_X - 15.0, ESP_Y + 11.0), (ESP_X + 15.0, ESP_Y + 11.0),
              (ESP_X + 15.0, ESP_Y + 21.0), (ESP_X - 15.0, ESP_Y + 21.0)]]
 KELVIN = [("Q1", "1", "D2", "2")]

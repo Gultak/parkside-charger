@@ -15,9 +15,10 @@
 
 ## Concept
 
-- **One printed module per battery** (87.6 × 120 mm footprint plus a 9.5 mm nose, 44 mm tall). Modules sit side by
-  side at an **88 mm pitch** (86 mm battery + 2 mm; you take the batteries out from below, so no
-  finger room is needed): a row of 8 needs **70.4 cm** of shelf. The controller drives up to 16 slots
+- **One printed module per battery** (85.6 mm wide, 132 mm deep from the nose tip to the rear
+  face, 44 mm tall; the XT30 plugs and the chain cable need about 25 mm more behind it). Modules
+  sit side by side at an **86 mm pitch** (batteries measured at 85 mm or less; you take them out
+  from below, so no finger room is needed): a row of 8 needs **68.8 cm** of shelf. The controller drives up to 16 slots
   through two 24 V outputs, for example **two rows of 8** on two shelves, one chain each.
 - **Neighbouring modules slot into each other** with a **sliding dovetail** that runs along the
   full length of each side. Every module has a tongue on its right edge and a groove on its left
@@ -75,7 +76,7 @@
 | Tongue width (above the grooves) | 46.3 mm | `chan_w` = 46.9 |
 | Groove depth / height | 4.5 / 5.4 mm | `lip_in` = 4.2, `lip_t` = 5.0 |
 | Tongue top → groove | 4.8 mm | `lip_gap` = 5.1 |
-| Battery body width | 86 mm | `pitch` = 88 |
+| Battery body width | ≤ 85 mm (measured) | `pitch` = 86 |
 | Rail length | 64 mm, tongue end (release button) to the contact face | `rail_len` = 64 |
 | Latch tooth | Measured: 4 mm from the tongue end, 29 mm wide, 4 mm long, sticks up about as far as the top surface (4–5 mm) | The pocket copies the reference holder: `latch_w` = 25, profile `latch_prof` (5 mm deep, open at the nose tip) |
 | Front end | From the reference holder: lips start 28.6 mm in front of the contact face; walls slope away at 45° and reach the plate face 43 mm in front of it; frame front 45.5 mm, nose tip 55 mm in front of it | `lip_l`, `lead_in`, `slope_l`, `front_l`, `nose_l`, `nose_w` |
@@ -213,18 +214,35 @@ No cable has to be threaded through a part before it is connected.
   in a cable duct along the rear.
 
 **Controller box** (125 × 179 × 50 mm with the LOP-300; 148 × 204 × 50 mm with the LOP-400). Two compartments:
-- **Low-voltage side:** the board sits on 4 standoffs with its components facing the lid. Its
-  walls have U-notches **open towards the lid**:
+- **Low-voltage side:** the board sits on 4 standoffs with its components facing the lid. The
+  cable openings are notches **open towards the lid**, 8 mm above the board (`cable_floor`); fins
+  on the lid come down into them and leave a **5 mm slot** (`cable_gap`) for the cables. Lay the
+  cables in, then put the lid on:
   - left and right walls: slot cables 1–8 and 9–16, and OUT A / OUT B. Those leave the board's
     bottom edge, run along the 12 mm cable channel behind it and out at the side (row 1 left,
     row 2 right)
-  - top wall: the ESP32's USB-C, plus the SHT21, Qwiic and expansion cables
+  - front wall (opposite the mains entry): one notch for the SHT21 and Qwiic cables, one for the
+    expansion header
+  - **USB-C:** the ESP32-C6 D1 sits with its USB-C mouth at the inside face of the front wall, in
+    a 9.6 × 4 mm hole; a 13.5 × 7.5 mm pocket from outside takes the plug's overmold (0.8 mm
+    of wall left). The height is `usb_h` = 14.2 mm above the board's top face: an estimate for
+    8.5 mm female headers, 2.5 mm male header spacer and a 1.6 mm module board. **Measure it**
+    with your headers and module before printing.
+  - **power LED** (`power_led`, Lumex SSI-LXMP059ID snap-in) in the front wall, left of the
+    notches (`led_pos`): cut-out `led_cut` 6.6 × 4.6 mm, wall thinned to `led_panel_t` = 1.6 mm
+    around it from inside. Check both against your part.
+- **Snap-in lid** (`lid_snap`): six tabs on the lid hook into windows through the walls (two in
+  the front wall, two in the rear wall, one in each side wall of the mains compartment). To open
+  it, push the hooks in through the windows from outside. Two screws stay in the rear corners
+  over the mains compartment (`lid_mains_screws`), so getting at mains needs a tool; turn them off
+  only if the box is somewhere nobody else can open it. The lid is modelled as fitted
+  (`controller_closed`) and exported turned over for printing; `controller_lid_check` must render
+  empty (no collision between lid and box).
 - **Mains side**, behind a closed partition: the PSU on four 6 mm M3 standoffs (heat-set inserts),
   a 20.5 mm hole for an **M20 cable gland** in the rear wall (`mains_entry = "gland"`), and 2.5 mm
   vent slots in both side walls. The lid carries a **90/92 mm fan** over the PSU (`psu_fan`, finger-safe
-  grille, M4 × 30 screws and nuts, a slot for its plug into the low-voltage side) and the
-  **power LED** (`power_led`, Lumex SSI-LXMP059ID snap-in, cut-out `led_cut` 6.6 × 4.6 mm, lid
-  thinned to `led_panel_t` = 1.6 mm around it: check both against your part). The charger is **hard-wired**: 3-core flex from a
+  grille, M4 × 30 screws and nuts, a slot for its plug into the low-voltage side). The PSU leads
+  pass the partition in a 14 × 10 mm slot at its top (`psu_lead_slot`). The charger is **hard-wired**: 3-core flex from a
   switched fused spur (3 A fuse) comes in through the gland, which clamps it. Use **round**
   cable (flat twin & earth doesn't seal or clamp properly in a round gland; M20 grips 6-12 mm). A 25 mm wiring bay (`mains_bay`) between the PSU and the rear wall
   holds the gland nut, the flex bend, the Wagos and the KSD301. (`mains_entry = "iec"`

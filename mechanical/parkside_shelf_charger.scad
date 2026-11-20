@@ -84,7 +84,7 @@ barrel_w    = 5.0;  // pocket for the crimped barrel + wire, across the tab plan
 tab_vertical = true; // blade plane vertical (the pockets assume this)
 
 /* [Module frame] */
-pitch    = 88;    // module width = slot spacing (battery body 86 + 2, batteries are grabbed from below)
+pitch    = 86;    // module width = slot spacing (battery bodies measured <= 85 mm; grabbed from below)
 plate_t  = 10;    // mounting plate thickness (carries the dovetail and the LED; as on the reference holder)
 wall_t   = 5;     // rail wall thickness
 stop_t   = 8;     // end wall thickness (behind the prong tips)
@@ -180,10 +180,26 @@ psu_fan = true;           // 90/92 mm 12 V PWM fan on the lid, blowing onto the 
 fan_size = 92;            // fan frame
 fan_hole_pitch = 82.5;    // fan screw holes (92 mm fan: 82.5, 80 mm fan: 71.5)
 fan_hole_d = 4.4;         // fan screws / M4
-power_led = true;         // panel LED (Lumex SSI-LXMP059ID, snap-in) in the lid over the low-voltage side
+power_led = true;         // panel LED (Lumex SSI-LXMP059ID, snap-in) in the front wall (opposite the mains entry)
+led_pos = [-36, 34];      // its centre: X in the box, Z above the base (above the slot cables)
 led_cut = [6.6, 4.6];     // its rectangular cut-out (catalogue: 0.258 x 0.177 in)  CHECK against your part
 led_panel_t = 1.6;        // lid thickness at the LED, for its snap-in clips (recessed from the inside)  CHECK
 vent_w = 2.5;             // vent slot width (finger-safe)
+// cable openings: notches open towards the lid, closed by fins on the lid down to a slot
+cable_floor = 8;          // notch floor above the controller board's top face
+cable_gap = 5;            // height of the slot the lid's fins leave for the cables
+psu_lead_slot = 10;       // depth (from the top) of the slot for the PSU leads in the partition
+// USB-C of the ESP32-C6 D1 in the front wall: the module sits with its USB-C mouth at the wall's
+// inside face (controller board layout); the plug's overmold goes into a pocket from outside
+esp_x = 56;               // module centre on the controller board (board X, as in layout.py)
+usb_h = 14.2;             // USB-C centre above the controller board's top face  CHECK (measure)
+usb_hole = [9.6, 4.0];    // through the wall: the receptacle (8.94 x 3.26) + clearance
+usb_plug = [13.5, 7.5];   // pocket from outside for the plug's overmold
+usb_skin = 0.8;           // wall left between the pocket and the inside face
+// snap-in lid: tabs on the lid hook into windows through the walls (press in from outside to open)
+lid_snap = true;
+lid_mains_screws = true;  // keep 2 screws over the mains compartment (opening it then needs a tool)
+snap_w = 10; snap_t = 1.8; snap_l = 12; snap_hook = 1.2;
 
 $fn = 48;
 eps = 0.01;
@@ -545,7 +561,36 @@ function psu_holes() = [for (i = [0, 1], j = [0, 1])
     psu_xy0() + psu_spec()[1] + [i * psu_spec()[2][0], j * psu_spec()[2][1]]];
 // lid ears: [side, y of the ear's start]; mid pair at the partition for the long box
 function ctl_ears() = let(o = ctl_o())
-    concat([[-1, 3], [1, 3], [-1, o[1] - 22], [1, o[1] - 22]], has_psu() ? [[-1, psu_y0() + 2], [1, psu_y0() + 2]] : []);
+    lid_snap ? (lid_mains_screws ? [[-1, o[1] - 22], [1, o[1] - 22]] : [])
+             : concat([[-1, 3], [1, 3], [-1, o[1] - 22], [1, o[1] - 22]], has_psu() ? [[-1, psu_y0() + 2], [1, psu_y0() + 2]] : []);
+function ctl_pz() = ctl_wall + ctl_standoff + 1.6;      // controller board top face
+function cable_z() = ctl_pz() + cable_floor;
+// cable notches: [wall, from, to]; L/R side walls (along Y), F front wall / B rear wall (along X)
+function ctl_notches() = concat(
+    [["L", ctl_pcb_xy([0, 0.5])[1], ctl_y1() - 3], ["R", ctl_pcb_xy([0, 0.5])[1], ctl_y1() - 3]],
+    [["F", ctl_pcb_xy([27, 0])[0], ctl_pcb_xy([43, 0])[0]],      // SHT21 + Qwiic
+     ["F", ctl_pcb_xy([68.5, 0])[0], ctl_pcb_xy([77, 0])[0]]],   // expansion header
+    has_psu() ? [] : [["B", ctl_pcb_xy([14, 0])[0], ctl_pcb_xy([92, 0])[0]]]);
+// snaps: [wall, position along it]
+function ctl_snaps() = let(o = ctl_o(), ym = (psu_y0() + psu_y1()) / 2)
+    concat([["F", -46], ["F", 38], ["B", -30], ["B", 30]], has_psu() ? [["L", ym], ["R", ym]] : []);
+// a block in the plane of a wall: along = [a, b], z = [z0, z1], inset = clearance off the
+// along-ends, t = [t0, t1] depth into the wall from its outside face
+module wall_block(w, a, b, z0, z1, inset = 0, t = [-0.01, 0]) {
+    o = ctl_o(); tw = ctl_wall + t[1] - t[0];
+    if (w == "L") translate([-o[0] / 2 + t[0], a + inset, z0]) cube([tw, b - a - 2 * inset, z1 - z0]);
+    if (w == "R") translate([o[0] / 2 - ctl_wall - t[1], a + inset, z0]) cube([tw, b - a - 2 * inset, z1 - z0]);
+    if (w == "F") translate([a + inset, t[0], z0]) cube([b - a - 2 * inset, tw, z1 - z0]);
+    if (w == "B") translate([a + inset, o[1] - ctl_wall - t[1], z0]) cube([b - a - 2 * inset, tw, z1 - z0]);
+}
+// local frame of a wall's inside face: origin on the face at "pos", +Y into the box
+module at_wall(w, pos) {
+    o = ctl_o(); ix = ctl_ix();
+    if (w == "F") translate([pos, ctl_wall, 0]) children();
+    if (w == "B") translate([pos, o[1] - ctl_wall, 0]) mirror([0, 1, 0]) children();
+    if (w == "L") translate([-ix / 2, pos, 0]) rotate([0, 0, -90]) children();
+    if (w == "R") translate([ix / 2, pos, 0]) rotate([0, 0, 90]) children();
+}
 module controller_box() {
     o = ctl_o();
     top = o[2];
@@ -573,19 +618,28 @@ module controller_box() {
             translate([sx * (o[0] / 2 + 6), y, -eps]) cylinder(d = screw_d, h = 5);
         for (e = ctl_ears())
             translate([e[0] * (o[0] / 2 + 4), e[1] + 4, top - 6]) cylinder(d = 4.2, h = 6 + eps);
-        // ---- cable notches (low-voltage compartment), open towards the lid
-        // left / right: slot connectors (board y 0.5..57) and, with a PSU, OUT A/B from the channel
-        for (sx = [-1, 1]) translate([sx > 0 ? o[0] / 2 - ctl_wall - eps : -o[0] / 2 - eps,
-                                      ctl_pcb_xy([0, 0.5])[1], pz + 2])
-            cube([ctl_wall + 2 * eps, (has_psu() ? ctl_y1() - 3 : ctl_pcb_xy([0, 57])[1]) - ctl_pcb_xy([0, 0.5])[1], top]);
-        // bottom wall (no PSU): PSU in, OUT A, OUT B (board x 14..92)
-        if (!has_psu())
-            translate([ctl_pcb_xy([14, 0])[0], o[1] - ctl_wall - eps, pz + 1]) cube([78, ctl_wall + 2 * eps, top]);
-        // top: SHT21 / Qwiic / ESP USB-C / expansion (board x 28..77)
-        translate([ctl_pcb_xy([28, 0])[0], -eps, pz + 1]) cube([49, ctl_wall + 2 * eps, top]);
+        // ---- cable notches, open towards the lid; the lid's fins close them down to a slot
+        for (n = ctl_notches()) wall_block(n[0], n[1], n[2], cable_z(), top + 1, 0, [-1, 1]);
+        // ---- USB-C of the ESP32 module: hole for the receptacle, pocket for the plug from outside
+        let(ux = ctl_pcb_xy([esp_x, 0])[0], uz = ctl_pz() + usb_h) {
+            translate([ux, -1, uz]) rotate([-90, 0, 0])
+                linear_extrude(ctl_wall + 2) offset(r = 1.6) offset(delta = -1.6) square(usb_hole, center = true);
+            translate([ux, -1, uz]) rotate([-90, 0, 0])
+                linear_extrude(1 + ctl_wall - usb_skin) offset(r = 1.5) offset(delta = -1.5) square(usb_plug, center = true);
+        }
+        // ---- power LED in the front wall, thinned from inside for its snap-in clips
+        if (power_led) {
+            translate([led_pos[0] - led_cut[0] / 2, -1, led_pos[1] - led_cut[1] / 2]) cube([led_cut[0], ctl_wall + 2, led_cut[1]]);
+            if (led_panel_t < ctl_wall)
+                translate([led_pos[0] - led_cut[0] / 2 - 3, led_panel_t, led_pos[1] - led_cut[1] / 2 - 3])
+                    cube([led_cut[0] + 6, ctl_wall, led_cut[1] + 6]);
+        }
+        // ---- windows for the lid's snap hooks (through: press the hook in from outside to open)
+        if (lid_snap) for (sn = ctl_snaps()) at_wall(sn[0], sn[1])
+            translate([-(snap_w + 1) / 2, -ctl_wall - 1, top - snap_l - 0.2]) cube([snap_w + 1, ctl_wall + 1.01, snap_l - 8.7 + 0.2 + 0.2]);
         if (has_psu()) {
             // 24 V leads from the PSU output terminals (right end) through the partition
-            translate([ix / 2 - psu_gap - 22, ctl_y1() - eps, ctl_wall + psu_standoff + 6]) cube([14, part_t + 2 * eps, top]);
+            translate([ix / 2 - psu_gap - 22, ctl_y1() - eps, top - psu_lead_slot]) cube([14, part_t + 2 * eps, psu_lead_slot + 1]);
             // mains entry in the rear wall, next to the PSU's AC input (left end): an M20 cable
             // gland for the hard-wired flex (default), or an IEC C14 inlet with fuse + switch
             if (mains_entry == "gland")
@@ -609,50 +663,54 @@ module controller_box() {
         for (h = psu_holes()) translate([h[0], h[1], ctl_wall - eps])
             difference() { cylinder(d = 7.5, h = psu_standoff); translate([0, 0, 1]) cylinder(d = 4.2, h = psu_standoff); }
 }
-module controller_lid() {
+// lid as installed (on top of the box); controller_lid() turns it over for printing
+module controller_lid_installed() {
     o = ctl_o();
     ix = ctl_ix();
+    top = o[2];
     difference() {
         union() {
-            translate([-o[0] / 2, 0, 0]) cube([o[0], o[1], 2.4]);
+            translate([-o[0] / 2, 0, top]) cube([o[0], o[1], 2.4]);
             for (e = ctl_ears())
-                translate([e[0] * (o[0] / 2 + 4) - 4, e[1], 0]) cube([8, 8, 2.4]);
-            // locating lips in the corners (not in front of the cable notches)
+                translate([e[0] * (o[0] / 2 + 4) - 4, e[1], top]) cube([8, 8, 2.4]);
+            // locating lips in the inside corners
             lips_y = has_psu() ? [ctl_wall + 0.3, psu_y0() + 0.3, o[1] - ctl_wall - 8.3]
                                : [ctl_wall + 0.3, o[1] - ctl_wall - 8.3];
             for (sx = [-1, 1]) for (y = lips_y)
-                translate([sx > 0 ? ix / 2 - 8.3 : -ix / 2 + 0.3, y, 2.4 - eps]) cube([8, 8, 3]);
+                translate([sx > 0 ? ix / 2 - 8.3 : -ix / 2 + 0.3, y, top - 3]) cube([8, 8, 3 + eps]);
+            // fins that close the cable notches down to a cable_gap slot
+            for (n = ctl_notches()) wall_block(n[0], n[1], n[2], cable_z() + cable_gap, top + eps, 0.3, [0.15, -0.15]);
+            // snap tabs with a hook at the tip (45 deg lead-in, flat catch)
+            if (lid_snap) for (sn = ctl_snaps()) at_wall(sn[0], sn[1]) {
+                translate([-snap_w / 2, 0.2, top - snap_l]) cube([snap_w, snap_t, snap_l + eps]);
+                translate([snap_w / 2, 0, 0]) rotate([0, -90, 0]) linear_extrude(snap_w) polygon([
+                    [top - snap_l, 0.2 + eps], [top - snap_l + snap_hook, 0.2 - snap_hook],
+                    [top - 8.7, 0.2 - snap_hook], [top - 8.7, 0.2 + eps]]);
+            }
         }
         for (e = ctl_ears())
-            translate([e[0] * (o[0] / 2 + 4), e[1] + 4, -eps]) cylinder(d = 3.4, h = 10);
+            translate([e[0] * (o[0] / 2 + 4), e[1] + 4, top - 1]) cylinder(d = 3.4, h = 10);
         // vent slots above the regulator / bus switch area
-        for (i = [0:7]) translate([-30 + i * 8, ctl_y1() - 26, -eps]) cube([3, 18, 3]);
+        for (i = [0:7]) translate([-30 + i * 8, ctl_y1() - 26, top - 1]) cube([3, 18, 5]);
         // above the PSU: the fan's grille and screw holes, or plain vent slots (finger-safe width)
         if (has_psu() && psu_fan) {
             fc = [0, (psu_y0() + psu_y1()) / 2];                // fan centred over the mains compartment
             intersection() {
-                translate([fc[0], fc[1], -eps]) cylinder(d = fan_size - 6, h = 3, $fn = 96);
+                translate([fc[0], fc[1], top - 1]) cylinder(d = fan_size - 6, h = 5, $fn = 96);
                 for (y = [-fan_size / 2 : vent_w + 2.5 : fan_size / 2])
-                    translate([fc[0] - fan_size / 2, fc[1] + y, -2 * eps]) cube([fan_size, vent_w, 3 + 2 * eps]);
+                    translate([fc[0] - fan_size / 2, fc[1] + y, top - 1]) cube([fan_size, vent_w, 5]);
             }
             for (dx = [-1, 1], dy = [-1, 1])
-                translate([fc[0] + dx * fan_hole_pitch / 2, fc[1] + dy * fan_hole_pitch / 2, -eps])
+                translate([fc[0] + dx * fan_hole_pitch / 2, fc[1] + dy * fan_hole_pitch / 2, top - 1])
                     cylinder(d = fan_hole_d, h = 10, $fn = 24);
-            // slot for the fan's 4-pin plug into the low-voltage side (to J7 on the board)
-            translate([fan_size / 2 + 7 - 6, ctl_y1() - 7 - 3, -eps]) cube([12, 6, 3]);   // beside the fan frame
+            // slot for the fan's 4-pin plug into the low-voltage side (to J7, right of the ESP32)
+            translate([fan_size / 2 + 7 - 6, ctl_y1() - 7 - 3, top - 1]) cube([12, 6, 5]);
         } else if (has_psu())
             for (y = [psu_y0() + psu_gap + 6 : 6 : psu_y1() - psu_gap - 6])
-                translate([-psu_spec()[0][0] / 2 + 12, y, -eps]) cube([psu_spec()[0][0] - 24, vent_w, 3]);
-        // power LED, near the low-voltage compartment's corner
-        if (power_led) {
-            lp = [-ix / 2 + 18, ctl_wall + 14];
-            translate([lp[0] - led_cut[0] / 2, lp[1] - led_cut[1] / 2, -eps]) cube([led_cut[0], led_cut[1], 3]);
-            if (led_panel_t < 2.4)
-                translate([lp[0] - led_cut[0] / 2 - 3, lp[1] - led_cut[1] / 2 - 3, led_panel_t])
-                    cube([led_cut[0] + 6, led_cut[1] + 6, 3]);
-        }
+                translate([-psu_spec()[0][0] / 2 + 12, y, top - 1]) cube([psu_spec()[0][0] - 24, vent_w, 5]);
     }
 }
+module controller_lid() rotate([0, 180, 0]) translate([0, 0, -(ctl_o()[2] + 2.4)]) controller_lid_installed();
 // for previews: the PSU as a block
 module dummy_psu() {
     if (has_psu()) color("darkgreen", 0.8)
@@ -690,6 +748,8 @@ else if (part == "end_gauge") rotate([-90, 0, 0]) translate([0, -y_bay0, 0]) end
 else if (part == "controller") controller_box();
 else if (part == "controller_preview") { controller_box(); dummy_psu(); }
 else if (part == "controller_lid") controller_lid();
+else if (part == "controller_closed") { controller_box(); color("steelblue", 0.6) controller_lid_installed(); }
+else if (part == "controller_lid_check") intersection() { controller_box(); translate([0, 0, 0.01]) controller_lid_installed(); }
 else if (part == "single") slot_module();
 // cut through the LED bezel with the LED in place
 else if (part == "led_section") intersection() {
