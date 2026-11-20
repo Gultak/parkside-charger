@@ -199,6 +199,7 @@ usb_skin = 0.8;           // wall left between the pocket and the inside face
 // snap-in lid: tabs on the lid hook into windows through the walls (press in from outside to open)
 lid_snap = true;
 lid_mains_screws = false; // true: 2 screws over the mains compartment as well (opening it then needs a tool)
+pry_w = 8; pry_ch = 1.5;   // pry slot in the lid edge over each snap, 45 deg chamfer on the wall below it
 snap_w = 10; snap_t = 1.8; snap_t_base = 3.6; snap_l = 12; snap_hook = 1.2;   // tabs taper from 3.6 at the lid to 1.8
 
 $fn = 48;
@@ -635,8 +636,13 @@ module controller_box() {
                     cube([led_cut[0] + 6, ctl_wall, led_cut[1] + 6]);
         }
         // ---- windows for the lid's snap hooks (through: press the hook in from outside to open)
-        if (lid_snap) for (sn = ctl_snaps()) at_wall(sn[0], sn[1])
+        if (lid_snap) for (sn = ctl_snaps()) at_wall(sn[0], sn[1]) {
             translate([-(snap_w + 1) / 2, -ctl_wall - 1, top - snap_l - 0.2]) cube([snap_w + 1, ctl_wall + 1.01, snap_l - 8.7 + 0.2 + 0.2]);
+            // pry chamfer: a screwdriver pushed down through the lid's slot wedges the wall outwards,
+            // off the hook
+            translate([pry_w / 2, 0, 0]) rotate([0, -90, 0]) linear_extrude(pry_w) polygon([   // (z, y)
+                [top + eps, eps], [top + eps, -pry_ch - eps], [top - pry_ch - eps, eps]]);
+        }
         if (has_psu()) {
             // 24 V leads from the PSU output terminals (right end) through the partition
             translate([ix / 2 - psu_gap - 22, ctl_y1() - eps, top - psu_lead_slot]) cube([14, part_t + 2 * eps, psu_lead_slot + 1]);
@@ -693,6 +699,8 @@ module controller_lid_installed() {
         }
         for (e = ctl_ears())
             translate([e[0] * (o[0] / 2 + 4), e[1] + 4, top - 1]) cylinder(d = 3.4, h = 10);
+        if (lid_snap) for (sn = ctl_snaps()) at_wall(sn[0], sn[1])
+            translate([-pry_w / 2, -ctl_wall - 1, top - 1]) cube([pry_w, ctl_wall + 1.2, 2.4 + 2]);
         // vent slots above the regulator / bus switch area
         for (i = [0:7]) translate([-30 + i * 8, ctl_y1() - 26, top - 1]) cube([3, 18, 5]);
         // above the PSU: the fan's grille and screw holes, or plain vent slots (finger-safe width)

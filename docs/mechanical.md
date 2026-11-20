@@ -235,7 +235,9 @@ No cable has to be threaded through a part before it is connected.
   walls (two in the front wall, two in the rear wall, one in each side wall of the mains
   compartment, above the vent slots). The tabs taper from 3.6 mm at the lid to 1.8 mm at the hook
   (`snap_t_base`, `snap_t`), so the bending spreads along them instead of breaking them off at the
-  root. To open the lid, push the hooks in through the windows from outside. Note that the mains
+  root. To open the lid, push the hooks in through the windows from outside, or push a flat
+  screwdriver down through the 8 mm slot in the lid edge above each snap (`pry_w`): it wedges on
+  a 45° chamfer at the top of the wall (`pry_ch`) and bends the wall outwards, off the hook. Note that the mains
   side then opens without a tool: `lid_mains_screws = true` adds two screws over it if the box is
   anywhere others can reach. The lid is modelled as fitted (`controller_closed`) and exported
   turned over for printing; `controller_lid_check` must render empty (no collision between lid
