@@ -1,5 +1,8 @@
 # Firmware (ESPHome) and charging strategy
 
+Component reference: [Parkside Charger (hub)](components/parkside_charger.md) and
+[Parkside Slot](components/parkside_slot.md).
+
 ## Files
 
 ```
