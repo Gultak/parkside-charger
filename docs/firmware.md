@@ -102,8 +102,9 @@ over 100–300 W or 35–45 °C, whichever asks for more (off again below 80 W a
   LOP-400-24 instead: 10 A / 13 A.)
 - **Entities:** "PSU fan" (speed fan, can be set by hand), "PSU fan speed" (rpm), "PSU fan fault".
 - **Wiring:** the fan's 4-pin plug into J7 through the slot in the lid. +12 V from the PSU's fan
-  connector (LOP-400: CN2, TKP 8812-2, pin 2 +12 V aux; LOP-300: CN101, JST PH, pin 1) to the
-  1-pin header J9. Ground is shared through the 24 V return.
+  connector to J9, a 2-pin JST PH header with the LOP-300's CN101 pinout (1 +12 V aux, 2 DC COM):
+  a 1:1 lead of two pre-crimped JST PH wires (ASPHSPH24K203, 20 cm) in a PHR-2 housing at each
+  end. (LOP-400: its CN2, TKP 8812-2, has +12 V aux on pin 2; crimp a matching lead.)
 
 ## Safety interlock
 

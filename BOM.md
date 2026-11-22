@@ -6,7 +6,7 @@ manufacturer and part number columns are the parts actually ordered.
 
 | Status | Meaning |
 |---|---|
-| 🛒 DigiKey | Order from DigiKey Ireland. Upload [`procurement/digikey_controller.csv`](procurement/digikey_controller.csv) and [`procurement/digikey_10_slots.csv`](procurement/digikey_10_slots.csv) |
+| 🛒 DigiKey | Order from DigiKey Ireland. Upload [`procurement/digikey_all.csv`](procurement/digikey_all.csv) (everything, quantities merged), or [`procurement/digikey_controller.csv`](procurement/digikey_controller.csv) and [`procurement/digikey_10_slots.csv`](procurement/digikey_10_slots.csv) separately |
 | ✅ at hand | Already there: don't order |
 | 🏭 PCB fab | Gerbers in `electronics/*/fab` (JLCPCB / PCBWay) |
 | ⚠️ resolve | The chosen part does not match the design yet: see the note |
@@ -51,10 +51,11 @@ Prices are DigiKey line totals including VAT, from the sheets. DigiKey ships fre
 | 2 | XT30 PCB socket, vertical, female | Amass | XT30UPB-F | ✅ at hand |  |  | J2,J3 |
 | 1 | Pin header 1×7, 2.54 mm | generic | – | ✅ at hand |  |  | J6 |
 | 1 | Pin header 1×2, 2.54 mm | generic | – | ✅ at hand |  |  | J8 |
-| 1 | Pin header 1×1, 2.54 mm | generic | – | ✅ at hand |  |  | J9 |
+| 1 | JST PH header 2-pin, vertical | JST | B2B-PH-K-S(LF)(SN) | 🛒 DigiKey | 455-1704-ND | 0.17 | J9 |
 | 1 | Panel LED, red, snap-in | Lumex | SSI-LXMP059ID | 🛒 DigiKey | 67-1179-ND | 1.05 | on J8 |
 | 1 | Fan 90/92 mm, 12 V, 4-pin PWM | generic | – | ✅ at hand |  |  | on J7 |
-| 1 | Plug for the PSU fan connector: housing + 2 contacts | JST | PHR-2 + SPH-002T-P0.5S | 🛒 DigiKey | 455-1165-ND + 455-1127-1-ND | 0.30 | PSU CN101 → J9 |
+| 2 | JST PH housing 2-pin (PSU CN101 and J9 ends) | JST | PHR-2 | 🛒 DigiKey | 455-1165-ND | 0.20 | CN101 → J9 |
+| 2 | JST PH pre-crimped lead, 24 AWG, 203 mm | JST | ASPHSPH24K203 | 🛒 DigiKey | 455-3359-ND | 0.72 | CN101 → J9, 1:1 |
 | 1 | Power supply 24 V, open frame | Mean Well | LOP-300-24 | 🛒 DigiKey | 1866-LOP-300-24-ND | 44.65 | budget 7 A, 10 A with the fan |
 | 2 | VH housing 6-pin | JST | VHR-6N | ✅ at hand |  |  |  |
 | 14 | VH crimp contact | JST | SVH-21T-P1.1 | ✅ at hand |  |  |  |
@@ -76,7 +77,7 @@ Prices are DigiKey line totals including VAT, from the sheets. DigiKey ships fre
 | 1 | Steel or aluminium sheet, 0.5–1 mm | generic | – | ✅ at hand |  |  |  |
 | – | Filament PETG / PETG V-0 | generic | – | ✅ at hand |  |  |  |
 
-DigiKey total: **€102.19**
+DigiKey total: **€102.98**
 
 ## 10 charger slots
 

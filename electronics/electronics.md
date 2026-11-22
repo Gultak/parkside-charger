@@ -179,7 +179,7 @@ up to **16 slots**.
 | Slot connectors | 16 × JST-XH 4 (5V, GND, SDA, SCL): slots 1–8 on the left edge, 9–16 on the right | Same pin order as the slot board's J2, so cables are wired 1:1 |
 | Supply sensing | 100 k / 10 k dividers: PSU voltage → **GPIO0**, switched bus voltage → **GPIO1** | Firmware entities *PSU voltage* and *Slot bus voltage* |
 | Buzzer | 12 mm 5 V active buzzer, 2N7002 from **GPIO18** | Sounds on any slot fault or enclosure > 50 °C |
-| PSU fan | **J7** standard 4-pin PC fan header (GND, +12 V, tach, PWM). +12 V comes from the PSU's own +12 V aux fan output to the 1-pin header **J9**. PWM from **GPIO6** through a 2N7002 (open drain, 25 kHz), tach into **GPIO7** with a 10 k pull-up to 3.3 V | 90/92 mm fan on the lid, blowing onto the PSU. Firmware: see "PSU fan" in docs/firmware.md |
+| PSU fan | **J7** standard 4-pin PC fan header (GND, +12 V, tach, PWM). +12 V comes from the PSU's own +12 V aux fan output (LOP-300 CN101) to **J9**, a 2-pin JST PH header with the same pinout (1 +12 V, 2 GND): a 1:1 lead, two pre-crimped PH wires in a PHR-2 at each end. PWM from **GPIO6** through a 2N7002 (open drain, 25 kHz), tach into **GPIO7** with a 10 k pull-up to 3.3 V | 90/92 mm fan on the lid, blowing onto the PSU. Firmware: see "PSU fan" in docs/firmware.md |
 | Power LED | **J8** 2-pin header: +5 V through 330 Ω (about 9 mA), anode on pin 1 | Lumex SSI-LXMP059ID snap-in panel LED in the lid |
 | Enclosure temperature | **RT1**, 10 kΩ NTC (Murata NCP18XH103F03RB, B3380) to GND with R18 10 kΩ to 3.3 V and C10 100 nF, read by the ADC on **GPIO5**. On the board left of the ESP32, so it reads the box air plus 1–2 °C | |
 | Headers | 7-pin expansion (3V3 GND IO5 IO6 IO7 TX RX; IO5 is the NTC, IO6/IO7 are the fan's PWM/tach) | |
