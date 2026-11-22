@@ -5,12 +5,12 @@ Qty,References,Value,Footprint,MPN / notes
 4,C3 C4 C8 C9,100n,C_0603_1608Metric,
 1,C5,10u 50V,C_1206_3216Metric,
 2,C6 C7,22u 10V,C_1206_3216Metric,
+1,C10,100n,C_0603_1608Metric,ADC filter
 1,D1,SMBJ26A,D_SMB,TVS 26 V
 1,D2,BZT52C12,D_SOD-123,Vgs clamp 12 V
 1,D3,1N4148W,D_SOD-123,
 1,F1,10A mini blade,Fuseholder_Blade_Mini_Keystone_3568,Keystone 3568 holder + 10 A mini blade fuse
 1,F2,0.5A PTC,Fuse_1206_3216Metric,Bourns MF-NSMF050 - slot 5 V rail
-1,J5,QWIIC,JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal,Qwiic / STEMMA QT spare I2C
 1,J7,FAN,FanPinHeader_1x04_P2.54mm_Vertical,4-pin PC fan header (Molex 47053-1000 or KF2510-4A)
 1,J101,SLOT 1,JST_XH_B4B-XH-A_1x04_P2.50mm_Vertical,slot 1 I2C (JST B4B-XH-A)
 1,J102,SLOT 2,JST_XH_B4B-XH-A_1x04_P2.50mm_Vertical,slot 2 I2C (JST B4B-XH-A)
@@ -40,7 +40,9 @@ Qty,References,Value,Footprint,MPN / notes
 2,R9 R10,4k7,R_0603_1608Metric,
 1,R16,10k,R_0603_1608Metric,fan tach pull-up
 1,R17,330,R_0603_1608Metric,"power LED, about 9 mA"
+1,R18,10k,R_0603_1608Metric,NTC divider
 8,RN1 RN2 RN3 RN4 RN5 RN6 RN7 RN8,4k7 x4,R_Array_Convex_4x0603,slot bus pull-ups
+1,RT1,10k NTC B3380,R_0603_1608Metric,"Murata NCP18XH103F03RB (10k, B25/50 3380, 1%): enclosure temperature"
 1,U1,TSR 1-2450,Converter_DCDC_RECOM_R-78E-0.5_THT,"TRACO TSR 1-2450 (6.5-36 V in, 5 V 1 A) or RECOM R-78E5.0-1.0"
 1,U3,TCA9548APWR,TSSOP-24_4.4x7.8mm_P0.65mm,"TI TCA9548APWR, address 0x70"
 1,U4,TCA9548APWR,TSSOP-24_4.4x7.8mm_P0.65mm,"TI TCA9548APWR, address 0x71"

@@ -3,7 +3,7 @@
 # (electronics/controller-board). GPIO map (controller board):
 #   GPIO22 SDA, GPIO23 SCL, GPIO19 24 V bus switch, GPIO18 buzzer,
 #   GPIO4 TCA9548A reset (active low), GPIO0 PSU voltage /11, GPIO1 bus voltage /11,
-#   GPIO6 PSU fan PWM (open drain via 2N7002, so inverted), GPIO7 PSU fan tach
+#   GPIO5 enclosure NTC (ADC), GPIO6 PSU fan PWM (open drain via 2N7002, so inverted), GPIO7 PSU fan tach
 # Fewer slots? Delete the unused "slotN" packages at the end.
 
 substitutions:
@@ -120,15 +120,30 @@ sensor:
     update_interval: 5s
     filters:
       - multiply: 0.5
-  - platform: htu21d     # SHT21 breakout (fixed address 0x40)
-    model: SHT21
-    i2c_id: i2c_main
-    temperature:
-      id: enclosure_temp
-      name: "Enclosure temperature"
-    humidity:
-      name: "Enclosure humidity"
-    update_interval: 30s
+  # enclosure temperature: 10k NTC (B3380) on the controller board, 10k to 3.3 V, ADC on GPIO5
+  - platform: adc
+    id: ntc_voltage
+    pin: GPIO5
+    attenuation: 12db
+    update_interval: 10s
+    internal: true
+  - platform: resistance
+    id: ntc_resistance
+    sensor: ntc_voltage
+    configuration: DOWNSTREAM # NTC between the ADC pin and GND
+    resistor: 10kOhm
+    reference_voltage: 3.3V
+    internal: true
+  - platform: ntc
+    id: enclosure_temp
+    name: "Enclosure temperature"
+    sensor: ntc_resistance
+    calibration:
+      b_constant: 3380
+      reference_temperature: 25°C
+      reference_resistance: 10kOhm
+    filters:
+      - sliding_window_moving_average: { window_size: 6, send_every: 3 }
   # room temperature from Home Assistant (safety interlock B)
   - platform: homeassistant
     id: room_temp
@@ -286,8 +301,8 @@ text_sensor:
     icon: mdi:shield-alert-outline
 
 # Safety interlock: the 24 V bus is switched off and no slot charges while
-#   A) the enclosure (SHT21) is above "max enclosure temperature" (3 degC hysteresis),
-#      or the SHT21 has not delivered a value for the grace period,
+#   A) the enclosure (NTC on the board) is above "max enclosure temperature" (3 degC hysteresis),
+#      or the NTC has not delivered a value for the grace period,
 #   B) the room (${room_temperature_entity}) is above "max room temperature" (2 degC
 #      hysteresis), or that value has been unknown / unavailable for the grace period,
 #   C) Home Assistant has not been connected for the grace period (unless "allow charging
@@ -308,7 +323,7 @@ interval:
           };
           std::vector<std::string> why;
 
-          // A) enclosure temperature (SHT21 on the controller board)
+          // A) enclosure temperature (NTC on the controller board)
           float te = id(enclosure_temp).state;
           bool enc_ok = id(enclosure_temp).has_state() && !std::isnan(te);
           if (since(enc_ok, enc_lost)) why.push_back("enclosure sensor not responding");

@@ -37,23 +37,21 @@ Prices are DigiKey line totals including VAT, from the sheets. DigiKey ships fre
 | 1 | Capacitor 1 µF 50 V X7R, 1206 | NIC Components | NMC1206X7R105K50TRPLPF | 🛒 DigiKey | 4988-NMC1206X7R105K50TRPLPFCT-ND | 0.43 | C2 |
 | 1 | Capacitor 10 µF 50 V X7R, 1206 | Samsung | CL31B106KBHNNNE | 🛒 DigiKey | 1276-6767-1-ND | 0.46 | C5 |
 | 2 | Capacitor 22 µF 10 V X7R, 1206 | Samsung | CL31B226KPHNNNE | 🛒 DigiKey | 1276-2769-1-ND | 1.08 | C6,C7 |
-| 4 | Capacitor 100 nF 50 V X7R, 0603 | Murata | GRT188R71H104KE13D | 🛒 DigiKey | 490-GRT188R71H104KE13DCT-ND | 1.23 | C3,C4,C8,C9 |
+| 5 | Capacitor 100 nF 50 V X7R, 0603 | Murata | GRT188R71H104KE13D | 🛒 DigiKey | 490-GRT188R71H104KE13DCT-ND | 1.54 | C3,C4,C8,C9,C10 |
+| 1 | NTC 10 kΩ B3380, 0603 (enclosure temperature) | Murata | NCP18XH103F03RB | 🛒 DigiKey | 490-4800-1-ND | 0.16 | RT1 |
 | 6 | Resistor 100 kΩ 1%, 0603 | Yageo | RC0603FR-07100KL | 🛒 DigiKey | 311-100KHRCT-ND | 0.66 | R1,R4,R5,R7,R13,R15 |
-| 4 | Resistor 10 kΩ 1%, 0603 | Panasonic | ERJ-3EKF1002V | 🛒 DigiKey | P10.0KHCT-ND | 0.44 | R6,R8,R11,R16 |
+| 5 | Resistor 10 kΩ 1%, 0603 | Panasonic | ERJ-3EKF1002V | 🛒 DigiKey | P10.0KHCT-ND | 0.55 | R6,R8,R11,R16,R18 |
 | 2 | Resistor 4.7 kΩ 1%, 0603 | Vishay | CRCW06034K70FKEA | 🛒 DigiKey | 541-4.70KHCT-ND | 0.22 | R9,R10 |
 | 3 | Resistor 100 Ω 1%, 0603 | KOA Speer | RK73H1JTTD1000F | 🛒 DigiKey | 2019-RK73H1JTTD1000FCT-ND | 0.33 | R3,R12,R14 |
 | 1 | Resistor 47 kΩ 1%, 0603 | Yageo | RC0603FR-0747KL | 🛒 DigiKey | 311-47.0KHRCT-ND | 0.11 | R2 |
 | 1 | Resistor 330 Ω 1%, 0603 | Yageo | RC0603FR-07330RL | 🛒 DigiKey | 311-330HRCT-ND | 0.11 | R17 |
 | 16 | JST-XH header 4-pin, vertical | JST | B4B-XH-A(LF)(SN) | 🛒 DigiKey | 455-B4B-XH-A-ND | 2.52 | J101-J116 |
-| 1 | JST-SH header 4-pin (Qwiic, optional) | JST | SM04B-SRSS-TB(LF)(SN) | 🛒 DigiKey | 455-1804-1-ND | 0.55 | J5 |
 | 1 | 4-pin PC fan header | Molex | 0470531000 | 🛒 DigiKey | WM4330-ND | 0.55 | J7 |
 | 1 | JST-VH header 6-pin | JST | B6P-VH | ✅ at hand |  |  | J1 |
 | 2 | XT30 PCB socket, vertical, female | Amass | XT30UPB-F | ✅ at hand |  |  | J2,J3 |
-| 1 | Pin header 1×4, 2.54 mm | generic | – | ✅ at hand |  |  | J4 |
 | 1 | Pin header 1×7, 2.54 mm | generic | – | ✅ at hand |  |  | J6 |
 | 1 | Pin header 1×2, 2.54 mm | generic | – | ✅ at hand |  |  | J8 |
 | 1 | Pin header 1×1, 2.54 mm | generic | – | ✅ at hand |  |  | J9 |
-| 1 | SHT21 breakout board | generic | – | ✅ at hand |  |  |  |
 | 1 | Panel LED, red, snap-in | Lumex | SSI-LXMP059ID | 🛒 DigiKey | 67-1179-ND | 1.05 | on J8 |
 | 1 | Fan 90/92 mm, 12 V, 4-pin PWM | generic | – | ✅ at hand |  |  | on J7 |
 | 1 | Plug for the PSU fan connector: housing + 2 contacts | JST | PHR-2 + SPH-002T-P0.5S | 🛒 DigiKey | 455-1165-ND + 455-1127-1-ND | 0.30 | PSU CN101 → J9 |
@@ -78,7 +76,7 @@ Prices are DigiKey line totals including VAT, from the sheets. DigiKey ships fre
 | 1 | Steel or aluminium sheet, 0.5–1 mm | generic | – | ✅ at hand |  |  |  |
 | – | Filament PETG / PETG V-0 | generic | – | ✅ at hand |  |  |  |
 
-DigiKey total: **€102.16**
+DigiKey total: **€102.19**
 
 ## 10 charger slots
 

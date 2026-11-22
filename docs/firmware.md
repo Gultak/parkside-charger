@@ -7,7 +7,7 @@ Component reference: [Parkside Charger (hub)](components/parkside_charger.md) an
 
 ```
 esphome/
-  parkside-charger.yaml      main config: ESP32-C6 D1, I2C, 2x TCA9548A, SHT21, bus switch, ADCs, hub
+  parkside-charger.yaml      main config: ESP32-C6 D1, I2C, 2x TCA9548A, enclosure NTC, bus switch, ADCs, hub
   slot.yaml                  per-slot package (included up to 16x with vars: n; delete unused ones)
   secrets.yaml.example       copy to secrets.yaml
   components/
@@ -78,7 +78,7 @@ Plus:
   charge: status *Pack BMS blocks charging*, entity `Slot n pack BMS fault`.
 - **Temperature:** charging only runs between 5 and 45 °C on the slot's NTC (next to the battery
   contacts), with 2 K hysteresis.
-  The LTC4162's own JEITA control is on as well. If the enclosure is above 45 °C (SHT21; adjustable, see the safety interlock), all
+  The LTC4162's own JEITA control is on as well. If the enclosure is above 45 °C (NTC on the controller board; adjustable, see the safety interlock), all
   charging stops and the 24 V bus switch opens.
 - **Power budget:** `max_total_current: 8A` is shared out every 2 s. "100 %" requests go first,
   then the emptiest packs. A pack in its CV phase only reserves what it actually draws plus
@@ -112,7 +112,7 @@ overrides the "Charging enabled" switch and releases by itself once everything i
 
 | | Condition | Limit (Home Assistant config entity) |
 |---|---|---|
-| A | Enclosure (SHT21) too hot, or no SHT21 reading for the grace period | "Safety: max enclosure temperature", 45 °C, 3 °C hysteresis |
+| A | Enclosure (NTC on the controller board) too hot, or no reading for the grace period | "Safety: max enclosure temperature", 45 °C, 3 °C hysteresis |
 | B | Room too hot (`room_temperature_entity`, default `sensor.hotpress_temperature_sensor_temperature`), or that value unknown / unavailable for the grace period | "Safety: max room temperature", 36 °C, 2 °C hysteresis |
 | C | Home Assistant not connected for the grace period | "Safety: Home Assistant grace period", 120 s |
 
@@ -205,8 +205,8 @@ action:
 
 ## Bring-up checklist
 
-1. Controller board only, no slots, SHT21 plugged in: the `i2c scan` must show 0x40, 0x70 and
-   0x71. *PSU voltage* should read about 24.5 V. *Slot bus voltage* should read 0 V, then about
+1. Controller board only, no slots: the `i2c scan` must show 0x70 and 0x71, and *Enclosure
+   temperature* should read about room temperature. *PSU voltage* should read about 24.5 V. *Slot bus voltage* should read 0 V, then about
    24.5 V after *Charging enabled* is switched on.
 2. One slot board **without a battery**: the log shows the slot's LTC4162 and PCA9554, with no
    "strap" or "wrong charger IC" error. `cell_count` only reads 5 while the charger is running

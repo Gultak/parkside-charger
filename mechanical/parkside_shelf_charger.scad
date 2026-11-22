@@ -543,7 +543,7 @@ module end_gauge() {
 // Low-voltage compartment: every connector group gets a U-notch open towards the lid,
 // so all cables can be plugged in first and the lid put on afterwards:
 //   left/right walls: slot cables 1-8 / 9-16, and OUT A/B (they run along the cable
-//   channel behind the board); top wall: ESP32 USB-C, SHT21 / Qwiic / expansion.
+//   channel behind the board); front wall: ESP32 USB-C, expansion.
 // Mains compartment: closed walls, M20 cable gland (or IEC C14 inlet) in the rear wall,
 // finger-safe vent slots; the PSU's 24 V leads pass the partition in one small notch.
 // PSU data [L, W, H], first hole from the corner [x, y], hole spacing [x, y] (datasheets)
@@ -569,8 +569,7 @@ function cable_z() = ctl_pz() + cable_floor;
 // cable notches: [wall, from, to]; L/R side walls (along Y), F front wall / B rear wall (along X)
 function ctl_notches() = concat(
     [["L", ctl_pcb_xy([0, 0.5])[1], ctl_y1() - 3], ["R", ctl_pcb_xy([0, 0.5])[1], ctl_y1() - 3]],
-    [["F", ctl_pcb_xy([27, 0])[0], ctl_pcb_xy([43, 0])[0]],      // SHT21 + Qwiic
-     ["F", ctl_pcb_xy([68.5, 0])[0], ctl_pcb_xy([77, 0])[0]]],   // expansion header
+    [["F", ctl_pcb_xy([68.5, 0])[0], ctl_pcb_xy([77, 0])[0]]],   // expansion header
     has_psu() ? [] : [["B", ctl_pcb_xy([14, 0])[0], ctl_pcb_xy([92, 0])[0]]]);
 // snaps: [wall, position along it]
 function ctl_snaps() = let(o = ctl_o(), ym = (psu_y0() + psu_y1()) / 2)

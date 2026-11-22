@@ -3,7 +3,7 @@
 ESP32-C6 D1 (xyzroe) in female Dupont headers, 2x TCA9548A = 16 slot I2C channels (each with
 4.7 k pull-ups to the 5 V slot rail - the TCA9548A at 3.3 V level-shifts), switched
 24 V output to two slot daisy chains, 24 V -> 5 V SIP regulator, supply voltage
-sensing, buzzer, SHT21 + Qwiic + expansion headers.
+sensing, buzzer, enclosure NTC, expansion header.
 """
 
 # fmt: off
@@ -73,14 +73,14 @@ PARTS = {
     "R13": ("100k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "BUZ", "2": "GND"}, ""),
     "D3": ("1N4148W", "Device:D", "Diode_SMD:D_SOD-123", {"1": "+5V", "2": "BUZ_N"}, ""),
     # ------------------------------------------------------ headers --------
-    "J4": ("SHT21", "Connector_Generic:Conn_01x04", "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
-           {"1": "+3V3", "2": "GND", "3": "SCL", "4": "SDA"}, "SHT21 breakout (VIN GND SCL SDA), on a Dupont cable; check the order on your board"),
-    "J5": ("QWIIC", "Connector_Generic:Conn_01x04",
-           "Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
-           {"1": "GND", "2": "+3V3", "3": "SDA", "4": "SCL"}, "Qwiic / STEMMA QT spare I2C"),
+    # enclosure temperature: 10k NTC to GND, 10k from 3.3 V, read by the ADC on IO5
+    "RT1": ("10k NTC B3380", "Device:Thermistor_NTC", "Resistor_SMD:R_0603_1608Metric", {"1": "IO5", "2": "GND"},
+            "Murata NCP18XH103F03RB (10k, B25/50 3380, 1%): enclosure temperature"),
+    "R18": ("10k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "+3V3", "2": "IO5"}, "NTC divider"),
+    "C10": ("100n", "Device:C", "Capacitor_SMD:C_0603_1608Metric", {"1": "IO5", "2": "GND"}, "ADC filter"),
     "J6": ("EXP", "Connector_Generic:Conn_01x07", "Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical",
            {"1": "+3V3", "2": "GND", "3": "IO5", "4": "IO6", "5": "IO7", "6": "TX", "7": "RX"},
-           "spare GPIO (IO6 / IO7 are also the fan's PWM / tach)"),
+           "spare GPIO (IO5 is the enclosure NTC, IO6 / IO7 the fan's PWM / tach)"),
     # --------------------------------------------------- PSU fan + power LED --
     # Standard 4-pin PC fan header (GND, +12V, TACH, PWM). 12 V comes from the PSU's own
     # +12 V aux fan output on a single Dupont pin (J9). PWM: open drain, 25 kHz from IO6;
@@ -143,7 +143,7 @@ NET_WIDTH = {"+5V": 0.6, "+5V_SLOT": 0.5, "+3V3": 0.4, "+24V": 0.6, "MUX_RST": 0
 # left out of fab/controller_board_bom.csv (the DigiKey order list); listed in fab/controller_board_bom_all.csv
 NOT_IN_ORDER_BOM = {
     "J1": "at hand (JST B6P-VH)", "U2": "at hand (ESP32-C6 D1 + headers)",
-    "J4": "at hand (2.54 mm pin header)", "J6": "at hand (2.54 mm pin header)",
+    "J6": "at hand (2.54 mm pin header)",
     "J8": "at hand (2.54 mm pin header)", "J9": "at hand (2.54 mm pin header)",
     "J2": "at hand (XT30UPB-F)", "J3": "at hand (XT30UPB-F)",
     "H1": "mounting hole", "H2": "mounting hole", "H3": "mounting hole", "H4": "mounting hole",

@@ -10,7 +10,7 @@
    │                 │                              └─► 0.5 A PTC ─► 5V_SLOT (slot logic + pull-ups)   │
    │                 └─► P-MOSFET bus switch (GPIO19, soft start) ─► J2 OUT A / J3 OUT B (24 V)         │
    │ GPIO22/23 I2C ─► TCA9548A 0x70 (slots 1-8) + TCA9548A 0x71 (slots 9-16), RESET GPIO4             │
-   │ GPIO0/1: PSU / bus voltage   GPIO18: buzzer   headers: SHT21, Qwiic, expansion                    │
+   │ GPIO0/1: PSU / bus voltage   GPIO18: buzzer   NTC on IO5, expansion header                      │
    └──────┬───────────────────────────────┬────────────────────────────────┬───────────────────────────┘
           │ OUT A: 24 V daisy chain        │ OUT B: 24 V daisy chain         │ 16 × 4-wire cable (5V GND SDA SCL)
           ▼                                ▼                                 │ one per slot, star topology
@@ -181,7 +181,8 @@ up to **16 slots**.
 | Buzzer | 12 mm 5 V active buzzer, 2N7002 from **GPIO18** | Sounds on any slot fault or enclosure > 50 °C |
 | PSU fan | **J7** standard 4-pin PC fan header (GND, +12 V, tach, PWM). +12 V comes from the PSU's own +12 V aux fan output to the 1-pin header **J9**. PWM from **GPIO6** through a 2N7002 (open drain, 25 kHz), tach into **GPIO7** with a 10 k pull-up to 3.3 V | 90/92 mm fan on the lid, blowing onto the PSU. Firmware: see "PSU fan" in docs/firmware.md |
 | Power LED | **J8** 2-pin header: +5 V through 330 Ω (about 9 mA), anode on pin 1 | Lumex SSI-LXMP059ID snap-in panel LED in the lid |
-| Headers | SHT21 breakout (3V3 GND SCL SDA, on a cable near the PSU), Qwiic (spare I²C), 7-pin expansion (3V3 GND IO5 IO6 IO7 TX RX; IO6/IO7 are the fan's PWM/tach) | |
+| Enclosure temperature | **RT1**, 10 kΩ NTC (Murata NCP18XH103F03RB, B3380) to GND with R18 10 kΩ to 3.3 V and C10 100 nF, read by the ADC on **GPIO5**. On the board left of the ESP32, so it reads the box air plus 1–2 °C | |
+| Headers | 7-pin expansion (3V3 GND IO5 IO6 IO7 TX RX; IO5 is the NTC, IO6/IO7 are the fan's PWM/tach) | |
 
 **Why the slot side runs at 5 V:** the green and blue chips of a typical RGB LED have
 V_F ≈ 3.0–3.4 V. At 3.3 V they would barely light, whichever way the LED is wired. At 5 V the PCA9554

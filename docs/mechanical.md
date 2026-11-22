@@ -221,8 +221,8 @@ No cable has to be threaded through a part before it is connected.
   - left and right walls: slot cables 1–8 and 9–16, and OUT A / OUT B. Those leave the board's
     bottom edge, run along the 12 mm cable channel behind it and out at the side (row 1 left,
     row 2 right)
-  - front wall (opposite the mains entry): one notch for the SHT21 and Qwiic cables, one for the
-    expansion header
+  - front wall (opposite the mains entry): one notch for the expansion header
+   
   - **USB-C:** the ESP32-C6 D1 sits with its USB-C mouth at the inside face of the front wall, in
     a 9.6 × 4 mm hole; a 13.5 × 7.5 mm pocket from outside takes the plug's overmold (0.8 mm
     of wall left). The height is `usb_h` = 14.2 mm above the board's top face: an estimate for
