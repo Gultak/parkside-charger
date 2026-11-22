@@ -38,7 +38,7 @@ Prices are DigiKey line totals including VAT, from the sheets. DigiKey ships fre
 | 1 | Capacitor 10 µF 50 V X7R, 1206 | Samsung | CL31B106KBHNNNE | 🛒 DigiKey | 1276-6767-1-ND | 0.46 | C5 |
 | 2 | Capacitor 22 µF 10 V X7R, 1206 | Samsung | CL31B226KPHNNNE | 🛒 DigiKey | 1276-2769-1-ND | 1.08 | C6,C7 |
 | 5 | Capacitor 100 nF 50 V X7R, 0603 | Murata | GRT188R71H104KE13D | 🛒 DigiKey | 490-GRT188R71H104KE13DCT-ND | 1.54 | C3,C4,C8,C9,C10 |
-| 1 | NTC 10 kΩ B3380, 0603 (enclosure temperature) | Murata | NCP18XH103F03RB | 🛒 DigiKey | 490-4800-1-ND | 0.16 | RT1 |
+| 1 | NTC 10 kΩ B3380, 0603 (enclosure temperature) | Murata | NCP18XH103F03RB | 🛒 DigiKey | 490-4800-1-ND | 0.20 | RT1 |
 | 6 | Resistor 100 kΩ 1%, 0603 | Yageo | RC0603FR-07100KL | 🛒 DigiKey | 311-100KHRCT-ND | 0.66 | R1,R4,R5,R7,R13,R15 |
 | 5 | Resistor 10 kΩ 1%, 0603 | Panasonic | ERJ-3EKF1002V | 🛒 DigiKey | P10.0KHCT-ND | 0.55 | R6,R8,R11,R16,R18 |
 | 2 | Resistor 4.7 kΩ 1%, 0603 | Vishay | CRCW06034K70FKEA | 🛒 DigiKey | 541-4.70KHCT-ND | 0.22 | R9,R10 |
@@ -51,11 +51,11 @@ Prices are DigiKey line totals including VAT, from the sheets. DigiKey ships fre
 | 2 | XT30 PCB socket, vertical, female | Amass | XT30UPB-F | ✅ at hand |  |  | J2,J3 |
 | 1 | Pin header 1×7, 2.54 mm | generic | – | ✅ at hand |  |  | J6 |
 | 1 | Pin header 1×2, 2.54 mm | generic | – | ✅ at hand |  |  | J8 |
-| 1 | JST PH header 2-pin, vertical | JST | B2B-PH-K-S(LF)(SN) | 🛒 DigiKey | 455-1704-ND | 0.17 | J9 |
+| 1 | JST PH header 2-pin, vertical | JST | B2B-PH-K-S(LF)(SN) | 🛒 DigiKey | 455-1704-ND | 0.14 | J9 |
 | 1 | Panel LED, red, snap-in | Lumex | SSI-LXMP059ID | 🛒 DigiKey | 67-1179-ND | 1.05 | on J8 |
 | 1 | Fan 90/92 mm, 12 V, 4-pin PWM | generic | – | ✅ at hand |  |  | on J7 |
-| 2 | JST PH housing 2-pin (PSU CN101 and J9 ends) | JST | PHR-2 | 🛒 DigiKey | 455-1165-ND | 0.20 | CN101 → J9 |
-| 2 | JST PH pre-crimped lead, 24 AWG, 203 mm | JST | ASPHSPH24K203 | 🛒 DigiKey | 455-3359-ND | 0.72 | CN101 → J9, 1:1 |
+| 2 | JST PH housing 2-pin (PSU CN101 and J9 ends) | JST | PHR-2 | 🛒 DigiKey | 455-1165-ND | 0.22 | CN101 → J9 |
+| 2 | JST PH pre-crimped lead, 24 AWG, 203 mm | JST | ASPHSPH24K203 | 🛒 DigiKey | 455-3359-ND | 0.89 | CN101 → J9, 1:1 |
 | 1 | Power supply 24 V, open frame | Mean Well | LOP-300-24 | 🛒 DigiKey | 1866-LOP-300-24-ND | 44.65 | budget 7 A, 10 A with the fan |
 | 2 | VH housing 6-pin | JST | VHR-6N | ✅ at hand |  |  |  |
 | 14 | VH crimp contact | JST | SVH-21T-P1.1 | ✅ at hand |  |  |  |
@@ -77,7 +77,7 @@ Prices are DigiKey line totals including VAT, from the sheets. DigiKey ships fre
 | 1 | Steel or aluminium sheet, 0.5–1 mm | generic | – | ✅ at hand |  |  |  |
 | – | Filament PETG / PETG V-0 | generic | – | ✅ at hand |  |  |  |
 
-DigiKey total: **€102.98**
+DigiKey total: **€103.18**
 
 ## 10 charger slots
 
@@ -111,7 +111,7 @@ DigiKey total: **€102.98**
 | 10 | Resistor 63.4 kΩ 1%, 0603 | Vishay | CRCW060363K4FKEA | 🛒 DigiKey | 541-63.4KHCT-ND | 0.34 | R4 |
 | 10 | JST-XH header 4-pin, vertical | JST | B4B-XH-A(LF)(SN) | 🛒 DigiKey | 455-B4B-XH-A-ND | 1.57 | J2 |
 | 20 | JST-XH housing 4-pin | JST | XHP-4 | 🛒 DigiKey | 455-2267-ND | 1.43 | slot cables |
-| 90 | JST-XH crimp contact (80 + 10 spare), 22-28 AWG | JST | SXH-001T-P0.6 | 🛒 DigiKey | 455-1135-100-ND | 5.14 | slot cables |
+| 90 | JST-XH crimp contact (80 + 10 spare), 22-26 AWG, insulation 1.3-1.9 mm | JST | SXH-001T-P0.6N | 🛒 DigiKey | 455-4220-100-ND | 6.10 | slot cables |
 | 10 | Microswitch with lever | Omron | D2F-01L | 🛒 DigiKey | SW154-ND | 12.98 | on J4 |
 | 10 | LED 5 mm RGB, common cathode, diffused, 4 leads | Inolux | INL-5TB4URGB25 | 🛒 DigiKey | 1830-1015-ND | 6.46 | on J5 (header in its lead order: B, R, cathode, G) |
 | 10 | XT30 PCB socket, right angle, male | Amass | XT30PW-M | ✅ at hand |  |  | J1 |
@@ -128,4 +128,4 @@ DigiKey total: **€102.98**
 | 10 | Wood screw 4 × 25, countersunk | generic | – | ✅ at hand |  |  |  |
 | 10 | Wood screw 4 × 25, pan head | generic | – | ✅ at hand |  |  |  |
 
-DigiKey total: **€228.54** for 10 slots (€22.85 per slot)
+DigiKey total: **€229.50** for 10 slots (€22.95 per slot)
