@@ -193,7 +193,7 @@ psu_lead_slot = 10;       // depth (from the top) of the slot for the PSU leads 
 // USB-C of the ESP32-C6 D1 in the front wall: the module sits with its USB-C mouth at the wall's
 // inside face (controller board layout); the plug's overmold goes into a pocket from outside
 esp_x = 56;               // module centre on the controller board (board X, as in layout.py)
-usb_h = 14.2;             // USB-C centre above the controller board's top face  CHECK (measure)
+usb_h = 14.2;             // USB-C centre above the controller board's top face: 8.5 socket + 2.5 pin spacer + 1.6 module + 1.6 (receptacle on the module's top face)
 usb_hole = [9.6, 4.0];    // through the wall: the receptacle (8.94 x 3.26) + clearance
 usb_plug = [13.5, 7.5];   // pocket from outside for the plug's overmold
 usb_skin = 0.8;           // wall left between the pocket and the inside face

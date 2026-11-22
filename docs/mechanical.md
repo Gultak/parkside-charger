@@ -227,9 +227,11 @@ No cable has to be threaded through a part before it is connected.
    
   - **USB-C:** the ESP32-C6 D1 sits with its USB-C mouth at the inside face of the front wall, in
     a 9.6 × 4 mm hole; a 13.5 × 7.5 mm pocket from outside takes the plug's overmold (0.8 mm
-    of wall left). The height is `usb_h` = 14.2 mm above the board's top face: an estimate for
-    8.5 mm female headers, 2.5 mm male header spacer and a 1.6 mm module board. **Measure it**
-    with your headers and module before printing.
+    of wall left). The module's USB-C is centred and flush with its board edge, sitting directly
+    on its 1.6 mm board, so its centre is `usb_h` = 14.2 mm above the controller board's top face:
+    8.5 mm female sockets (Sullins PPTC081LFBN-RC), the 2.5 mm plastic spacer of the module's
+    pins, 1.6 mm module board and 1.6 mm to the receptacle's centre. Other sockets or a module
+    pushed down less than fully change this one-for-one.
   - **power LED** (`power_led`, Lumex SSI-LXMP059ID snap-in) in the front wall, centred above
     the USB-C (`led_pos`): cut-out `led_cut` 6.6 × 4.6 mm, wall thinned to `led_panel_t` = 1.6 mm
     around it from inside. Check both against your part.
