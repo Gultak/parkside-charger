@@ -188,6 +188,7 @@ vent_w = 2.5;             // vent slot width (finger-safe)
 // cable openings: notches open towards the lid, closed by fins on the lid down to a slot
 cable_floor = 8;          // notch floor above the controller board's top face
 cable_gap = 5;            // height of the slot the lid's fins leave for the cables
+fin_groove = [1.0, 1.0];  // groove (width, depth) in the notches' vertical edges for the lid fins' tongues
 psu_lead_slot = 10;       // depth (from the top) of the slot for the PSU leads in the partition
 // USB-C of the ESP32-C6 D1 in the front wall: the module sits with its USB-C mouth at the wall's
 // inside face (controller board layout); the plug's overmold goes into a pocket from outside
@@ -619,7 +620,14 @@ module controller_box() {
         for (e = ctl_ears())
             translate([e[0] * (o[0] / 2 + 4), e[1] + 4, top - 6]) cylinder(d = 4.2, h = 6 + eps);
         // ---- cable notches, open towards the lid; the lid's fins close them down to a slot
-        for (n = ctl_notches()) wall_block(n[0], n[1], n[2], cable_z(), top + 1, 0, [-1, 1]);
+        for (n = ctl_notches()) {
+            wall_block(n[0], n[1], n[2], cable_z(), top + 1, 0, [-1, 1]);
+            // grooves in the notch's vertical edges: the lid fin's tongues slide down in them
+            let(g = (ctl_wall - fin_groove[0]) / 2) {
+                wall_block(n[0], n[1] - fin_groove[1], n[1] + eps, cable_z() + cable_gap - 0.3, top + 1, 0, [g, -g]);
+                wall_block(n[0], n[2] - eps, n[2] + fin_groove[1], cable_z() + cable_gap - 0.3, top + 1, 0, [g, -g]);
+            }
+        }
         // ---- USB-C of the ESP32 module: hole for the receptacle, pocket for the plug from outside
         let(ux = ctl_pcb_xy([esp_x, 0])[0], uz = ctl_pz() + usb_h) {
             translate([ux, -1, uz]) rotate([-90, 0, 0])
@@ -686,7 +694,14 @@ module controller_lid_installed() {
             for (sx = [-1, 1]) for (y = lips_y)
                 translate([sx > 0 ? ix / 2 - 8.3 : -ix / 2 + 0.3, y, top - 3]) cube([8, 8, 3 + eps]);
             // fins that close the cable notches down to a cable_gap slot
-            for (n = ctl_notches()) wall_block(n[0], n[1], n[2], cable_z() + cable_gap, top + eps, 0.3, [0.15, -0.15]);
+            for (n = ctl_notches()) {
+                wall_block(n[0], n[1], n[2], cable_z() + cable_gap, top + eps, 0.3, [0.15, -0.15]);
+                // tongues into the grooves (0.2 mm play all round)
+                let(g = (ctl_wall - fin_groove[0] + 0.4) / 2) {
+                    wall_block(n[0], n[1] - fin_groove[1] + 0.2, n[1] + 0.3 + eps, cable_z() + cable_gap, top + eps, 0, [g, -g]);
+                    wall_block(n[0], n[2] - 0.3 - eps, n[2] + fin_groove[1] - 0.2, cable_z() + cable_gap, top + eps, 0, [g, -g]);
+                }
+            }
             // snap tabs with a hook at the tip (45 deg lead-in, flat catch)
             if (lid_snap) for (sn = ctl_snaps()) at_wall(sn[0], sn[1]) {
                 translate([snap_w / 2, 0, 0]) rotate([0, -90, 0]) linear_extrude(snap_w) polygon([   // (z, y)

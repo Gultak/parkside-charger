@@ -216,7 +216,9 @@ No cable has to be threaded through a part before it is connected.
 **Controller box** (125 × 179 × 50 mm with the LOP-300; 148 × 204 × 50 mm with the LOP-400). Two compartments:
 - **Low-voltage side:** the board sits on 4 standoffs with its components facing the lid. The
   cable openings are notches **open towards the lid**, 8 mm above the board (`cable_floor`); fins
-  on the lid come down into them and leave a **5 mm slot** (`cable_gap`) for the cables. Lay the
+  on the lid come down into them and leave a **5 mm slot** (`cable_gap`) for the cables. Each fin
+  has a tongue on both ends that slides down a 1 × 1 mm groove in the notch's vertical edges
+  (`fin_groove`), so the fins stay in the wall plane and the cables can't push them aside. Lay the
   cables in, then put the lid on:
   - left and right walls: slot cables 1–8 and 9–16, and OUT A / OUT B. Those leave the board's
     bottom edge, run along the 12 mm cable channel behind it and out at the side (row 1 left,
