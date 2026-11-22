@@ -230,18 +230,18 @@ No cable has to be threaded through a part before it is connected.
     of wall left). The height is `usb_h` = 14.2 mm above the board's top face: an estimate for
     8.5 mm female headers, 2.5 mm male header spacer and a 1.6 mm module board. **Measure it**
     with your headers and module before printing.
-  - **power LED** (`power_led`, Lumex SSI-LXMP059ID snap-in) in the front wall, left of the
-    notches (`led_pos`): cut-out `led_cut` 6.6 × 4.6 mm, wall thinned to `led_panel_t` = 1.6 mm
+  - **power LED** (`power_led`, Lumex SSI-LXMP059ID snap-in) in the front wall, centred above
+    the USB-C (`led_pos`): cut-out `led_cut` 6.6 × 4.6 mm, wall thinned to `led_panel_t` = 1.6 mm
     around it from inside. Check both against your part.
-- **Snap-in lid** (`lid_snap`), no screws: six tabs on the lid hook into windows through the
-  walls (two in the front wall, two in the rear wall, one in each side wall of the mains
-  compartment, above the vent slots). The tabs taper from 3.6 mm at the lid to 1.8 mm at the hook
-  (`snap_t_base`, `snap_t`), so the bending spreads along them instead of breaking them off at the
-  root. To open the lid, push the hooks in through the windows from outside, or push a flat
-  screwdriver down through the 8 mm slot in the lid edge above each snap (`pry_w`): it wedges on
-  a 45° chamfer at the top of the wall (`pry_ch`) and bends the wall outwards, off the hook. Note that the mains
-  side then opens without a tool: `lid_mains_screws = true` adds two screws over it if the box is
-  anywhere others can reach. The lid is modelled as fitted (`controller_closed`) and exported
+- **Snap-in lid** (`lid_snap`), no screws: six tabs on the lid hook into pockets in the walls
+  (two in the front wall, two in the rear wall, one in each side wall of the mains compartment,
+  above the vent slots). The pockets are closed on the outside by a 1 mm skin (`snap_skin`), so
+  the box looks smooth; `snap_skin = 0` makes them windows through the wall. The tabs taper from
+  3.6 mm at the lid to 1.8 mm at the hook (`snap_t_base`, `snap_t`), so the bending spreads along
+  them instead of breaking them off at the root. To open the lid, push a flat screwdriver down
+  through the 8 mm slot in the lid edge above each snap (`pry_w`): it wedges on a 45° chamfer at
+  the top of the wall (`pry_ch`) and bends the wall outwards, off the hook. `lid_mains_screws =
+  true` adds two screws over the mains side if the box is anywhere others can reach. The lid is modelled as fitted (`controller_closed`) and exported
   turned over for printing; `controller_lid_check` must render empty (no collision between lid
   and box).
 - **Mains side**, behind a closed partition: the PSU on four 6 mm M3 standoffs (heat-set inserts),

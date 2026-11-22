@@ -181,7 +181,7 @@ fan_size = 92;            // fan frame
 fan_hole_pitch = 82.5;    // fan screw holes (92 mm fan: 82.5, 80 mm fan: 71.5)
 fan_hole_d = 4.4;         // fan screws / M4
 power_led = true;         // panel LED (Lumex SSI-LXMP059ID, snap-in) in the front wall (opposite the mains entry)
-led_pos = [-36, 34];      // its centre: X in the box, Z above the base (above the slot cables)
+led_pos = [0, 37];        // its centre: X in the box, Z above the base (centred above the USB-C)
 led_cut = [6.6, 4.6];     // its rectangular cut-out (catalogue: 0.258 x 0.177 in)  CHECK against your part
 led_panel_t = 1.6;        // lid thickness at the LED, for its snap-in clips (recessed from the inside)  CHECK
 vent_w = 2.5;             // vent slot width (finger-safe)
@@ -197,11 +197,12 @@ usb_h = 14.2;             // USB-C centre above the controller board's top face 
 usb_hole = [9.6, 4.0];    // through the wall: the receptacle (8.94 x 3.26) + clearance
 usb_plug = [13.5, 7.5];   // pocket from outside for the plug's overmold
 usb_skin = 0.8;           // wall left between the pocket and the inside face
-// snap-in lid: tabs on the lid hook into windows through the walls (press in from outside to open)
+// snap-in lid: tabs on the lid hook into pockets in the walls (pry the wall off them through the lid's slots)
 lid_snap = true;
 lid_mains_screws = false; // true: 2 screws over the mains compartment as well (opening it then needs a tool)
 pry_w = 8; pry_ch = 1.5;   // pry slot in the lid edge over each snap, 45 deg chamfer on the wall below it
 snap_w = 10; snap_t = 1.8; snap_t_base = 3.6; snap_l = 12; snap_hook = 1.2;   // tabs taper from 3.6 at the lid to 1.8
+snap_skin = 1.0;            // outer skin left over the hook pockets (smooth outside); 0 = windows through the wall
 
 $fn = 48;
 eps = 0.01;
@@ -642,9 +643,11 @@ module controller_box() {
                 translate([led_pos[0] - led_cut[0] / 2 - 3, led_panel_t, led_pos[1] - led_cut[1] / 2 - 3])
                     cube([led_cut[0] + 6, ctl_wall, led_cut[1] + 6]);
         }
-        // ---- windows for the lid's snap hooks (through: press the hook in from outside to open)
+        // ---- pockets for the lid's snap hooks, closed on the outside by snap_skin (opened with the
+        // pry slots); snap_skin = 0 makes them windows through the wall
         if (lid_snap) for (sn = ctl_snaps()) at_wall(sn[0], sn[1]) {
-            translate([-(snap_w + 1) / 2, -ctl_wall - 1, top - snap_l - 0.2]) cube([snap_w + 1, ctl_wall + 1.01, snap_l - 8.7 + 0.2 + 0.2]);
+            let(d = snap_skin > 0 ? ctl_wall - snap_skin : ctl_wall + 1)
+                translate([-(snap_w + 1) / 2, -d, top - snap_l - 0.2]) cube([snap_w + 1, d + 0.01, snap_l - 8.7 + 0.2 + 0.2]);
             // pry chamfer: a screwdriver pushed down through the lid's slot wedges the wall outwards,
             // off the hook
             translate([pry_w / 2, 0, 0]) rotate([0, -90, 0]) linear_extrude(pry_w) polygon([   // (z, y)
