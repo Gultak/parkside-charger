@@ -83,12 +83,13 @@ PARTS = {
            "spare GPIO (IO5 is the enclosure NTC, IO6 / IO7 the fan's PWM / tach)"),
     # --------------------------------------------------- PSU fan + power LED --
     # Standard 4-pin PC fan header (GND, +12V, TACH, PWM). 12 V comes from the PSU's own
-    # +12 V aux fan output on a single Dupont pin (J9). PWM: open drain, 25 kHz from IO6;
+    # +12 V aux fan output (CN101, JST PH: 1 +12Vaux, 2 DC COM) through J9, the same PH
+    # header, so a 1:1 lead with PH contacts both ends. PWM: open drain, 25 kHz from IO6;
     # tach: open collector from the fan, pulled up to 3.3 V, into IO7.
     "J7": ("FAN", "Connector_Generic:Conn_01x04", "Connector:FanPinHeader_1x04_P2.54mm_Vertical",
            {"1": "GND", "2": "+12V_FAN", "3": "IO7", "4": "FAN_PWM"}, "4-pin PC fan header (Molex 47053-1000 or KF2510-4A)"),
-    "J9": ("12V FAN IN", "Connector_Generic:Conn_01x01", "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",
-           {"1": "+12V_FAN"}, "1-pin header: +12 V aux from the PSU's fan connector"),
+    "J9": ("12V FAN IN", "Connector_Generic:Conn_01x02", "Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical",
+           {"1": "+12V_FAN", "2": "GND"}, "JST PH 2-pin, same pinout as the PSU's CN101: 1:1 lead"),
     "Q4": ("2N7002K", "Device:Q_NMOS_GSD", "Package_TO_SOT_SMD:SOT-23",
            {"1": "FAN_G", "2": "GND", "3": "FAN_PWM"}, "fan PWM, open drain"),
     "R14": ("100", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "IO6", "2": "FAN_G"}, ""),
@@ -144,7 +145,7 @@ NET_WIDTH = {"+5V": 0.6, "+5V_SLOT": 0.5, "+3V3": 0.4, "+24V": 0.6, "MUX_RST": 0
 NOT_IN_ORDER_BOM = {
     "J1": "at hand (JST B6P-VH)", "U2": "at hand (ESP32-C6 D1 + headers)",
     "J6": "at hand (2.54 mm pin header)",
-    "J8": "at hand (2.54 mm pin header)", "J9": "at hand (2.54 mm pin header)",
+    "J8": "at hand (2.54 mm pin header)",
     "J2": "at hand (XT30UPB-F)", "J3": "at hand (XT30UPB-F)",
     "H1": "mounting hole", "H2": "mounting hole", "H3": "mounting hole", "H4": "mounting hole",
 }

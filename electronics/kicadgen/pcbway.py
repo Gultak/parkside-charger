@@ -38,6 +38,7 @@ MPN = {
     (None, "JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal"): ("JST", "SM04B-SRSS-TB(LF)(SN)", "JST-SH header 4-pin (Qwiic)"),
     (None, "FanPinHeader_1x04_P2.54mm_Vertical"): ("Molex", "0470531000", "4-pin PC fan header"),
     (None, "TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm_Horizontal"): ("Phoenix Contact", "1715035", "Screw terminal 3-pole 5.0 mm (MKDS 1,5/3)"),
+    (None, "JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical"): ("JST", "B2B-PH-K-S(LF)(SN)", "JST-PH header 2-pin vertical"),
     (None, "JST_VH_B6P-VH_1x06_P3.96mm_Vertical"): ("JST", "B6P-VH", "JST-VH header 6-pin vertical"),
     (None, "PinHeader_1x01_P2.54mm_Vertical"): ("generic", "-", "Pin header 1x1 2.54 mm"),
     (None, "PinHeader_1x02_P2.54mm_Vertical"): ("generic", "-", "Pin header 1x2 2.54 mm"),

@@ -8,25 +8,25 @@ Item #,Designator,Qty,Manufacturer,Mfg Part #,Description / Value,Package/Footpr
 7,D2,1,onsemi,MMSZ5242BT1G,Zener 12 V SOD-123 (BZT52C12),D_SOD-123,SMD,
 8,D3,1,onsemi,MMSD4148T1G,Diode 1N4148W SOD-123 (1N4148W),D_SOD-123,SMD,
 9,F2,1,Littelfuse,NANOSMDC050F/13.2-2,PTC fuse 0.5 A 1206 (0.5A PTC),Fuse_1206_3216Metric,SMD,
-10,Q1,1,Alpha & Omega,AOD4185,P-MOSFET -40 V TO-252 (AOD4185),TO-252-2,SMD,
-11,"Q2,Q3,Q4",3,Diotec,2N7002,N-MOSFET 60 V SOT-23 (2N7002K),SOT-23,SMD,
-12,"R1,R4,R5,R7,R13,R15",6,Yageo,RC0603FR-07100KL,Resistor 100 k 1% 0603 (100k),R_0603_1608Metric,SMD,
-13,R2,1,Yageo,RC0603FR-0747KL,Resistor 47 k 1% 0603 (47k),R_0603_1608Metric,SMD,
-14,"R3,R12,R14",3,KOA Speer,RK73H1JTTD1000F,Resistor 100 Ohm 1% 0603 (100),R_0603_1608Metric,SMD,
-15,"R6,R8,R11,R16,R18",5,Panasonic,ERJ-3EKF1002V,Resistor 10 k 1% 0603 (10k),R_0603_1608Metric,SMD,
-16,"R9,R10",2,Vishay,CRCW06034K70FKEA,Resistor 4.7 k 1% 0603 (4k7),R_0603_1608Metric,SMD,
-17,R17,1,Yageo,RC0603FR-07330RL,Resistor 330 Ohm 1% 0603 (330),R_0603_1608Metric,SMD,
-18,"RN1,RN2,RN3,RN4,RN5,RN6,RN7,RN8",8,Panasonic,EXB-38V472JV,Resistor array 4 x 4.7 k 0603 (4k7 x4),R_Array_Convex_4x0603,SMD,
-19,RT1,1,Murata,NCP18XH103F03RB,NTC thermistor 10 k B3380 1% 0603 (10k NTC B3380),R_0603_1608Metric,SMD,
-20,"U3,U4",2,NXP,"PCA9548APW,118",8-channel I2C mux TSSOP-24 (TCA9548APWR),TSSOP-24_4.4x7.8mm_P0.65mm,SMD,
-21,BZ1,1,Same Sky,CMI-1275-05TH,Buzzer 12 mm 5 V active (7.6 mm pin pitch) (5V active),Buzzer_12x9.5RM7.6,THT,
-22,F1,1,Keystone,3568,"Mini blade fuse holder, PCB (fuse not included) (10A mini blade)",Fuseholder_Blade_Mini_Keystone_3568,THT,Holder only; no fuse
-23,J7,1,Molex,0470531000,4-pin PC fan header (FAN),FanPinHeader_1x04_P2.54mm_Vertical,THT,
-24,"J101,J102,J103,J104,J105,J106,J107,J108,J109,J110,J111,J112,J113,J114,J115,J116",16,JST,B4B-XH-A(LF)(SN),JST-XH header 4-pin vertical (SLOT 1 / SLOT 2 / SLOT 3 / SLOT 4 / SLOT 5 / SLOT 6 / SLOT 7 / SLOT 8 / SLOT 9 / SLOT 10 / SLOT 11 / SLOT 12 / SLOT 13 / SLOT 14 / SLOT 15 / SLOT 16),JST_XH_B4B-XH-A_1x04_P2.50mm_Vertical,THT,
-25,U1,1,TRACO Power,TSR 1-2450E,"5 V 1 A switching regulator, SIP-3 (TSR 1-2450)",Converter_DCDC_RECOM_R-78E-0.5_THT,THT,
-26,J1,1,JST,B6P-VH,JST-VH header 6-pin vertical (24V PSU IN),JST_VH_B6P-VH_1x06_P3.96mm_Vertical,THT,DO NOT PLACE (customer fits it)
-27,"J2,J3",2,Amass,XT30UPB-F,"XT30 PCB connector, vertical, female (24V OUT A / 24V OUT B)",AMASS_XT30UPB-F_1x02_P5.0mm_Vertical,THT,DO NOT PLACE (customer fits it)
-28,J6,1,generic,-,Pin header 1x7 2.54 mm (EXP),PinHeader_1x07_P2.54mm_Vertical,THT,DO NOT PLACE (customer fits it)
-29,J8,1,generic,-,Pin header 1x2 2.54 mm (PWR LED),PinHeader_1x02_P2.54mm_Vertical,THT,DO NOT PLACE (customer fits it)
-30,J9,1,generic,-,Pin header 1x1 2.54 mm (12V FAN IN),PinHeader_1x01_P2.54mm_Vertical,THT,DO NOT PLACE (customer fits it)
+10,J9,1,JST,B2B-PH-K-S(LF)(SN),JST-PH header 2-pin vertical (12V FAN IN),JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical,SMD,
+11,Q1,1,Alpha & Omega,AOD4185,P-MOSFET -40 V TO-252 (AOD4185),TO-252-2,SMD,
+12,"Q2,Q3,Q4",3,Diotec,2N7002,N-MOSFET 60 V SOT-23 (2N7002K),SOT-23,SMD,
+13,"R1,R4,R5,R7,R13,R15",6,Yageo,RC0603FR-07100KL,Resistor 100 k 1% 0603 (100k),R_0603_1608Metric,SMD,
+14,R2,1,Yageo,RC0603FR-0747KL,Resistor 47 k 1% 0603 (47k),R_0603_1608Metric,SMD,
+15,"R3,R12,R14",3,KOA Speer,RK73H1JTTD1000F,Resistor 100 Ohm 1% 0603 (100),R_0603_1608Metric,SMD,
+16,"R6,R8,R11,R16,R18",5,Panasonic,ERJ-3EKF1002V,Resistor 10 k 1% 0603 (10k),R_0603_1608Metric,SMD,
+17,"R9,R10",2,Vishay,CRCW06034K70FKEA,Resistor 4.7 k 1% 0603 (4k7),R_0603_1608Metric,SMD,
+18,R17,1,Yageo,RC0603FR-07330RL,Resistor 330 Ohm 1% 0603 (330),R_0603_1608Metric,SMD,
+19,"RN1,RN2,RN3,RN4,RN5,RN6,RN7,RN8",8,Panasonic,EXB-38V472JV,Resistor array 4 x 4.7 k 0603 (4k7 x4),R_Array_Convex_4x0603,SMD,
+20,RT1,1,Murata,NCP18XH103F03RB,NTC thermistor 10 k B3380 1% 0603 (10k NTC B3380),R_0603_1608Metric,SMD,
+21,"U3,U4",2,NXP,"PCA9548APW,118",8-channel I2C mux TSSOP-24 (TCA9548APWR),TSSOP-24_4.4x7.8mm_P0.65mm,SMD,
+22,BZ1,1,Same Sky,CMI-1275-05TH,Buzzer 12 mm 5 V active (7.6 mm pin pitch) (5V active),Buzzer_12x9.5RM7.6,THT,
+23,F1,1,Keystone,3568,"Mini blade fuse holder, PCB (fuse not included) (10A mini blade)",Fuseholder_Blade_Mini_Keystone_3568,THT,Holder only; no fuse
+24,J7,1,Molex,0470531000,4-pin PC fan header (FAN),FanPinHeader_1x04_P2.54mm_Vertical,THT,
+25,"J101,J102,J103,J104,J105,J106,J107,J108,J109,J110,J111,J112,J113,J114,J115,J116",16,JST,B4B-XH-A(LF)(SN),JST-XH header 4-pin vertical (SLOT 1 / SLOT 2 / SLOT 3 / SLOT 4 / SLOT 5 / SLOT 6 / SLOT 7 / SLOT 8 / SLOT 9 / SLOT 10 / SLOT 11 / SLOT 12 / SLOT 13 / SLOT 14 / SLOT 15 / SLOT 16),JST_XH_B4B-XH-A_1x04_P2.50mm_Vertical,THT,
+26,U1,1,TRACO Power,TSR 1-2450E,"5 V 1 A switching regulator, SIP-3 (TSR 1-2450)",Converter_DCDC_RECOM_R-78E-0.5_THT,THT,
+27,J1,1,JST,B6P-VH,JST-VH header 6-pin vertical (24V PSU IN),JST_VH_B6P-VH_1x06_P3.96mm_Vertical,THT,DO NOT PLACE (customer fits it)
+28,"J2,J3",2,Amass,XT30UPB-F,"XT30 PCB connector, vertical, female (24V OUT A / 24V OUT B)",AMASS_XT30UPB-F_1x02_P5.0mm_Vertical,THT,DO NOT PLACE (customer fits it)
+29,J6,1,generic,-,Pin header 1x7 2.54 mm (EXP),PinHeader_1x07_P2.54mm_Vertical,THT,DO NOT PLACE (customer fits it)
+30,J8,1,generic,-,Pin header 1x2 2.54 mm (PWR LED),PinHeader_1x02_P2.54mm_Vertical,THT,DO NOT PLACE (customer fits it)
 31,U2,1,Sullins,2x PPTC081LFBN-RC,Socket for the ESP32-C6 D1: 2x female header 1x8 2.54 mm (ESP32-C6-D1),ESP32_C6_D1_Socket,THT,DO NOT PLACE (customer fits it)
