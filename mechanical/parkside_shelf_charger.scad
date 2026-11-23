@@ -354,7 +354,7 @@ module groove45(x0, w, y0, y1, z0, h, open) {
 
 // ---------------------------- slot module -----------------------------
 module slot_module() {
-    col = 7;  // corner columns in the bay that take the lid inserts
+    col = 7;  // corner columns in the bay
     difference() {
         union() {
             // mounting plate (full module width, with a rear screw tab)

@@ -71,9 +71,9 @@ Prices are DigiKey line totals including VAT, from the sheets. DigiKey ships fre
 | 3 | Insulated ring lug M3/M3.5, 0.5–1.5 mm² | generic | – | ✅ at hand |  |  |  |
 | 1 | Green/yellow wire 0.75 mm², about 15 cm | generic | – | ✅ at hand |  |  |  |
 | 1 | Star washer M3 | generic | DIN 6798 A M3 | ✅ at hand |  |  |  |
-| 14 | Heat-set insert M3 | generic | – | ✅ at hand |  |  |  |
-| 14 | Screw M3 × 8 | generic | ISO 7380 | ✅ at hand |  |  |  |
-| 4 | Screw M4 × 30 + nut | generic | ISO 7380 / DIN 934 | ✅ at hand |  |  |  |
+| 8 | Heat-set insert M3 (4 PCB + 4 PSU standoffs) | generic | – | ✅ at hand |  |  |  |
+| 8 | Screw M3 × 8 (4 PCB + 4 PSU) | generic | ISO 7380 | ✅ at hand |  |  |  |
+| 4 | Screw M4 × 30 + nut (fan on the lid) | generic | ISO 7380 / DIN 934 | ✅ at hand |  |  |  |
 | 1 | Steel or aluminium sheet, 0.5–1 mm | generic | – | ✅ at hand |  |  |  |
 | – | Filament PETG / PETG V-0 | generic | – | ✅ at hand |  |  |  |
 
