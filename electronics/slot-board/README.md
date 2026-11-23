@@ -67,6 +67,9 @@ The layout follows the LTC4162 datasheet's *PCB Layout Considerations*:
   to the planes, and the exposed pad has 9 thermal vias.
 - The input parts (TVS, bulk capacitor, fuse) sit in the left column next to the input FET, so
   the 24 V terminals and the I²C connector are as far forward as possible.
+- The pack-ID circuit (R15–R18, C15, C16, comparator U4) sits in the front-left corner next to
+  J3's ID terminal, so the ID line from the pack is short; only the comparator's logic output
+  crosses the board to the PCA9554.
 - The bleed resistors lie flat in the right half, away from the IC. Mount them 2–3 mm above the
   board.
 - The **screwdriver hole** (board cutout, copper kept 0.5 mm away on all layers) sits between the
@@ -100,6 +103,6 @@ is shared with the controller board in `../kicadgen/`. It needs KiCad 7 (`kicad-
    (towards the contact block) and that the XT30 noses of J1/J6 stick out of the rear edge.
 3. **Review the routing in KiCad:** a custom grid router routed this board automatically.
    Electrically it is DRC-clean, but a human pass is recommended, especially:
-   - the long ID trace from J3 to the comparator (R15/R16)
+   - the comparator output (U4 → PCA9554 IO6) across the board
    - the I²C pair along the middle of the board
 4. **First bring-up:** use a current-limited lab supply. See `docs/firmware.md`, *Bring-up checklist*.

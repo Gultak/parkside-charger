@@ -93,6 +93,8 @@ for i in range(8):
     LABELS.append((f"S{1 + i}", 15.2, 3.5 + 7.0 * i + 0.5, 0.9))
     LABELS.append((f"S{9 + i}", 96.6, 4.5 + 7.0 * i + 0.5, 0.9))
 LABELS.append(("5V GND SDA SCL", 8.0, 57.2, 0.8))
+# J9 (PSU +12 V) sits where the S10 label would go: put that one at the top edge of its connector
+LABELS[:] = [(t, x, 8.9, sz) if t == "S10" else (t, x, y, sz) for t, x, y, sz in LABELS]
 LABELS.append(("SCL SDA GND 5V", 104.0, 57.2, 0.8))
 
 # ------------------------------------------------------------------ schematic --

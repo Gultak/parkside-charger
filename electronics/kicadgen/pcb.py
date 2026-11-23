@@ -12,6 +12,7 @@ Run with the system python that has the pcbnew module.
 """
 import heapq
 import math
+import os
 import sys
 from pathlib import Path
 
@@ -384,7 +385,7 @@ def place_references(fps, boxes, size=0.8):
         for x, y in cands:
             b = (x - w / 2, y - h / 2, x + w / 2, y + h / 2)
             if free(b, bx):
-                t.SetTextAngleDegrees(0)
+                t.SetTextAngleDegrees(-fp.GetOrientationDegrees())   # horizontal on the board, as its box assumes
                 t.SetPosition(P(x, y))
                 placed.append(b)
                 break
@@ -483,6 +484,14 @@ def build(outdir: Path, promote=()):
         print("PLACEMENT PROBLEMS:\n  " + "\n  ".join(problems))
 
     place_references(fps, boxes)
+    if os.environ.get("KICADGEN_PLACE_ONLY"):     # quick look at placement + silkscreen, no routing
+        for text, x, y, size in LABELS:
+            t = pcbnew.PCB_TEXT(board); t.SetText(text); t.SetPosition(P(x, y)); t.SetLayer(pcbnew.F_SilkS)
+            t.SetTextSize(pcbnew.VECTOR2I(pcbnew.FromMM(size), pcbnew.FromMM(size)))
+            t.SetTextThickness(pcbnew.FromMM(size * 0.15)); board.Add(t)
+        out = Path(os.environ["KICADGEN_PLACE_ONLY"])
+        board.Save(str(out))
+        return out, []
 
     router = Router(board, netobjs)
     router.add_pad_shapes()
