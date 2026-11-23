@@ -249,7 +249,7 @@ No cable has to be threaded through a part before it is connected.
 - **Mains side**, behind a closed partition: the PSU on four 6 mm M3 standoffs (heat-set inserts),
   a 20.5 mm hole for an **M20 cable gland** in the rear wall (`mains_entry = "gland"`), and 2.5 mm
   vent slots in both side walls. The lid carries a **90/92 mm fan** over the PSU (`psu_fan`, finger-safe
-  grille, M4 × 30 screws and nuts, a slot for its plug into the low-voltage side). The PSU leads
+  grille, fastened with the fan's own self-tapping screws through 5.2 mm holes in the lid (`fan_hole_d`), a slot for its plug into the low-voltage side). The PSU leads
   pass the partition in a 14 × 10 mm slot at its top (`psu_lead_slot`). The charger is **hard-wired**: 3-core flex from a
   switched fused spur (3 A fuse) comes in through the gland, which clamps it. Use **round**
   cable (flat twin & earth doesn't seal or clamp properly in a round gland; M20 grips 6-12 mm). A 25 mm wiring bay (`mains_bay`) between the PSU and the rear wall
