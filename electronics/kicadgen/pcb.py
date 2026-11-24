@@ -360,6 +360,15 @@ def place_references(fps, boxes, size=0.8):
     placed = [(x - 0.31 * sz * len(t) - 0.1, y - sz / 2 - 0.1, x + 0.31 * sz * len(t) + 0.1, y + sz / 2 + 0.1)
               for t, x, y, sz in LABELS]
     keep_out = list(boxes.values())
+    # each part's own silkscreen (pin-1 marks, outlines past the courtyard) is off limits too,
+    # including for its own reference
+    own_silk = []
+    for fp in fps.values():
+        for g in fp.GraphicalItems():
+            if g.GetLayer() == pcbnew.F_SilkS and g.GetClass() != "FP_TEXT":
+                b = g.GetBoundingBox()
+                own_silk.append((mm(b.GetLeft()) - OX - 0.15, mm(b.GetTop()) - OY - 0.15,
+                                 mm(b.GetRight()) - OX + 0.15, mm(b.GetBottom()) - OY + 0.15))
 
     def free(b, own):
         if b[0] < 0.4 or b[1] < 0.4 or b[2] > BW - 0.4 or b[3] > BH - 0.4:
@@ -369,7 +378,7 @@ def place_references(fps, boxes, size=0.8):
                 continue
             if b[0] < o[2] and o[0] < b[2] and b[1] < o[3] and o[1] < b[3]:
                 return False
-        return all(not (b[0] < o[2] and o[0] < b[2] and b[1] < o[3] and o[1] < b[3]) for o in placed)
+        return all(not (b[0] < o[2] and o[0] < b[2] and b[1] < o[3] and o[1] < b[3]) for o in placed + own_silk)
 
     for ref in sorted(fps, key=lambda r: (boxes[r][2] - boxes[r][0]) * (boxes[r][3] - boxes[r][1])):
         fp, bx = fps[ref], boxes[ref]
@@ -385,7 +394,8 @@ def place_references(fps, boxes, size=0.8):
         for x, y in cands:
             b = (x - w / 2, y - h / 2, x + w / 2, y + h / 2)
             if free(b, bx):
-                t.SetTextAngleDegrees(-fp.GetOrientationDegrees())   # horizontal on the board, as its box assumes
+                # horizontal on the board, as its box assumes (KiCad 8+: absolute angle; 7: relative)
+                t.SetTextAngleDegrees(0 if int(pcbnew.Version().split(".")[0]) >= 8 else -fp.GetOrientationDegrees())
                 t.SetPosition(P(x, y))
                 placed.append(b)
                 break
@@ -403,7 +413,8 @@ def build(outdir: Path, promote=()):
     ds.m_CopperEdgeClearance = pcbnew.FromMM(0.3)
     ds.m_MinClearance = pcbnew.FromMM(0.127)    # footprint-inherent pin gaps (JLC 4-layer: 0.09 min)
     ds.m_HoleClearance = pcbnew.FromMM(0.2)
-    nc = ds.m_NetSettings.m_DefaultNetClass
+    ns = ds.m_NetSettings
+    nc = ns.GetDefaultNetclass() if hasattr(ns, "GetDefaultNetclass") else ns.m_DefaultNetClass   # KiCad 9 / 7
     nc.SetClearance(pcbnew.FromMM(0.13))      # router itself keeps CLEAR = 0.15
     nc.SetTrackWidth(pcbnew.FromMM(DEFAULT_WIDTH))
     nc.SetViaDiameter(pcbnew.FromMM(VIA_D))
@@ -675,7 +686,7 @@ def build(outdir: Path, promote=()):
     gnd = netobjs["GND"]
     gnd_poly = [pour[2] for pour in POURS if pour[0] == "GND" and (len(pour) == 3 or pour[3] == "F")]
     for p in netpads["GND"]:
-        if p.GetAttribute() == pcbnew.PAD_ATTRIB_PTH or (p.GetParent().GetReference(), p.GetNumber()) in GND_VIA_SKIP:
+        if p.GetAttribute() == pcbnew.PAD_ATTRIB_PTH or (p.GetParentFootprint().GetReference(), p.GetNumber()) in GND_VIA_SKIP:
             continue  # through-hole pads reach the planes; exposed pads have thermal vias
         pos = p.GetPosition()
         x, y = mm(pos.x) - OX, mm(pos.y) - OY
@@ -691,7 +702,7 @@ def build(outdir: Path, promote=()):
                             target_fn=lambda L, i, j: L == 0 and vok[j, i] and math.hypot(i - i0, j - j0) > 6
                             and router.via_far(i, j))
         if path is None:   # not fatal: the GND fill usually reaches it; the DRC checks connectivity
-            print(f"  warning: no GND via next to {p.GetParent().GetReference()}.{p.GetNumber()}")
+            print(f"  warning: no GND via next to {p.GetParentFootprint().GetReference()}.{p.GetNumber()}")
             continue
         router.commit(gnd, 0.3, path)
         L, i, j = path[-1]
@@ -727,7 +738,10 @@ def build(outdir: Path, promote=()):
     filler.Fill(board.Zones())
     board.Save(str(out))
     rpt = outdir / "drc_report.txt"
-    pcbnew.WriteDRCReport(board, str(rpt), pcbnew.EDA_UNITS_MILLIMETRES, True)
+    # kicad-cli's DRC is what KiCad itself runs, including the footprint-vs-library check
+    import subprocess
+    subprocess.run(["kicad-cli", "pcb", "drc", "--severity-all", "-o", str(rpt), str(out)],
+                   capture_output=True, text=True)
     import collections
     kinds = collections.Counter(ln.split("]")[0] + "]" for ln in rpt.read_text().splitlines() if ln.startswith("["))
     print("DRC:", dict(kinds))

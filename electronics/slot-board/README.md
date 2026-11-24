@@ -1,4 +1,4 @@
-# Slot board (KiCad 7)
+# Slot board (KiCad 9)
 
 One per battery slot. It holds the LTC4162-LAD 5S Li-ion charger, the PCA9554 slot I/O
 (presence switch, RGB LED, bleed resistor), and the I²C and 24 V connectors.
@@ -91,8 +91,9 @@ cd tools
 
 `design.py` is the single source of truth for parts and nets. `layout.py` holds the placement,
 pour shapes, routing priorities, silkscreen and schematic sheet positions. The generator itself
-is shared with the controller board in `../kicadgen/`. It needs KiCad 7 (`kicad-cli` and the
-`pcbnew` Python module).
+is shared with the controller board in `../kicadgen/`. It needs KiCad 9 (`kicad-cli` and the
+`pcbnew` Python module) with the standard KiCad 9 footprint and symbol libraries, so the
+footprints in the board match the libraries KiCad 9 checks them against.
 
 ## Before ordering: check these
 

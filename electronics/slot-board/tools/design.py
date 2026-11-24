@@ -126,7 +126,7 @@ PARTS = {
     # ---------------------------------------------------------------- bleed --
     "R11": ("100", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "IO4", "2": "BLEED_G"}, ""),
     "R12": ("100k", "Device:R", "Resistor_SMD:R_0603_1608Metric", {"1": "BLEED_G", "2": "GND"}, ""),
-    "Q3": ("2N7002K", "Device:Q_NMOS_GSD", "Package_TO_SOT_SMD:SOT-23",
+    "Q3": ("2N7002K", "Transistor_FET:Q_NMOS_GSD", "Package_TO_SOT_SMD:SOT-23",
            {"1": "BLEED_G", "2": "GND", "3": "BLEED_D"}, "60 V, 0.3 A"),
     "R13": ("100 2W", "Device:R", "Resistor_THT:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal",
             {"1": "BAT_F", "2": "BLEED_M"}, "metal oxide 2 W, mount 2-3 mm above the board"),

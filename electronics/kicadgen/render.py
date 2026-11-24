@@ -59,7 +59,10 @@ def render(pcb, outdir, layers=("top", "inner1", "inner2", "bottom")):
             net = t.GetNetname().lstrip("/")
             if t.GetClass() == "PCB_VIA":
                 cx, cy = px(t.GetPosition())
-                r = pcbnew.ToMM(t.GetWidth()) / 2 * SCALE
+                try:
+                    r = pcbnew.ToMM(t.GetWidth(pcbnew.F_Cu)) / 2 * SCALE    # KiCad 9: per layer
+                except TypeError:
+                    r = pcbnew.ToMM(t.GetWidth()) / 2 * SCALE
                 d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color(net), outline=(255, 255, 255))
                 continue
             w = max(1, int(pcbnew.ToMM(t.GetWidth()) * SCALE))
@@ -72,7 +75,10 @@ def render(pcb, outdir, layers=("top", "inner1", "inner2", "bottom")):
                 if not pad.IsOnLayer(layer):
                     continue
                 net = pad.GetNetname().lstrip("/")
-                poly = pad.GetEffectivePolygon()
+                try:
+                    poly = pad.GetEffectivePolygon(layer)     # KiCad 9: per layer
+                except TypeError:
+                    poly = pad.GetEffectivePolygon()          # KiCad 7
                 for k in range(poly.OutlineCount()):
                     o = poly.Outline(k)
                     d.polygon([px(o.CPoint(i)) for i in range(o.PointCount())],

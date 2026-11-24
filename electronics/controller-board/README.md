@@ -1,4 +1,4 @@
-# Controller board (KiCad 7)
+# Controller board (KiCad 9)
 
 The controller board is the hub of the charger. It holds the **xyzroe ESP32-C6 D1** in female Dupont headers,
 switches the 24 V for the slot chains, and runs one I²C channel to each of up to **16 slots**.
@@ -17,7 +17,7 @@ ground pour around them, and the 24 V band stays separate. The extra cost is sma
 
 | File | |
 |---|---|
-| `controller_board.kicad_pro / .kicad_sch / .kicad_pcb` | KiCad 7 project |
+| `controller_board.kicad_pro / .kicad_sch / .kicad_pcb` | KiCad 9 project |
 | `pcl.kicad_sym`, `pcl.pretty/` | Custom symbols and the ESP32-C6 D1 socket footprint (holes from the module's own drill file) |
 | `controller_board_schematic.pdf` | Schematic |
 | `fab/controller_board_gerbers.zip`, `fab/*_bom.csv`, `fab/*_cpl.csv` | Gerbers, BOM and pick-and-place positions |

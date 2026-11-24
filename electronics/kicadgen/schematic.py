@@ -23,10 +23,12 @@ eff = symbols.eff
 
 
 def extract_symbol(lib_text, name):
-    m = re.search(r'\n  \(symbol "' + re.escape(name) + r'"', lib_text)
+    # KiCad 9 libraries are tab-indented and multi-line: work on whitespace-collapsed text
+    lib_text = re.sub(r"\s+", " ", lib_text)
+    m = re.search(r'\(symbol "' + re.escape(name) + r'"', lib_text)
     if not m:
         raise KeyError(name)
-    i, depth = m.start() + 3, 0
+    i, depth = m.start(), 0
     for j in range(i, len(lib_text)):
         c = lib_text[j]
         if c == "(":

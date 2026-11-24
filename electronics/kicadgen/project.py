@@ -1,5 +1,5 @@
 """Write <project>.kicad_pro with the design rules / net class the PCB was made for.
-(KiCad 7 keeps net classes and board constraints in the project file.)"""
+(KiCad keeps net classes and board constraints in the project file.)"""
 import json
 import sys
 from pathlib import Path
