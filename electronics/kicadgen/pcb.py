@@ -47,7 +47,7 @@ def configure(design, layout, board_dir):
              DEFAULT_WIDTH=getattr(design, "DEFAULT_WIDTH", 0.2), BOARD_DIR=Path(board_dir))
     for k in ("PROJECT", "BW", "BH", "EDGE_KEEP", "PLACE", "POURS", "FIXED_TRACKS", "FIXED_VIAS", "KELVIN",
               "ROUTE_ORDER_FIRST", "ROUTE_ORDER_LAST", "LABELS", "KEEPOUTS", "GND_VIA_SKIP", "CUTOUTS",
-              "OVERHANG"):
+              "OVERHANG", "ROOT_UUID"):
         if hasattr(layout, k):
             g[k] = getattr(layout, k)
 
@@ -403,6 +403,31 @@ def place_references(fps, boxes, size=0.8):
             t.SetLayer(pcbnew.F_Fab)
 
 
+def assign_unconnected_nets(board, sch, fps):
+    """KiCad gives every unused symbol pin its own net "unconnected-(REF-PIN-PadN)"; the schematic
+    parity check wants the pad on that net too (otherwise: "Pad missing net given by schematic")."""
+    import re
+    import subprocess
+    import tempfile
+    if not Path(sch).exists():
+        return
+    with tempfile.NamedTemporaryFile(suffix=".net") as t:
+        subprocess.run(["kicad-cli", "sch", "export", "netlist", "-o", t.name, str(sch)], check=True,
+                       capture_output=True)
+        txt = open(t.name).read()
+    for m in re.finditer(r'\(net \(code "?\d+"?\) \(name "(unconnected-[^"]*)"\)(.*?)\)\s*(?=\(net |\)\s*\)\s*$)',
+                         txt, re.S):
+        nodes = re.findall(r'\(node \(ref "([^"]+)"\) \(pin "([^"]+)"\)', m.group(2))
+        if len(nodes) != 1 or nodes[0][0] not in fps:
+            continue
+        ref, pin = nodes[0]
+        for pad in fps[ref].Pads():
+            if pad.GetNumber() == pin and not pad.GetNetname():
+                ni = pcbnew.NETINFO_ITEM(board, m.group(1))
+                board.Add(ni)
+                pad.SetNet(ni)
+
+
 def build(outdir: Path, promote=()):
     board = pcbnew.BOARD()
     board.SetCopperLayerCount(4)
@@ -455,6 +480,11 @@ def build(outdir: Path, promote=()):
         fp = pcbnew.FootprintLoad(str(libdir), name)
         fp.SetFPID(pcbnew.LIB_ID(lib, name))
         fp.SetReference(ref)
+        if "ROOT_UUID" in globals():   # link to the schematic symbol, as "Update PCB from Schematic" does
+            from kicadgen.schematic import symbol_uuid
+            fp.SetPath(pcbnew.KIID_PATH("/" + symbol_uuid(ROOT_UUID, ref)))
+            fp.SetSheetname("/")
+            fp.SetSheetfile(f"{PROJECT}.kicad_sch")
         fp.SetValue(value)
         x, y, rot = PLACE[ref]
         fp.SetPosition(P(x, y))
@@ -730,6 +760,7 @@ def build(outdir: Path, promote=()):
     if failures:
         return None, failures
     out = outdir / f"{PROJECT}.kicad_pcb"
+    assign_unconnected_nets(board, outdir / f"{PROJECT}.kicad_sch", fps)
     board.Save(str(out))
     print("saved unfilled board, filling zones ...", flush=True)
     # filling a board built in memory crashes pcbnew 7; reload it from disk first

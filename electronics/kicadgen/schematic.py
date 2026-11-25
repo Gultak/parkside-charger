@@ -18,6 +18,11 @@ def uid():
     return str(uuid.uuid4())
 
 
+def symbol_uuid(root_uuid, ref):
+    """stable per reference, so the board's footprints can link to their symbols"""
+    return str(uuid.uuid5(uuid.UUID(root_uuid), ref))
+
+
 F = symbols.F
 eff = symbols.eff
 
@@ -94,8 +99,8 @@ def build(design, layout, outdir: Path, project: str, root_uuid: str):
             ptxt.append(f'    (property "{k}" "{v}" (at {F(px)} {F(py)} 0) {eff(hide=hide, justify="left")})')
         pin_uuids = "\n".join(f'    (pin "{n}" (uuid {uid()}))' for n in sym_pins)
         items.append(f'''  (symbol (lib_id "{lid}") (at {F(X)} {F(Y)} 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
-    (uuid {uid()})
+    (in_bom {'no' if fp.startswith('MountingHole:') else 'yes'}) (on_board yes) (dnp no) (fields_autoplaced)
+    (uuid {symbol_uuid(root_uuid, ref)})
 {chr(10).join(ptxt)}
 {pin_uuids}
     (instances (project "{project}" (path "/{root_uuid}" (reference "{ref}") (unit 1))))
