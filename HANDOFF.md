@@ -63,7 +63,8 @@ attached to the old session, for context only:
 | `docs/firmware.md` | Charging strategy, entities, LED legend, interlock, PSU fan, bring-up |
 | `docs/components/parkside_charger.md`, `parkside_slot.md` | ESPHome-style component docs |
 | `electronics/electronics.md` | Architecture, decisions, pin maps, power budget, safety |
-| `electronics/kicadgen/` | **Our own generator**: builds schematic + routed PCB + fab outputs from Python |
+| `tools/agent-tools/` | Git submodule [Gultak/agent-tools](https://github.com/Gultak/agent-tools), pinned: **our own generator `kicadgen`** (schematic + routed PCB + fab outputs from Python), `pcbtools/boardsig.py` (board comparison) and `bom/bomgen.py`. Shared with homelab-power-supply. Run `git submodule update --init` after cloning |
+| `electronics/pcl_lib.py` | The boards' own library for kicadgen (nickname `pcl`): custom symbols and footprints, PCBWay part numbers, render net colours |
 | `electronics/slot-board/`, `electronics/controller-board/` | Per board: `tools/design.py` (parts + nets), `tools/layout.py` (placement, pours, labels), generated KiCad project, `fab/` (Gerbers, BOM, PCBWay files), `img/` (layer renders), `drc_report.txt` |
 | `esphome/parkside-charger.yaml` | The device config (controller + 16 slots). `slot.yaml` is the per-slot package |
 | `esphome/components/parkside_charger/` | C++ for hub **and** slots (`parkside_slot/__init__.py` is the config schema only) |
@@ -79,7 +80,11 @@ curl -sS "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x245D5502FAD7A8
 echo "deb https://ppa.launchpadcontent.net/kicad/kicad-9.0-releases/ubuntu noble main" > /etc/apt/sources.list.d/kicad9.list
 apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kicad kicad-footprints kicad-symbols
 mkdir -p ~/.config/kicad/9.0 && cp /usr/share/kicad/template/fp-lib-table /usr/share/kicad/template/sym-lib-table ~/.config/kicad/9.0/
+git submodule update --init      # tools/agent-tools (kicadgen, bomgen)
 ```
+
+`tools/agent-tools/env/setup-kicad9.sh` does all of this (plus `librsvg2-bin`); the project's
+cloud environment runs the same script.
 
 - Skip `kicad-packages3d` (several GB, not needed).
 - Without the global lib tables, `kicad-cli pcb drc` reports every footprint as "library not
@@ -97,6 +102,15 @@ mkdir -p ~/.config/kicad/9.0 && cp /usr/share/kicad/template/fp-lib-table /usr/s
 - Simulator: see §7.
 
 ## 5. Building the boards (kicadgen)
+
+kicadgen lives in the `tools/agent-tools` submodule (Gultak/agent-tools). Each board's
+`tools/build.py` puts it on `sys.path` and passes `electronics/pcl_lib.py` as the project
+library. Change the generator in agent-tools, push it there, then bump the submodule here
+(`git -C tools/agent-tools pull origin main`, commit `tools/agent-tools`). After a generator
+change, compare the rebuilt boards with the committed ones:
+`/usr/bin/python3 tools/agent-tools/pcbtools/boardsig.py old.kicad_pcb new.kicad_pcb`. The
+router is deterministic; only fill areas where two same-priority pours touch may move by a
+fraction of a mm² (`--no-fill` hides that).
 
 ```bash
 cd electronics/slot-board && /usr/bin/python3 tools/build.py          # all steps: sch pcb fab img
@@ -208,11 +222,12 @@ cd electronics/controller-board && /usr/bin/python3 tools/build.py
 - **`procurement/tools/bom_data.py`** mirrors the sheets as Python tuples:
   `(qty, part, manufacturer, part number, ticked, DigiKey #, € line total, refs, issue)`.
   - **Workflow:** read the sheets, update `bom_data.py`, run
-    `python3 procurement/tools/gen_bom.py`, which writes `BOM.md` and the three CSVs. Check that
+    `python3 procurement/tools/gen_bom.py`, which writes `BOM.md` and the three CSVs (table and
+    CSV formatting from `tools/agent-tools/bom/bomgen.py`). Check that
     the € totals match the sheets' subtotal rows (currently €103.18 controller, €229.50 for 10
     slots).
 - **Board-level BOM vs order BOM:** each board's `design.py` has `NOT_IN_ORDER_BOM` (parts at hand
-  or mounting holes). `kicadgen/pcbway.py` has the MPN map for the PCBWay assembly files.
+  or mounting holes). `electronics/pcl_lib.py` (`MPN`, `PCBWAY_NOTES`) has the MPN map for the PCBWay assembly files.
 - **Parts at hand** (don't order):
   - Wire, mechanics, tools:
     - PETG / PETG V-0

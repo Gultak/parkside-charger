@@ -91,7 +91,9 @@ cd tools
 
 `design.py` is the single source of truth for parts and nets. `layout.py` holds the placement,
 pour shapes, routing priorities, silkscreen and schematic sheet positions. The generator itself
-is shared with the controller board in `../kicadgen/`. It needs KiCad 9 (`kicad-cli` and the
+(`kicadgen`) is shared with the controller board and lives in the `tools/agent-tools` submodule
+([Gultak/agent-tools](https://github.com/Gultak/agent-tools)); the boards' custom symbols and
+footprints are in `../pcl_lib.py`. It needs KiCad 9 (`kicad-cli` and the
 `pcbnew` Python module) with the standard KiCad 9 footprint and symbol libraries, so the
 footprints in the board match the libraries KiCad 9 checks them against.
 

@@ -1,0 +1,3 @@
+[submodule "tools/agent-tools"]
+	path = tools/agent-tools
+	url = ../agent-tools.git

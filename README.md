@@ -30,7 +30,7 @@ verdict** for every slot to Home Assistant.
 | `electronics/electronics.md` | Architecture, design decisions, pin maps, power budget, safety |
 | `electronics/slot-board/` | KiCad 9 project, Gerbers, BOM and pick-and-place for the slot board |
 | `electronics/controller-board/` | KiCad 9 project, Gerbers, BOM and pick-and-place for the controller board |
-| `electronics/kicadgen/` | The generator that builds both boards from `tools/design.py` + `tools/layout.py` |
+| `tools/agent-tools/` | Submodule [Gultak/agent-tools](https://github.com/Gultak/agent-tools) with the generator (`kicadgen`) that builds both boards from `tools/design.py` + `tools/layout.py` and `electronics/pcl_lib.py`. Run `git submodule update --init` after cloning |
 | `HANDOFF.md` | Project state, decisions and gotchas for picking the work up in a new session |
 | `procurement/` | DigiKey upload CSVs and the BOM generator (`tools/`) |
 | `BOM.md` | Bill of materials with rough prices and vendor links (DigiKey Ireland, Amazon.ie) |

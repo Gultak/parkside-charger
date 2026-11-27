@@ -1,10 +1,12 @@
 """Writes BOM.md and procurement/digikey_*.csv from bom_data.py.
 Run from anywhere: python3 procurement/tools/gen_bom.py
 bom_data.py mirrors the procurement Google Sheets (see HANDOFF.md): edit it, then rerun."""
-import csv, sys
+import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools" / "agent-tools"))   # git submodule Gultak/agent-tools
 from bom_data import CTL, SLOTS
+from bom.bomgen import OrderList, eur, md_table
 R = str(Path(__file__).resolve().parents[2]) + "/"
 ISSUE = {
  "inductor": "⚠️ footprint: the board has the Coilcraft XAL6060 land pattern; the IHLP-2525 has different pads",
@@ -20,12 +22,9 @@ def status(t, issue):
     if not t: return "✅ at hand"
     return "⚠️ resolve" if issue in BLOCK else "🛒 DigiKey"
 def table(rows):
-    out = ["| Qty | Part | Manufacturer | Part number | Status | DigiKey # | € (DigiKey, incl. VAT) | Used for / note |",
-           "|---:|---|---|---|---|---|---:|---|"]
-    for q, part, man, mpn, t, dk, eur, refs, issue in rows:
-        note = "; ".join(x for x in (refs, ISSUE.get(issue, "")) if x)
-        out.append(f"| {q} | {part} | {man} | {mpn} | {status(t, issue)} | {dk} | {'' if eur is None else f'{eur:.2f}'} | {note} |")
-    return "\n".join(out)
+    return md_table(["Qty", "Part", "Manufacturer", "Part number", "Status", "DigiKey #", "€ (DigiKey, incl. VAT)", "Used for / note"],
+                    [[q, part, man, mpn, status(t, issue), dk, eur(e), "; ".join(x for x in (refs, ISSUE.get(issue, "")) if x)]
+                     for q, part, man, mpn, t, dk, e, refs, issue in rows], align="r-----r-")
 def tot(rows): return sum(r[6] for r in rows if r[4] is True and r[6])
 md = f"""# Bill of materials
 
@@ -56,22 +55,17 @@ DigiKey total: **€{tot(CTL):.2f}**
 DigiKey total: **€{tot(SLOTS):.2f}** for 10 slots (€{tot(SLOTS)/10:.2f} per slot)
 """
 open(R + 'BOM.md', 'w').write(md)
-ALL = {}
+ALL = OrderList()
 for name, rows in (("digikey_controller.csv", CTL), ("digikey_10_slots.csv", SLOTS)):
-    with open(R + 'procurement/' + name, 'w', newline='') as f:
-        w = csv.writer(f)
-        w.writerow(["Quantity", "Digi-Key Part Number", "Manufacturer", "Manufacturer Part Number", "Customer Reference"])
-        for q, part, man, mpn, t, dk, eur, refs, issue in rows:
-            if t is not True: continue
-            dks = [d.strip() for d in dk.split("+")]
-            qtys = [q] if len(dks) == 1 else [1, 2]       # PHR-2 housing + 2 SPH contacts
-            for d, qq in zip(dks, qtys):
-                ref = (refs + (" - CHECK BEFORE ORDERING: " + ISSUE[issue].replace("⚠️ ", "").replace("**", "") if issue in BLOCK else "")).strip(" -")
-                w.writerow([qq, d, man, mpn, ref[:100]])
-                ALL.setdefault(d, [0, man, mpn, []]); ALL[d][0] += qq; ALL[d][3].append(("CTL " if rows is CTL else "SLOTS ") + ref)
-with open(R + 'procurement/digikey_all.csv', 'w', newline='') as f:
-    w = csv.writer(f)
-    w.writerow(["Quantity", "Digi-Key Part Number", "Manufacturer", "Manufacturer Part Number", "Customer Reference"])
-    for d, (q, man, mpn, refs) in ALL.items():
-        w.writerow([q, d, man, mpn, "; ".join(refs)[:100]])
+    one = OrderList()
+    for q, part, man, mpn, t, dk, e, refs, issue in rows:
+        if t is not True: continue
+        dks = [d.strip() for d in dk.split("+")]
+        qtys = [q] if len(dks) == 1 else [1, 2]       # PHR-2 housing + 2 SPH contacts
+        for d, qq in zip(dks, qtys):
+            ref = (refs + (" - CHECK BEFORE ORDERING: " + ISSUE[issue].replace("⚠️ ", "").replace("**", "") if issue in BLOCK else "")).strip(" -")
+            one.add(qq, d, man, mpn, ref, merge=False)
+            ALL.add(qq, d, man, mpn, ("CTL " if rows is CTL else "SLOTS ") + ref)
+    one.write(R + 'procurement/' + name)
+ALL.write(R + 'procurement/digikey_all.csv')
 print(f"controller €{tot(CTL):.2f}, slots €{tot(SLOTS):.2f}")
