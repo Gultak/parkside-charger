@@ -87,7 +87,7 @@ build ten boards, check on one pack:
 
 ## 3. Slot board (×16 max), 72 × 47.5 mm, 4 layers
 
-**The complete KiCad 7 design (schematic, routed PCB, Gerbers, BOM, pick-and-place) is in
+**The complete KiCad 9 design (schematic, routed PCB, Gerbers, BOM, pick-and-place) is in
 [`slot-board/`](slot-board/README.md).** This section summarises the design decisions.
 
 The board slides into the card guides of the printed bay. Components go on the top side. The
@@ -164,7 +164,7 @@ off the PCB and away from plastic. If you don't fit them, delete `bleed_output:`
 
 ## 4. Controller board, 112 × 64 mm, 4 layers
 
-**The complete KiCad 7 design is in [`controller-board/`](controller-board/README.md).** It covers
+**The complete KiCad 9 design is in [`controller-board/`](controller-board/README.md).** It covers
 up to **16 slots**.
 
 | Function | Part | Connection |

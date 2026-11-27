@@ -28,9 +28,11 @@ verdict** for every slot to Home Assistant.
 | `mechanical/stl/` | STLs exported with the measured rail dimensions. Test-fit the gauges first |
 | `docs/mechanical.md` | How to measure the pack, test prints, printing, mounting, cabling |
 | `electronics/electronics.md` | Architecture, design decisions, pin maps, power budget, safety |
-| `electronics/slot-board/` | KiCad 7 project, Gerbers, BOM and pick-and-place for the slot board |
-| `electronics/controller-board/` | KiCad 7 project, Gerbers, BOM and pick-and-place for the controller board |
+| `electronics/slot-board/` | KiCad 9 project, Gerbers, BOM and pick-and-place for the slot board |
+| `electronics/controller-board/` | KiCad 9 project, Gerbers, BOM and pick-and-place for the controller board |
 | `electronics/kicadgen/` | The generator that builds both boards from `tools/design.py` + `tools/layout.py` |
+| `HANDOFF.md` | Project state, decisions and gotchas for picking the work up in a new session |
+| `procurement/` | DigiKey upload CSVs and the BOM generator (`tools/`) |
 | `BOM.md` | Bill of materials with rough prices and vendor links (DigiKey Ireland, Amazon.ie) |
 | `esphome/` | ESPHome config + external component (`parkside_charger`, `parkside_slot`) |
 | `esphome/tests/sim/` | Host simulation of the charging logic (fake LTC4162 + battery model) |
