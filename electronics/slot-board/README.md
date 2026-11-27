@@ -19,7 +19,7 @@ so it isn't worth the risk.
 
 | File | |
 |---|---|
-| `slot_board.kicad_pro / .kicad_sch / .kicad_pcb` | KiCad 7 project: open with KiCad 7 or newer |
+| `slot_board.kicad_pro / .kicad_sch / .kicad_pcb` | KiCad 9 project: open with KiCad 9 or newer |
 | `pcl.kicad_sym`, `sym-lib-table` | Custom symbols (LTC4162-LAD, PCA9554, Power33 MOSFET, ESD array, ...) |
 | `slot_board_schematic.pdf` | Schematic |
 | `fab/slot_board_gerbers.zip` | Gerbers + Excellon drill, ready to upload (e.g. JLCPCB: 4 layers, 1.6 mm, 1 oz) |
